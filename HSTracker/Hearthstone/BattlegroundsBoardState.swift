@@ -16,7 +16,14 @@ class BattlegroundsBoardState {
     init(game: Game) {
         self.game = game
     }
-    
+
+    // BACONBRAIN: expose last-known opponent boards for the snapshot exporter
+    var opponentBoardSnapshots: [Int: BoardSnapshot] {
+        var out = [Int: BoardSnapshot]()
+        lastKnownBattlegroundsBoardState.forEach { out[$0.0] = $0.1 }
+        return out
+    }
+
     func snapshotCurrentBoard() {
         guard let opponentHero = game.entities.values.filter({ x in x.isHero && x.isInZone(zone: Zone.play) && x.isControlled(by: game.opponent.id) }).sorted(by: { $0.id < $1.id }).first else {
             return

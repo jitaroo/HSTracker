@@ -17,6 +17,7 @@
 		1CF204F91E83B74300037A42 /* MirrorHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CF204F81E83B74300037A42 /* MirrorHelper.swift */; };
 		340AAC051D0544AD0015FE33 /* StringTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340AAC041D0544AD0015FE33 /* StringTracker.swift */; };
 		3CB1A35D2E8C3A400090486F /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 3CB1A35C2E8C3A400090486F /* Mixpanel */; };
+		BACB0BA100000000000000A1 /* BaconbrainKit in Frameworks */ = {isa = PBXBuildFile; productRef = BACB0BA100000000000000A2 /* BaconbrainKit */; };
 		3CB1A35F2E8C63060090486F /* MixpanelEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB1A35E2E8C63010090486F /* MixpanelEvents.swift */; };
 		3CB1A3602E8C63060090486F /* MixpanelEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB1A35E2E8C63010090486F /* MixpanelEvents.swift */; };
 		43050C621E6B484D007600EA /* Hearthstone.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43050C611E6B484D007600EA /* Hearthstone.xcassets */; };
@@ -2917,6 +2918,7 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		B8AEB6142FB2770200CDA2C0 /* AnimalCompanionGenerator */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AnimalCompanionGenerator; sourceTree = "<group>"; };
+		BACB0BA100000000000000A4 /* Baconbrain */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Baconbrain; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2924,6 +2926,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BACB0BA100000000000000A1 /* BaconbrainKit in Frameworks */,
 				B882CC902FBBE364002234D6 /* libcoreclr.dylib in Frameworks */,
 				B8D75BF725BE032500446923 /* Sparkle in Frameworks */,
 				B8D75BBD25BCEACB00446923 /* TextAttributes in Frameworks */,
@@ -3206,6 +3209,7 @@
 			isa = PBXGroup;
 			children = (
 				434106A01C9868620045655A /* Assets */,
+				BACB0BA100000000000000A4 /* Baconbrain */,
 				B82F4EAC24E3221D00905024 /* BobsBuddy */,
 				B82AE5F928BE8631004A8FE0 /* BobsBuddy-version.txt */,
 				B82AE5FA28BE8631004A8FE0 /* cards-version.txt */,
@@ -4892,6 +4896,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				B8AEB6142FB2770200CDA2C0 /* AnimalCompanionGenerator */,
+				BACB0BA100000000000000A4 /* Baconbrain */,
 			);
 			name = HSTracker;
 			packageProductDependencies = (
@@ -4910,6 +4915,7 @@
 				B889F6082CEC1CFB001506F4 /* Atomics */,
 				B8E1E5A22CF94FB900383975 /* AppMover */,
 				3CB1A35C2E8C3A400090486F /* Mixpanel */,
+				BACB0BA100000000000000A2 /* BaconbrainKit */,
 			);
 			productName = HSTracker;
 			productReference = 439C7E481C7772C000D29859 /* HSTracker.app */;
@@ -5011,6 +5017,7 @@
 				B889F6072CEC1CFB001506F4 /* XCRemoteSwiftPackageReference "swift-atomics" */,
 				B8E1E5A12CF94F2A00383975 /* XCRemoteSwiftPackageReference "AppMover" */,
 				3CB1A35B2E8C3A390090486F /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
+				BACB0BA100000000000000A3 /* XCLocalSwiftPackageReference "../baconbrain/BaconbrainKit" */,
 			);
 			productRefGroup = 439C7E491C7772C000D29859 /* Products */;
 			projectDirPath = "";
@@ -7240,7 +7247,7 @@
 					"$(PROJECT_DIR)/downloaded-frameworks/mono/universal",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 3.6.0;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
@@ -7304,7 +7311,7 @@
 					"$(PROJECT_DIR)/downloaded-frameworks/mono/universal",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 3.6.0;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = (
@@ -7422,6 +7429,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		BACB0BA100000000000000A3 /* XCLocalSwiftPackageReference "../baconbrain/BaconbrainKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../baconbrain/BaconbrainKit";
+		};
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
 		3CB1A35B2E8C3A390090486F /* XCRemoteSwiftPackageReference "mixpanel-swift" */ = {
@@ -7666,6 +7680,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B8E1E5A12CF94F2A00383975 /* XCRemoteSwiftPackageReference "AppMover" */;
 			productName = AppMover;
+		};
+		BACB0BA100000000000000A2 /* BaconbrainKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BaconbrainKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

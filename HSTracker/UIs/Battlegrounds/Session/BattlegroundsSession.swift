@@ -409,6 +409,9 @@ class BattlegroundsSession: OverWindowController {
     private func trySetCompStats() async {
         do {
             if let compStats = try await getBattlegroundsCompStats() {
+                // BACONBRAIN: raw Tier7 comp rows (cache-only; this is HSTracker's own fetch site)
+                SnapshotExporter.shared.onCompStats(compStats.data.first_place_comps_lobby_races,
+                    game: AppDelegate.instance().coreManager.game)
                 setBattlegroundsCompositionStatsViewModel(compStats.data.first_place_comps_lobby_races)
                 showCompositionStats()
             }
