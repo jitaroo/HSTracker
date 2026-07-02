@@ -16,7 +16,7 @@ enum SnapshotBuilder {
     /// KB version guard needs real precision (PLAN-phase0.md §8).
     static let gamePatch = "36.0"
 
-    static func build(game: Game, ctx: ExporterContext) -> GameSnapshot? {
+    static func build(game: Game, ctx: ExporterContextSnapshot) -> GameSnapshot? {
         guard game.isBattlegroundsSoloMatch(), !game.gameId.isEmpty else { return nil }
 
         let phase = currentPhase(game: game)
@@ -66,12 +66,15 @@ enum SnapshotBuilder {
 
         let activeTribes = (game.availableRaces ?? []).compactMap(tribe(from:))
 
+        // F1 (Codex review fix): HSTracker's own handler (TagChangeActions.onNextOpponentPlayerId)
+        // only treats this tag as meaningful when it lands on the local player's own entity — it
+        // bails out immediately for any other entity ID. Scanning "first entity with the tag" was
+        // wrong; read it from game.playerEntity directly, same as HSTracker itself does.
         let nextOpponentPlayerId: Int? = {
-            guard let entity = game.entities.values.first(where: { $0.has(tag: .next_opponent_player_id) }) else {
+            guard let value = game.playerEntity?[.next_opponent_player_id], value != 0 else {
                 return nil
             }
-            let value = entity[.next_opponent_player_id]
-            return value == 0 ? nil : value
+            return value
         }()
 
         return GameSnapshot(
@@ -192,7 +195,7 @@ enum SnapshotBuilder {
     // entities. Kind is inferred from the per-game offer ordinal cached in ExporterContext
     // (1st offer = lesser, 2nd = greater), defaulting to .lesser.
 
-    private static func trinket(from entity: Entity, ctx: ExporterContext) -> Trinket {
+    private static func trinket(from entity: Entity, ctx: ExporterContextSnapshot) -> Trinket {
         Trinket(
             cardId: entity.cardId,
             name: entity.card.name,
@@ -225,7 +228,7 @@ enum SnapshotBuilder {
 
     // MARK: - HSReplay caches (hooks f/h/i; the exporter never issues requests — BRS §9)
 
-    private static func mapHSReplay(ctx: ExporterContext) -> HSReplayBlock {
+    private static func mapHSReplay(ctx: ExporterContextSnapshot) -> HSReplayBlock {
         let comps = ctx.comps?.map { comp -> CompRow in
             CompRow(
                 name: comp.name ?? "Comp \(comp.id)",
@@ -237,18 +240,13 @@ enum SnapshotBuilder {
 
         let heroPick = ctx.heroPickStats?.map { stat -> HeroPickRow in
             let card = Cards.by(dbfId: stat.hero_dbf_id, collectible: false)
-            let topComps = stat.first_place_comp_popularity?
-                .filter { $0.is_valid }
-                .map { comp -> CompRow in
-                    CompRow(
-                        name: comp.name,
-                        keyMinionsTop3: comp.key_minions_top3.map(cardId(fromDbfId:)),
-                        popularity: comp.popularity,
-                        // BattlegroundsComposition carries no placement figure; documented sentinel
-                        // (PLAN-phase0.md §8) since CompRow requires the field.
-                        avgFinalPlacement: 0.0
-                    )
-                }
+            // F5 (Codex review fix): BattlegroundsComposition (the HSReplay type backing
+            // first_place_comp_popularity) carries no placement figure at all — there is no real
+            // avgFinalPlacement source for hero-pick top comps. CompRow.avgFinalPlacement is a
+            // non-optional Double, so there is no way to represent "unknown" per-row; rather than
+            // fabricate a 0.0 that looks like real (and misleadingly great) placement data
+            // downstream, omit topComps entirely until a real source exists (PLAN-phase0.md §8).
+            let topComps: [CompRow]? = nil
             return HeroPickRow(
                 cardId: card?.id ?? String(stat.hero_dbf_id),
                 name: card?.name ?? "Hero \(stat.hero_dbf_id)",

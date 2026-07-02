@@ -3664,9 +3664,15 @@ class Game: NSObject, PowerEventHandler {
         let offered = offeredEntities.filter { x in x.isBattlegroundsTrinket }
         let trinkets = (player.trinkets + offered).compactMap({ x in x.card.id })
         windowManager.battlegroundsTierOverlay.tierOverlay.onTrinkets(trinkets: trinkets)
-        
+
+        // BACONBRAIN (F2): force-emit the offer immediately, stats nil/absent — do not let a
+        // slow/hung Tier7 request delay this time-limited decision's snapshot. onTrinketPickStats
+        // below re-emits once (if) the request resolves.
+        SnapshotExporter.shared.onTrinketOffer(offered: offered, game: self)
         let result = await getTrinketPickStats(choice: choice)
-        SnapshotExporter.shared.onTrinketOffer(offered: offered, stats: result?.data, game: self) // BACONBRAIN
+        if let stats = result?.data {
+            SnapshotExporter.shared.onTrinketPickStats(stats, game: self) // BACONBRAIN
+        }
         if let result, !isTrinketChoiceComplete(choiceId: choice.id) {
             let data = offeredEntities.compactMap({ entity in result.data?.first { x in x.trinket_dbf_id == entity.card.dbfId }})
             windowManager.battlegroundsTrinketPicking.viewModel.setTrinketStats(data)
