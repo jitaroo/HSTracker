@@ -112,6 +112,15 @@ class PowerGameStateParser: LogEventParser {
                 }
                 
                 set(currentEntity: id)
+                if let playerId = Int(matches[1].value) {
+                    let accountMatches = PlayerIDRegex.matches(matches[2].value)
+                    if accountMatches.count == 2,
+                       let accountHi = Int64(accountMatches[0].value),
+                       let accountLo = Int64(accountMatches[1].value),
+                       let game = eventHandler as? Game {
+                        game.inferBattlegroundsPlayer(playerId: playerId, accountHi: accountHi, accountLo: accountLo)
+                    }
+                }
                 if eventHandler.determinedPlayers() {
                     tagChangeHandler.invokeQueuedActions(eventHandler: eventHandler)
                 }

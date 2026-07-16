@@ -38,6 +38,11 @@ final class CoreManager: NSObject {
     var timer = RepeatingTimer(timeInterval: 300.0)
 
     var queue = DispatchQueue(label: "net.hearthsim.hstracker.readers", attributes: [])
+    private var usingHearthstoneLogSessionFallback = false
+
+    private var shouldEraseTrackedLogs: Bool {
+        return !usingHearthstoneLogSessionFallback && !CoreManager.isHearthstoneRunning()
+    }
     
     override init() {
         self.game = Game(hearthstoneRunState: HearthstoneRunState(isRunning: CoreManager.isHearthstoneRunning(),
@@ -49,8 +54,10 @@ final class CoreManager: NSObject {
             NotificationManager.showNotification(type: .restartRequired)
         }
         
-        let logPath = MirrorHelper.getLogSessionDir()
-        logReaderManager = LogReaderManager(logPath: logPath, coreManager: self)
+        let logPath = currentLogPath()
+        logReaderManager = LogReaderManager(logPath: logPath,
+                                            coreManager: self,
+                                            removeLogfiles: !usingHearthstoneLogSessionFallback)
         
         self.toaster = Toaster(windowManager: game.windowManager)
         
@@ -270,10 +277,12 @@ final class CoreManager: NSObject {
             }
 #endif
 
-            let logPath = MirrorHelper.getLogSessionDir()
+            let logPath = currentLogPath()
             if !logPath.isEmpty {
                 logger.info("Starting log reader with path \(logPath)")
-                self.logReaderManager = LogReaderManager(logPath: logPath, coreManager: self)
+                self.logReaderManager = LogReaderManager(logPath: logPath,
+                                                         coreManager: self,
+                                                         removeLogfiles: !usingHearthstoneLogSessionFallback)
                 self.logReaderManager.start()
                 if game.currentRegion == .unknown {
                     game.currentRegion = Helper.getCurrentRegion()
@@ -298,13 +307,62 @@ final class CoreManager: NSObject {
         }
     }
 
+    private func currentLogPath() -> String {
+        let mirrorPath = MirrorHelper.getLogSessionDir()
+        if !mirrorPath.isEmpty {
+            usingHearthstoneLogSessionFallback = false
+            return mirrorPath
+        }
+
+        let fallbackPath = Self.latestHearthstoneLogSessionDir()
+        if !fallbackPath.isEmpty {
+            usingHearthstoneLogSessionFallback = true
+            logger.info("Using Hearthstone log session fallback at \(fallbackPath)")
+        }
+        return fallbackPath
+    }
+
+    private static func latestHearthstoneLogSessionDir() -> String {
+        let fileManager = FileManager.default
+        let logsURL = URL(fileURLWithPath: Settings.hearthstonePath, isDirectory: true)
+            .appendingPathComponent("Logs", isDirectory: true)
+
+        guard let sessions = try? fileManager.contentsOfDirectory(
+            at: logsURL,
+            includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles]
+        ) else {
+            return ""
+        }
+
+        let candidates: [(url: URL, modified: Date)] = sessions.compactMap { sessionURL in
+            guard sessionURL.lastPathComponent.hasPrefix("Hearthstone_") else {
+                return nil
+            }
+
+            let powerLogURL = sessionURL.appendingPathComponent("Power.log", isDirectory: false)
+            let attributes: [FileAttributeKey: Any]?
+            if fileManager.fileExists(atPath: powerLogURL.path) {
+                attributes = try? fileManager.attributesOfItem(atPath: powerLogURL.path)
+            } else {
+                attributes = try? fileManager.attributesOfItem(atPath: sessionURL.path)
+            }
+            let modified = attributes?[.modificationDate] as? Date ?? .distantPast
+            return (sessionURL, modified)
+        }
+
+        return candidates.max { lhs, rhs in
+            lhs.modified < rhs.modified
+        }?.url.path ?? ""
+    }
+
     func startTracking() {
 		// Starting logreaders after short delay is as game might be still in loading state
         let time = DispatchTime.now() + .seconds(1)
         DispatchQueue.main.asyncAfter(deadline: time) {
             logger.info("Start Tracking")
             if self.logReaderManager.running {
-                self.logReaderManager.stop(eraseLogFile: !CoreManager.isHearthstoneRunning())
+                self.logReaderManager.stop(eraseLogFile: self.shouldEraseTrackedLogs)
             }
             self.internalStartTracking()
         }
@@ -312,7 +370,7 @@ final class CoreManager: NSObject {
 
     func stopTracking() {
         logger.info("Stop Tracking")
-		logReaderManager.stop(eraseLogFile: !CoreManager.isHearthstoneRunning())
+		logReaderManager.stop(eraseLogFile: shouldEraseTrackedLogs)
         SceneHandler.reset()
         Watchers.stop()
         MirrorHelper.destroy()

@@ -157,9 +157,32 @@ class Game: NSObject, PowerEventHandler {
 		}
 	}
 	
-	func determinedPlayers() -> Bool {
+    func determinedPlayers() -> Bool {
         return player.id > 0 && opponent.id > 0
 	}
+
+    func inferBattlegroundsPlayer(playerId: Int, accountHi: Int64, accountLo: Int64) {
+        guard previousMode == .bacon || currentMode == .bacon else {
+            return
+        }
+
+        if _currentGameType == .gt_unknown {
+            _currentGameType = .gt_battlegrounds
+            _currentGameMode = .battlegrounds
+            logger.info("Inferred Battlegrounds game type from bacon log mode")
+        }
+
+        let isLocalAccount = accountHi != 0 || accountLo != 0
+        if isLocalAccount {
+            if player.id != playerId {
+                logger.info("Inferred local Battlegrounds player id \(playerId) from CREATE_GAME")
+            }
+            player.id = playerId
+        } else if opponent.id <= 0 {
+            logger.info("Inferred Battlegrounds opponent/Bob player id \(playerId) from CREATE_GAME")
+            opponent.id = playerId
+        }
+    }
 	
 	private var guiNeedsUpdate = false
 	private var guiUpdateResets = false

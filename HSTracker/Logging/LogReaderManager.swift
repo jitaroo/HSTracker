@@ -58,7 +58,7 @@ final class LogReaderManager {
     private var queue: DispatchQueue?
     private let coreManager: CoreManager
     
-	init(logPath: String, coreManager: CoreManager) {
+	init(logPath: String, coreManager: CoreManager, removeLogfiles: Bool = true) {
         self.coreManager = coreManager
 		loadingScreenHandler = LoadingScreenHandler(with: coreManager)
 		powerGameStateParser = PowerGameStateParser(with: coreManager.game)
@@ -69,13 +69,14 @@ final class LogReaderManager {
                                      startsWithFilters: ["PowerTaskList.DebugPrintPower", "GameState.", "PowerProcessor.EndCurrentTaskList"],
                                      containsFilters: ["Begin Spectating", "Start Spectator",
                                                        "End Spectator"])
-        powerLog = LogReader(info: plReader, logPath: logPath)
+        powerLog = LogReader(info: plReader, logPath: logPath, removeLogfile: removeLogfiles)
 
-        rachelle = LogReader(info: LogReaderInfo(name: .rachelle), logPath: logPath)
-        arena = LogReader(info: LogReaderInfo(name: .arena), logPath: logPath)
+        rachelle = LogReader(info: LogReaderInfo(name: .rachelle), logPath: logPath, removeLogfile: removeLogfiles)
+        arena = LogReader(info: LogReaderInfo(name: .arena), logPath: logPath, removeLogfile: removeLogfiles)
         loadingScreen = LogReader(info: LogReaderInfo(name: .loadingScreen,
                                                       startsWithFilters: ["LoadingScreen.OnSceneLoaded", "Gameplay", "LoadingScreen.OnScenePreUnload", "MulliganManager.HandleGameStart"]),
-                                  logPath: logPath)
+                                  logPath: logPath,
+                                  removeLogfile: removeLogfiles)
         gameInfoHandler = GameInfoHandler()
     }
 
@@ -157,9 +158,16 @@ final class LogReaderManager {
     }
 
     private func entryPoint() -> LogDate {
+        let createGameEntry = powerLog.findEntryPoint(choice: "CREATE_GAME")
         let powerEntry = powerLog.findEntryPoint(choices:
             ["tag=STATE value=COMPLETE", "End Spectator"])
         let loadingScreenEntry = loadingScreen.findEntryPoint(choice: "Gameplay.Start")
+
+        if !MirrorHelper.isInitialized(), createGameEntry > LogDate(date: Date.distantPast) {
+            let cge = LogReaderManager.iso8601StringFormatter.string(from: createGameEntry)
+            logger.verbose("Mirror unavailable; using CREATE_GAME entry : \(cge)")
+            return createGameEntry
+        }
 
         let pe = LogReaderManager.iso8601StringFormatter.string(from: powerEntry)
         let lse = LogReaderManager.iso8601StringFormatter.string(from: loadingScreenEntry)
