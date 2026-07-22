@@ -211,7 +211,7 @@ class Game: NSObject, PowerEventHandler {
             self.updateMaxResourcesWidget()
         }
         self.updateCounters()
-        SnapshotExporter.shared.emitIfChanged(game: self) // BACONBRAIN
+        BaconbrainHooks.gameStateDidChange(game: self) // BACONBRAIN
 	}
 	
     // MARK: - GUI calls
@@ -1494,7 +1494,7 @@ class Game: NSObject, PowerEventHandler {
         currentTurn = 0
         hasValidDeck = false
         gameId = UUID.init().uuidString
-        SnapshotExporter.shared.onGameReset(gameId: gameId) // BACONBRAIN: clear per-game caches
+        BaconbrainHooks.gameDidReset(gameId: gameId) // BACONBRAIN: clear per-game caches
 
         playedCards.removeAll()
 		
@@ -2402,7 +2402,7 @@ class Game: NSObject, PowerEventHandler {
                     self.isBattlegroundsCombatPhase = true
                     OpponentDeadForTracker.shoppingStarted(game: self)
                     BobsBuddyInvoker.instance(gameId: self.gameId, turn: self.turnNumber() - 1)?.startShopping()
-                    SnapshotExporter.shared.onTurnStart(game: self) // BACONBRAIN: force-emit on recruit start
+                    BaconbrainHooks.recruitTurnDidStart(game: self) // BACONBRAIN: force-emit on recruit start
                     windowManager.battlegroundsTierOverlay.tierOverlay.onHeroPowers(heroPowers: self.player.board.filter { x in x.isHeroPower }.compactMap { x in x.cardId })
                     windowManager.battlegroundsTierOverlay.tierOverlay.onTrinkets(trinkets: self.player.trinkets.compactMap({ x in x.cardId }))
                 }
@@ -2902,7 +2902,7 @@ class Game: NSObject, PowerEventHandler {
         }
 
         if let stats = battlegroundsHeroPickStats {
-            SnapshotExporter.shared.onHeroPickStats(stats.data, game: self) // BACONBRAIN: raw Tier7 hero rows
+            BaconbrainHooks.heroPickStatsDidLoad(stats.data, game: self) // BACONBRAIN: raw Tier7 hero rows
             let heroIds = heroes.sorted(by: { (a, b) -> Bool in return a.zonePosition < b.zonePosition }).compactMap { x in x.card.dbfId }
             DispatchQueue.main.async { [self] in
                 self.showBattlegroundsHeroPickingStats(heroIds.compactMap({ dbfId in stats.data.first { x in x.hero_dbf_id == dbfId }}), stats.toast.parameters, stats.toast.min_mmr, stats.toast.anomaly_adjusted ?? false)
@@ -3048,7 +3048,7 @@ class Game: NSObject, PowerEventHandler {
         var toastParams: [String: String]?
             
         if let stats = battlegroundsHeroPickStats {
-            SnapshotExporter.shared.onHeroPickStats(stats.data, game: self) // BACONBRAIN: raw Tier7 hero rows
+            BaconbrainHooks.heroPickStatsDidLoad(stats.data, game: self) // BACONBRAIN: raw Tier7 hero rows
             toastParams = stats.toast.parameters
             DispatchQueue.main.async {
                 self.showBattlegroundsHeroPickingStats(heroIds.compactMap { dbfId in stats.data.first { x in x.hero_dbf_id == dbfId }}, stats.toast.parameters, stats.toast.min_mmr, stats.toast.anomaly_adjusted ?? false)
@@ -3691,10 +3691,10 @@ class Game: NSObject, PowerEventHandler {
         // BACONBRAIN (F2): force-emit the offer immediately, stats nil/absent — do not let a
         // slow/hung Tier7 request delay this time-limited decision's snapshot. onTrinketPickStats
         // below re-emits once (if) the request resolves.
-        SnapshotExporter.shared.onTrinketOffer(offered: offered, game: self)
+        BaconbrainHooks.trinketOfferDidAppear(offered: offered, game: self)
         let result = await getTrinketPickStats(choice: choice)
         if let stats = result?.data {
-            SnapshotExporter.shared.onTrinketPickStats(stats, game: self) // BACONBRAIN
+            BaconbrainHooks.trinketPickStatsDidLoad(stats, game: self) // BACONBRAIN
         }
         if let result, !isTrinketChoiceComplete(choiceId: choice.id) {
             let data = offeredEntities.compactMap({ entity in result.data?.first { x in x.trinket_dbf_id == entity.card.dbfId }})
@@ -3791,7 +3791,7 @@ class Game: NSObject, PowerEventHandler {
     
     func setChoicesVisible(_ choicesVisible: Bool) {
         windowManager.battlegroundsTrinketPicking.viewModel.choicesVisible = choicesVisible
-        if !choicesVisible { SnapshotExporter.shared.onTrinketOfferEnded(game: self) } // BACONBRAIN
+        if !choicesVisible { BaconbrainHooks.trinketOfferDidEnd(game: self) } // BACONBRAIN
     }
     
     func handleSpecialShop(_ args: SpecialShopChoicesArgs) {

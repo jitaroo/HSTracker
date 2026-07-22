@@ -122,7 +122,7 @@ final class CoreManager: NSObject {
     func start() {
         startListeners()
         Watchers.initialize()
-        SnapshotExporter.shared.start() // BACONBRAIN: bind 127.0.0.1:47800
+        BaconbrainHooks.applicationDidStart() // BACONBRAIN: bind 127.0.0.1:47800
         if CoreManager.isHearthstoneRunning() {
             logger.info("Hearthstone is running, starting trackers now.")
             Watchers.experienceWatcher.run()

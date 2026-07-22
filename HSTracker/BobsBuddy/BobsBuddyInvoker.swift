@@ -307,7 +307,7 @@ class BobsBuddyInvoker {
                 }
                 self.output = top
                 // BACONBRAIN: extract scalars while the mono thread is attached
-                SnapshotExporter.shared.onBobsBuddyResult(winRate: top.winRate, tieRate: top.tieRate,
+                BaconbrainHooks.bobsBuddySimulationDidComplete(winRate: top.winRate, tieRate: top.tieRate,
                     lossRate: top.lossRate, myDeathRate: top.myDeathRate, theirDeathRate: top.theirDeathRate,
                     damageResults: top.getResultDamage(), game: self.game)
                 seal.fulfill(true)
