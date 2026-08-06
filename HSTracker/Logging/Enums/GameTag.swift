@@ -348,6 +348,7 @@ enum GameTag: Int, CaseIterable, Codable {
     casts_when_drawn = 1077,
     reborn = 1085,
     quest_reward_database_id = 1089,
+    extra_deathrattles_additional = 1131,
     proxy_galakrond = 1190,
     sidequest = 1192,
     mega_windfury = 1207,
@@ -389,7 +390,7 @@ enum GameTag: Int, CaseIterable, Codable {
     bacon_skin = 2038,
     bacon_skin_parent_id = 2039,
     is_using_trade_option = 2045,
-    gametag_2088 = 2088,
+    coin_card = 2088,
     bacon_combat_damage_cap = 2089,
     corpses = 2186,
     lettuce_show_opposing_fake_hand = 2224,
@@ -466,6 +467,7 @@ enum GameTag: Int, CaseIterable, Codable {
     bacon_elemental_buffhealthvalue = 4001,
     bacon_elemental_buffatkvalue = 4002,
     kindred = 4028,
+    additional_hero_power_entity_1 = 4029,
     imbue_sub_counter = 4168,
     shattered = 4240,
     gametag_4283 = 4283,
@@ -478,7 +480,10 @@ enum GameTag: Int, CaseIterable, Codable {
     gametag_4639 = 4639,
     bacon_fodders_in_refresh = 4664,
     gametag_4696 = 4696,
-    gametag_4741 = 4741
+    gametag_4741 = 4741,
+    hidden_script_data_4 = 4830,
+    hidden_script_data_5 = 4831,
+    hidden_script_data_6 = 4832
 
     static var lookup = [String: GameTag]()
     

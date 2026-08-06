@@ -145,6 +145,8 @@ class Game: NSObject, PowerEventHandler {
     var battlegroundsBuddiesEnabled: Bool {
         return gameEntity?[.bacon_buddy_enabled] ?? 0 > 0
     }
+    
+    var battlegroundsLobbyInfo: MirrorBattlegroundsLobbyInfo?
 	
 	// MARK: - PowerEventHandler protocol
 	
@@ -234,7 +236,7 @@ class Game: NSObject, PowerEventHandler {
         }
     }
 	
-	@objc fileprivate func updateOpponentTracker(reset: Bool = false) {
+	@objc func updateOpponentTracker(reset: Bool = false) {
         DispatchQueue.main.async { [weak self] in
             guard let self else {
                 return
@@ -1076,18 +1078,59 @@ class Game: NSObject, PowerEventHandler {
     }
 
     private var _currentGameType: GameType = .gt_unknown
+    private var _gameTypeDuosCorrectionCheckCompleted = false
     var currentGameType: GameType {
 
         if _currentGameType != .gt_unknown {
+            if _gameTypeDuosCorrectionCheckCompleted {
+                return _currentGameType
+            }
+            if isSoloBattlegroundsGameType(_currentGameType) {
+                tryCorrectMisreadSoloGameType()
+            }
             return _currentGameType
         }
         if currentMode == .gameplay, let gameType = MirrorHelper.getGameType(),
             let type = GameType(rawValue: gameType) {
             _currentGameType = type
+            if _gameTypeDuosCorrectionCheckCompleted {
+                return _currentGameType
+            }
+            if isSoloBattlegroundsGameType(_currentGameType) {
+                tryCorrectMisreadSoloGameType()
+            }
+            return _currentGameType
         }
         return .gt_unknown
     }
     
+    /// <summary>
+    /// The mirror can report a stale solo game type for a Duos game (confirmed to be a longstanding issue
+    /// via Sentry). The likely cause, the previous game's game_type was read during the menu-to-gameplay
+    /// transition, which then locks the game into solo mode.
+    /// The fix: check all player entities for any nonzero BACON_DUO_TEAM_ID tag.
+    /// </summary>
+    private func tryCorrectMisreadSoloGameType() {
+        // swiftlint:disable switch_case_alignment
+        let duoGameTypeEquivalent = switch _currentGameType {
+            case GameType.gt_battlegrounds: GameType.gt_battlegrounds_duo
+            case GameType.gt_battlegrounds_friendly: GameType.gt_battlegrounds_duo_friendly
+            case GameType.gt_battlegrounds_ai_vs_ai: GameType.gt_battlegrounds_duo_ai_vs_ai
+            case GameType.gt_battlegrounds_player_vs_ai: GameType.gt_battlegrounds_duo_vs_ai
+            default: GameType.gt_unknown
+        }
+        // swiftlint:enable switch_case_alignment
+        let hasDuoTeamId = entities.values
+            .any({ e in e.has(tag: GameTag.player_id) && e[GameTag.bacon_duo_team_id] > 0 })
+        if hasDuoTeamId {
+            logger.warning("Correcting misread solo game type \(_currentGameType) to \(duoGameTypeEquivalent) (player entity has BACON_DUO_TEAM_ID)")
+            _currentGameType = duoGameTypeEquivalent
+            _gameTypeDuosCorrectionCheckCompleted = true
+        } else if setupDone {  // All player entities now exist, the game is genuinely solo.
+            _gameTypeDuosCorrectionCheckCompleted = true
+        }
+    }
+
     private var _serverInfo: MirrorGameServerInfo?
     var serverInfo: MirrorGameServerInfo? {
         if _serverInfo == nil {
@@ -1127,6 +1170,7 @@ class Game: NSObject, PowerEventHandler {
     private var awaitingAvenge = false
     var isInMenu = true
     private var handledGameEnd = false
+    private var _pendingBattlegroundsGame: PendingBattlegroundsGame?
     
 	var enqueueTime = LogDate(date: Date.distantPast)
     private var lastTurnStart: [Int] = [0, 0]
@@ -1507,6 +1551,7 @@ class Game: NSObject, PowerEventHandler {
         _matchInfo = nil
         _currentFormatType = .ft_unknown
         _currentGameType = .gt_unknown
+        _gameTypeDuosCorrectionCheckCompleted = false
 		_currentGameMode = .none
         _serverInfo = nil
 
@@ -1607,7 +1652,9 @@ class Game: NSObject, PowerEventHandler {
     
     func cacheGameType() {
         if let currentGameType = MirrorHelper.getGameType(), currentGameType != GameType.gt_unknown.rawValue {
-            _currentGameType = GameType(rawValue: currentGameType) ?? .gt_unknown
+            if !_gameTypeDuosCorrectionCheckCompleted { // Do not let a late mirror overwrite a bg game type already corrected by TryCorrectMisreadSoloGameType.
+                _currentGameType = GameType(rawValue: currentGameType) ?? .gt_unknown
+            }
         } else {
             DispatchQueue.global().asyncAfter(deadline: .now() + 1.0) {
                 self.cacheGameType()
@@ -1895,6 +1942,7 @@ class Game: NSObject, PowerEventHandler {
                         self.windowManager.battlegroundsSession.updateScaling()
                     }
                     Watchers.battlegroundsLeaderboardWatcher.run()
+                    Watchers.battlegroundsLobbyInfoWatcher.run()
                     if self.isBattlegroundsDuosMatch() {
                         Watchers.battlegroundsTeammateBoardStateWatcher.run()
                     }
@@ -1965,7 +2013,7 @@ class Game: NSObject, PowerEventHandler {
 		if let name = self.player.name {
 			result.playerName = name
 		}
-		if let _player = self.entities.values.first(where: { $0.isPlayer(eventHandler: self) }) {
+		if let _player = self.entities.values.filter({ $0.isPlayer(eventHandler: self) }).sorted(by: { $0.id < $1.id }).first {
 			result.coin = !_player.has(tag: .first_player)
 		}
 		
@@ -2054,7 +2102,7 @@ class Game: NSObject, PowerEventHandler {
             }
             
             result.gameDurationSeconds = Int(result.endTime.timeIntervalSince(result.startTime))
-            let hero = entities.values.first { x in x.has(tag: .player_leaderboard_place) && x.isControlled(by: player.id) }
+            let hero = (playerEntity?[.hero_entity]).flatMap { entities[$0] }
             
             let finalPlacement = hero?[.player_leaderboard_place] ?? 0
             if battlegroundsDetails != nil {
@@ -2072,6 +2120,8 @@ class Game: NSObject, PowerEventHandler {
                     battlegroundsDetails?.lobby_hero_dbf_ids?.append(lobbyHero.card.dbfId)
                 }
                 result.battlegroundsDetails = battlegroundsDetails
+                result.battlegroundsDetails?.game_uuid = battlegroundsLobbyInfo?.gameUuid
+                result.battlegroundsDetails?.lobby_players = battlegroundsLobbyInfo?.players.compactMap({ p in UploadMetaData.BattlegroundsLobbyStatePlayer(hero_card_id: p.heroCardId, player_name: p.name, account_hi: p.accountId.hi.int64Value, account_lo: p.accountId.lo.int64Value) })
             }
             result.battlegroundsRaces = self.availableRaces?.compactMap({ x in Race.allCases.firstIndex(of: x)}) ?? []
 
@@ -2142,24 +2192,21 @@ class Game: NSObject, PowerEventHandler {
                 self.windowManager.battlegroundsTierOverlay.tierOverlay.reset()
             }
             updatePostGameBattlegroundsRating(gameStats: currentGameStats)
-            recordBattlegroundsGame(gameStats: currentGameStats)
-            windowManager.battlegroundsSession.onGameEnd(gameStats: currentGameStats)
+            captureBattlegroundsGame(stats: currentGameStats)
             windowManager.battlegroundsHeroPicking.viewModel.reset()
             windowManager.battlegroundsQuestPicking.viewModel.reset()
             windowManager.battlegroundsTrinketPicking.viewModel.reset()
             hideBattlegroundsHeroPanel()
             hideBattlegroundsTimewarpPanel()
         }
-        if isConstructedMatch() {
+        if isTraditionalHearthstoneMatch {
             hideMulliganToast()
             DispatchQueue.main.async {
                 self.player.mulliganCardStats = nil
                 self.hideMulliganGuideStats()
             }
-            if opponent.isPlayingWhizbang {
-                opponent.isPlayingWhizbang = false
-                Player.knownOpponentDeck = nil
-            }
+            opponent.isPlayingWhizbang = false
+            Player.knownOpponentDeck = nil
         }
 
         if let currentDeck = self.currentDeck {
@@ -2188,6 +2235,11 @@ class Game: NSObject, PowerEventHandler {
         }
 
 		self.syncStats(logLines: self.powerLog, stats: currentGameStats)
+        
+        if isBattlegroundsMatch() {
+            recordBattlegroundsGame()
+            windowManager.battlegroundsSession.onGameEnd(gameStats: currentGameStats)
+        }
         
         activeEffects.reset()
         counterManager.reset()
@@ -2275,26 +2327,58 @@ class Game: NSObject, PowerEventHandler {
         }
     }
     
-    func recordBattlegroundsGame(gameStats: InternalGameStats) {
+    private class PendingBattlegroundsGame {
+        init(stats: InternalGameStats, heroCardId: String, placement: Int, finalBoard: [Entity], friendlyGame: Bool, duos: Bool) {
+            self.stats = stats
+            self.heroCardId = heroCardId
+            self.placement = placement
+            self.finalBoard = finalBoard
+            self.friendlyGame = friendlyGame
+            self.duos = duos
+        }
+        
+        let stats: InternalGameStats
+        let heroCardId: String
+        let placement: Int
+        let finalBoard: [Entity]
+        let friendlyGame: Bool
+        let duos: Bool
+    }
+
+    // Capture entity-derived data before the SaveReplays await, since a return to menu or
+    // the next game start can clear _game.Entities (and reset the game type) meanwhile.
+    private func captureBattlegroundsGame(stats: InternalGameStats) {
+        _pendingBattlegroundsGame = nil
+        
         if spectator {
             return
         }
-        let hero = entities.values.first(where: { x in x.has(tag: .player_leaderboard_place) && x.isControlled(by: player.id) })
-        let heroCardId = hero?.cardId
+        
+        let hero = (playerEntity?[.hero_entity]).flatMap { entities[$0] }
+        let heroCardId = hero?.cardId != nil ? BattlegroundsUtils.getOriginalHeroId(heroId: hero?.cardId ?? "") : nil
+        let duos = isBattlegroundsDuosMatch()
+        let placement = min(hero?[.player_leaderboard_place] ?? 0, duos ? 4 : 8)
+        guard let heroCardId, placement > 0 else {
+            logger.error("Missing data while trying to record battleground game")
+            return
+        }
         let finalBoard = entities.values.filter({ x in x.isMinion && x.isInZone(zone: .play) && x.isControlled(by: player.id)}).compactMap({ x in x.copy() }).sorted(by: { x, y in
             x[.zone_position] < y[.zone_position]
         })
         let friendlyGame = currentGameType == .gt_battlegrounds_friendly || currentGameType == .gt_battlegrounds_duo_friendly
-        let duos = isBattlegroundsDuosMatch()
-        let placement = min(hero?[.player_leaderboard_place] ?? 0, duos ? 4 : 8)
-        if let heroCardId = heroCardId, placement > 0 {
-            BattlegroundsLastGames.instance.addGame(startTime: gameStats.startTime, endTime: gameStats.endTime, hero: BattlegroundsUtils.getOriginalHeroId(heroId: heroCardId), rating: gameStats.battlegroundsRating, ratingAfter: gameStats.battlegroundsRatingAfter, placement: placement, finalBoard: finalBoard, friendlyGame: friendlyGame, duos: duos)
-            DispatchQueue.main.async {
-                self.windowManager.battlegroundsSession.update()
-                self.windowManager.battlegroundsSession.updateScaling()
-            }
-        } else {
-            logger.error("Missing data while trying to record battleground game")
+        _pendingBattlegroundsGame = PendingBattlegroundsGame(stats: stats, heroCardId: heroCardId, placement: placement, finalBoard: finalBoard, friendlyGame: friendlyGame, duos: duos)
+    }
+    
+    // Persist the captured game once SaveReplays has populated the post-game rating.
+    func recordBattlegroundsGame() {
+        guard let pending = _pendingBattlegroundsGame else {
+            return
+        }
+        _pendingBattlegroundsGame = nil
+        BattlegroundsLastGames.instance.addGame(startTime: pending.stats.startTime, endTime: pending.stats.endTime, hero: pending.heroCardId, rating: pending.stats.battlegroundsRating, ratingAfter: pending.stats.battlegroundsRatingAfter, placement: pending.placement, finalBoard: pending.finalBoard, friendlyGame: pending.friendlyGame, duos: pending.duos)
+        DispatchQueue.main.async {
+            self.windowManager.battlegroundsSession.update()
+            self.windowManager.battlegroundsSession.updateScaling()
         }
     }
 
@@ -2315,12 +2399,16 @@ class Game: NSObject, PowerEventHandler {
         }
         return 0
     }
+    
+    var currentTurnActivePlayer: PlayerType {playerEntity?.isCurrentPlayer == true ? PlayerType.player : PlayerType.opponent }
 
     func turnsInPlayChange(entity: Entity, turn: Int) {
-        guard let opponentEntity = opponentEntity else { return }
+        if playerEntity == nil {
+            return
+        }
 
         if entity.isHero {
-            let player: PlayerType = opponentEntity.isCurrentPlayer ? .opponent : .player
+            let player = currentTurnActivePlayer
             if lastTurnStart[player.rawValue] >= turn {
                 return
             }
@@ -2492,6 +2580,10 @@ class Game: NSObject, PowerEventHandler {
     }
     
     func isBattlegroundsSoloMatch() -> Bool {
+        return isSoloBattlegroundsGameType(currentGameType)
+    }
+    
+    func isSoloBattlegroundsGameType(_ currentGameType: GameType) -> Bool {
         return currentGameType == .gt_battlegrounds || currentGameType == .gt_battlegrounds_friendly || currentGameType == .gt_battlegrounds_ai_vs_ai || currentGameType == .gt_battlegrounds_player_vs_ai
     }
     
@@ -2535,9 +2627,9 @@ class Game: NSObject, PowerEventHandler {
         if isBattlegroundsMatch() {
                 return true
         }
-        let player = entities.map { $0.1 }.first { $0.isPlayer(eventHandler: self) }
+        let player = entities.map { $0.1 }.filter { $0.isPlayer(eventHandler: self) }.sorted(by: { $0.id < $1.id }).first
         let opponent = entities.map { $0.1 }
-            .first { $0.has(tag: .player_id) && !$0.isPlayer(eventHandler: self) }
+            .filter { $0.has(tag: .player_id) && !$0.isPlayer(eventHandler: self) }.sorted(by: { $0.id < $1.id }).first
 
         if let player = player, let opponent = opponent {
             return player[.mulligan_state] == Mulligan.done.rawValue
@@ -2725,6 +2817,12 @@ class Game: NSObject, PowerEventHandler {
     
     func handleOpponentLibramReduction(change: Int) {
         opponent.updateLibramReduction(change: change)
+    }
+    
+    func resetOpponentHandCostReduction() {
+        for card in opponent.hand {
+            card.info.costReduction = 0
+        }
     }
     
     func handlePlayerAbyssalCurse(value: Int) {
@@ -2999,6 +3097,7 @@ class Game: NSObject, PowerEventHandler {
     @available(macOS 10.15.0, *) @MainActor
     private func handleBattlegroundsStart() async {
         Watchers.battlegroundsLeaderboardWatcher.run()
+        Watchers.battlegroundsLobbyInfoWatcher.run()
         OpponentDeadForTracker.reset()
         var heroes = [Entity]()
         for _ in 0 ..< 10 {
@@ -3827,10 +3926,16 @@ class Game: NSObject, PowerEventHandler {
             if isBattlegroundsMatch() {
                 if chosen.count == 1 {
                     let hero = chosen.first
+                    var heroPowers = [String]()
                     let heroPower = Cards.by(dbfId: hero?[.hero_power], collectible: false)?.id
                     if let hp = heroPower {
-                        windowManager.battlegroundsTierOverlay.tierOverlay?.onHeroPowers(heroPowers: [ hp ])
+                        heroPowers.append(hp)
                     }
+                    let additionalHeroPowerId = hero?[GameTag.additional_hero_power_entity_1] ?? 0
+                    if additionalHeroPowerId > 0, let additionalHeroPower =  entities[additionalHeroPowerId] {
+                        heroPowers.append(additionalHeroPower.card.id)
+                    }
+                    windowManager.battlegroundsTierOverlay.tierOverlay?.onHeroPowers(heroPowers: heroPowers)
                 } else {
                     logger.error("Could not reliably determine Battlegrounds hero power. \(chosen.count) hero(es) chosen.")
                 }
@@ -3840,13 +3945,15 @@ class Game: NSObject, PowerEventHandler {
             }
         case ChoiceType.general:
             counterManager.handleChoicePicked(choice: choice)
+            handleSphereOfSapienceChosen(choice, chosen, source)
             if isBattlegroundsMatch() {
                 windowManager.battlegroundsQuestPicking.viewModel.reset()
                 windowManager.battlegroundsTrinketPicking.viewModel.reset()
                 if source?[.bacon_is_magic_item_discover] ?? 0 > 0 {
                     windowManager.battlegroundsTierOverlay.tierOverlay?.onTrinkets(trinkets: (self.player.trinkets + chosen).compactMap({ x in x.cardId }))
                 }
-                windowManager.battlegroundsTierOverlay.tierOverlay?.onHeroPowers(heroPowers: player.board.filter({ x in x.isHeroPower }).compactMap({ x in x.card.id }))
+                // the entity of a chosen hero power is only created after the choice completes, concat the chosen one
+                windowManager.battlegroundsTierOverlay.tierOverlay?.onHeroPowers(heroPowers: player.board.filter({ x in x.isHeroPower }).compactMap({ x in x.card.id }) + chosen.filter({ x in x.isHeroPower }).compactMap({ x in x.card.id }))
                 
                 // quest choice
                 if let chosenEntity = chosen.first {
@@ -3860,6 +3967,37 @@ class Game: NSObject, PowerEventHandler {
             }
         default: break
         }
+    }
+    
+    // Sphere of Sapience offers the top card of the deck, or "A New Fate" to put it on the
+    // bottom. The card in the deck never changes zone, and the offered card is only a copy of
+    // it, so the choice is the only signal we get about the new position.
+    private func handleSphereOfSapienceChosen(_ choice: IHsCompletedChoice, _ chosen: [Entity], _ source: Entity?) {
+        if source?.cardId != CardIds.Collectible.Neutral.SphereOfSapience {
+            return
+        }
+
+        let offeredCopy = choice.offeredEntityIds?
+            .compactMap { id in entities[id] }
+            .first { x in x.cardId != CardIds.NonCollectible.Neutral.SphereofSapience_ANewFateToken }
+        guard let offeredCopy else {
+            return
+        }
+
+        var linkedId = offeredCopy[GameTag.linked_entity]
+        if linkedId == 0 {
+            linkedId = offeredCopy[GameTag.copied_from_entity_id]
+        }
+        guard let topCard = entities[linkedId], !topCard.isInDeck else {
+            return
+        }
+
+        let putOnBottom = chosen.any({ x in x.cardId == CardIds.NonCollectible.Neutral.SphereofSapience_ANewFateToken })
+        dredgeCounter += 1
+        let newIndex = dredgeCounter
+        topCard.info.deckIndex = putOnBottom ? -newIndex : newIndex
+        logger.info("Sphere of Sapience \(putOnBottom ? "Bottom" : "Top"): \(topCard)")
+        updatePlayerTracker()
     }
     
     @available(macOS 10.15.0, *) @MainActor

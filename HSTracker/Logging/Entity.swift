@@ -62,7 +62,7 @@ class Entity {
     }
     
     var isTheCoin: Bool {
-        return cardId == CardIds.NonCollectible.Neutral.TheCoinBasic || (isSpell && self[.gametag_2088] == 1)
+        return cardId == CardIds.NonCollectible.Neutral.TheCoinBasic || (isSpell && self[.coin_card] == 1)
     }
     
     func isInZone(zone: Zone) -> Bool {
@@ -206,6 +206,10 @@ class Entity {
         }
         return Card()
     }
+    
+    var latestCard: Card {
+        return info.latestCardId == cardId ? card : Card(id: info.latestCardId)
+    }
 
     func set(cardCount count: Int) {
         card.count = count
@@ -255,6 +259,8 @@ extension Entity: NSCopying {
         e.info.costReduction = info.costReduction
         e.info.revealedOnHistory = info.revealedOnHistory
         e.info.creatorId = info.creatorId
+        e.info.cardIdBeforeReveal = info.cardIdBeforeReveal
+        e.info.originalCardId = info.originalCardId
 
         return e
     }

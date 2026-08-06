@@ -1,0 +1,912 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "3aJ-8X-AqP.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Duels\"; ObjectID = \"3aJ-8X-AqP\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duels"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duels"
+          }
+        }
+      }
+    },
+    "7ln-3f-To8.title" : {
+      "comment" : "Class = \"NSTextFieldCell\"; title = \"Subscription status\"; ObjectID = \"7ln-3f-To8\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscription status"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statut de l'abonnement"
+          }
+        }
+      }
+    },
+    "9Sj-4I-EKw.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Mercenaries\"; ObjectID = \"9Sj-4I-EKw\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Mercenaries"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mercenaires"
+          }
+        }
+      }
+    },
+    "87B-1e-y45.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Login to HSReplay.net\"; ObjectID = \"87B-1e-y45\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Login to HSReplay.net"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login to HSReplay"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se connecter à HSReplay.net"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login to HSReplay"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login to HSReplay"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login to HSReplay"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login to HSReplay"
+          }
+        },
+        "th-TH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login to HSReplay"
+          }
+        }
+      }
+    },
+    "a4D-nA-Vqz.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Show upload notification\"; ObjectID = \"a4D-nA-Vqz\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show upload notification"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show upload notification"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la notification d'envoi"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show upload notification"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show upload notification"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show upload notification"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show upload notification"
+          }
+        },
+        "th-TH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show upload notification"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示上传通知"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示上傳通知"
+          }
+        }
+      }
+    },
+    "aAI-Yn-Z1P.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Upload replays automatically\"; ObjectID = \"aAI-Yn-Z1P\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Match-Ergebnisse synchronisieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Upload replays automatically"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizar los resultados de las partidas"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload replays automatically"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyer les replays automatiquement"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronize matches results"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload replays automatically"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload replays automatically"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload replays automatically"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronize matches results"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload replays automatically"
+          }
+        },
+        "th-TH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload replays automatically"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同步对战数据"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動上傳重播"
+          }
+        }
+      }
+    },
+    "dX9-1S-Y1M.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Spectator\"; ObjectID = \"dX9-1S-Y1M\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Spectator"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spectator"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spectateur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spectator"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spectator"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spectator"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spectator"
+          }
+        },
+        "th-TH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spectator"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "观战模式"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "觀戰模式"
+          }
+        }
+      }
+    },
+    "fXm-MH-vJc.title" : {
+      "comment" : "Class = \"NSTextFieldCell\"; title = \"X\"; ObjectID = \"fXm-MH-vJc\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "X"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X"
+          }
+        }
+      }
+    },
+    "hNI-pm-upP.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Ranked\"; ObjectID = \"hNI-pm-upP\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Ranked"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ranked"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ranked"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ranked"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ranked"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ranked"
+          }
+        },
+        "th-TH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ranked"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "排名模式"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "排名模式"
+          }
+        }
+      }
+    },
+    "KV0-Rl-jeI.title" : {
+      "comment" : "Class = \"NSBox\"; title = \"My Account\"; ObjectID = \"KV0-Rl-jeI\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "My Account"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compte"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上传收藏"
+          }
+        }
+      }
+    },
+    "lGJ-41-bPm.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Tavern Brawl\"; ObjectID = \"lGJ-41-bPm\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Tavern Brawl"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tavern Brawl"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bras de fer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tavern Brawl"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tavern Brawl"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tavern Brawl"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tavern Brawl"
+          }
+        },
+        "th-TH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tavern Brawl"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "乱斗模式"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "旅店大亂鬥"
+          }
+        }
+      }
+    },
+    "Lla-JP-gmw.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Friendly\"; ObjectID = \"Lla-JP-gmw\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Friendly"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Friendly"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amical"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Friendly"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Friendly"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Friendly"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Friendly"
+          }
+        },
+        "th-TH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Friendly"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "友谊赛"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "友誼賽"
+          }
+        }
+      }
+    },
+    "LV9-Mi-ztK.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Find out more\"; ObjectID = \"LV9-Mi-ztK\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Find out more"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En savoir plus"
+          }
+        }
+      }
+    },
+    "qvg-bJ-3rk.title" : {
+      "comment" : "Class = \"NSBox\"; title = \"Upload game modes\"; ObjectID = \"qvg-bJ-3rk\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Upload game modes"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload game modes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modes de jeu à envoyer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload game modes"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload game modes"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload game modes"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload game modes"
+          }
+        },
+        "th-TH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload game modes"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上傳遊戲模式"
+          }
+        }
+      }
+    },
+    "sW4-mJ-KZE.title" : {
+      "comment" : "Class = \"NSTextFieldCell\"; title = \"Thank you for supporting us!\"; ObjectID = \"sW4-mJ-KZE\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Thank you for supporting us!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merci de nous soutenir !"
+          }
+        }
+      }
+    },
+    "XLN-hm-TrI.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Arena\"; ObjectID = \"XLN-hm-TrI\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Arena"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arena"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arène"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arena"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arena"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arena"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arena"
+          }
+        },
+        "th-TH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arena"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "竞技模式"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "競技場"
+          }
+        }
+      }
+    },
+    "XWA-c6-mjM.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Adventure / Practice\"; ObjectID = \"XWA-c6-mjM\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Adventure / Practice"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adventure / Practice"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aventure / Entraînement"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adventure / Practice"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adventure / Practice"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adventure / Practice"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adventure / Practice"
+          }
+        },
+        "th-TH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adventure / Practice"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "冒险 / 练习"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "冒險 / 練習"
+          }
+        }
+      }
+    },
+    "zQQ-GF-3Lg.title" : {
+      "comment" : "Class = \"NSTextFieldCell\"; title = \"Login to claim your replays and enable all HSReplay.net features.\"; ObjectID = \"zQQ-GF-3Lg\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Login to claim your replays and enable all HSReplay.net features."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connectez-vous pour réclamer vos replays et activer toutes les fonctionnalités de HSReplay.net."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在连接 HSReplay 后，打开你的收藏，上传会自动进行。"
+          }
+        }
+      }
+    },
+    "ZRj-Jq-3gI.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Battlegrounds\"; ObjectID = \"ZRj-Jq-3gI\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Battlegrounds"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Champs de bataille"
+          }
+        }
+      }
+    },
+    "zUq-Mn-Mae.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Casual\"; ObjectID = \"zUq-Mn-Mae\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Casual"
+          }
+        },
+        "es-MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normal"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casual"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casual"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casual"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casual"
+          }
+        },
+        "th-TH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casual"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "休闲模式"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一般模式"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

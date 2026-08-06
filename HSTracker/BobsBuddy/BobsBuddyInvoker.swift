@@ -27,13 +27,12 @@ class BobsBuddyInvoker {
     
     let Iterations: Int = 10_000
     let MaxTime: Int = 1_500
+    let MinimumSpinTime: TimeInterval = 0.500
     let MaxTimeForComplexBoards = 3_000
     let MaxTimeForLeapfrogger = 5_000
     let MinimumSimulationsToReportSentry = 2500
     let StateChangeDelay = 500
     let LichKingDelay = 2000
-    
-    static let cardIdsWithoutPremiumImplementation: [String] = MinionFactoryProxy.getCardIdsWithoutPremiumImplementations()
     
     static let cardIdsWithCleave: [String] = MinionFactoryProxy.getCardIdsWithCleave()
     
@@ -45,6 +44,28 @@ class BobsBuddyInvoker {
     
     var input: InputProxy?
     var output: OutputProxy?
+    
+    // True while the current Battlegrounds combat contains a Dr. Boom's Monster, so the per-HEALTH-change reborn
+    // detection in TagChangeActions can skip the entity lookup for the (vast majority of) combats without one.
+    static var currentCombatHasDrBoomsMonster = false
+    
+    // True in games where an opponent Malorne can be summoned during the current combat (the Bring in the Buddies anomaly)
+    static var currentCombatMayHaveOpponentMalorne = false
+    
+    // True while at least one magnetized AutoAssembler deathrattle observation awaits flushing
+    static var currentCombatHasPendingAutoAssemblerObservations = false
+    
+    // True while at least one granted Surf n' Surf Crab deathrattle observation awaits flushing
+    static var currentCombatHasPendingCrabObservations = false
+    
+    // Incremented on every detected game reconnect. Each combat snapshot records the current value;
+    // a mismatch at validation time means the reconnect happened after this combat started, so the
+    // absence of the combat's outcome should not be deemed as CombatResult.Tie.
+    private static var _reconnectCounter = 0
+    static func onGameReconnect() {
+        _reconnectCounter += 1
+    }
+    private var _reconnectCounterAtSnapshot = 0
     
     var doNotReport = true
     
@@ -100,6 +121,7 @@ class BobsBuddyInvoker {
     
     private init(key: String) {
         _instanceKey = key
+        _reconnectCounterAtSnapshot = BobsBuddyInvoker._reconnectCounter
         game = AppDelegate.instance().coreManager.game
         
         let opaque = mono_thread_attach(MonoHelper._monoInstance)
@@ -130,6 +152,11 @@ class BobsBuddyInvoker {
         return nil
     }
     
+    // BobsBuddy states during which a revealed card can be added to simulator input
+    private var updateRevealedEntityValidStates: Bool {
+        state == BobsBuddyState.initial || state == BobsBuddyState.combat || state == BobsBuddyState.combatPartial
+    }
+    
     func shouldRun() -> Bool {
         if !Settings.showBobsBuddy {
             return false
@@ -137,41 +164,55 @@ class BobsBuddyInvoker {
         return true
     }
     
+    private func snapshotCombatState() -> Bool {
+        let opaque = mono_thread_attach(MonoHelper._monoInstance)
+        
+        defer {
+            mono_thread_detach(opaque)
+        }
+        
+        if game.isBattlegroundsDuosMatch() {
+            snapshotBoardState(turn: game.turnNumber())
+            BobsBuddyInvoker.bobsBuddyDisplay.setState(st: .waitingForTeammates)
+            DispatchQueue.main.async {
+                BobsBuddyInvoker.bobsBuddyDisplay.resetText()
+            }
+            if input != nil && (duosInputPlayerTeammate == nil || duosInputOpponentTeammate == nil) {
+                logger.debug("Waiting Teammates. Exiting.")
+                return false
+            }
+        }
+        
+        if state.rawValue >= BobsBuddyState.combat.rawValue {
+            logger.debug("Already in \(state) state. Exiting")
+            return false
+        } else {
+            snapshotBoardState(turn: game.turnNumber())
+        }
+        logger.info("State is now combat")
+        state = .combat
+        
+        return true
+    }
+
     func startCombat() {
         opponentHand = [Entity]()
         opponentSecrets = [Entity]()
-        
+
         if !shouldRun() {
             return
         }
+
+        if !snapshotCombatState() {
+            return
+        }
+
         DispatchQueue.global().async { [self] in
             let opaque = mono_thread_attach(MonoHelper._monoInstance)
-            
+
             defer {
                 mono_thread_detach(opaque)
             }
-            
-            if game.isBattlegroundsDuosMatch() {
-                snapshotBoardState(turn: game.turnNumber())
-                BobsBuddyInvoker.bobsBuddyDisplay.setState(st: .waitingForTeammates)
-                DispatchQueue.main.async {
-                    BobsBuddyInvoker.bobsBuddyDisplay.resetText()
-                }
-                if input != nil && (duosInputPlayerTeammate == nil || duosInputOpponentTeammate == nil) {
-                    logger.debug("Waiting Teammates. Exiting.")
-                    return
-                }
-            }
-            
-            if state.rawValue >= BobsBuddyState.combat.rawValue {
-                logger.debug("Already in \(state) state. Exiting")
-                return
-            } else {
-                snapshotBoardState(turn: game.turnNumber())
-            }
-            logger.info("State is now combat")
-            state = .combat
-            
             Thread.sleep(forTimeInterval: Double(StateChangeDelay) / 1_000.0)
             
             if state != .combat {
@@ -257,6 +298,7 @@ class BobsBuddyInvoker {
         return Promise<Bool> { seal in
             currentOpponentMinions.removeAll()
             logger.debug("Running simulation...")
+            let startTime = Date()
             DispatchQueue.main.async {
                 BobsBuddyInvoker.bobsBuddyDisplay.hidePercentagesShowSpinners()
             }
@@ -272,6 +314,11 @@ class BobsBuddyInvoker {
                     mono_thread_detach(opaque)
                 }
 
+                // extremely fast simulations otherwise make the spinner disappear quickly, making the result feel unreliable
+                let remainingSpinTime = self.MinimumSpinTime - (Date().timeIntervalSince1970 - startTime.timeIntervalSince1970)
+                if remainingSpinTime > 0 {
+                    Thread.sleep(forTimeInterval: remainingSpinTime)
+                }
                 // Add enum for exit conditions
                 if top.simulationCount <= 500 && top.getMyExitCondition() ==  .time {
                     logger.debug("Could not perform enough simulations. Displaying error state and exiting.")
@@ -490,6 +537,15 @@ class BobsBuddyInvoker {
             return
         }
         let wasPreviousStatePartial = state == .combatPartial
+        
+        // The last death of the combat has no following attack to trigger a potential flush.
+        if BobsBuddyInvoker.currentCombatHasPendingAutoAssemblerObservations {
+            flushAndUpdateObservedAutoAssemblerDeathrattlesAsync()
+        }
+        if BobsBuddyInvoker.currentCombatHasPendingCrabObservations {
+            flushAndUpdateObservedCrabDeathrattlesAsync()
+        }
+        
         if isGameOver {
             if state != .initial {
                 logger.debug("Setting UI state to GameOver")
@@ -539,7 +595,10 @@ class BobsBuddyInvoker {
     }
     
     private func getLastCombatResult() -> CombatResult {
-        guard let LastAttackingHero = LastAttackingHero else {
+        guard let LastAttackingHero else {
+            if _reconnectCounterAtSnapshot != BobsBuddyInvoker._reconnectCounter {
+                return .reconnect
+            }
             return .tie
         }
         if LastAttackingHero.isControlled(by: game.player.id) {
@@ -551,10 +610,21 @@ class BobsBuddyInvoker {
     
     private func getLastLethalResult() -> LethalResult {
         guard let defendingHero = _defendingHero, let attackingHero = _attackingHero else {
-            return .noOneDied
+            return .noOneDied // No damage dealt, defender still alive (was a tie)
         }
 
-        let totalDefenderHealth = defendingHero.health + defendingHero[.armor]
+        var totalDefenderHealth = defendingHero.health + defendingHero[.armor]
+        if game.isBattlegroundsDuosMatch(), let input {
+            // A duos pair shares one health pool. _defendingHero holds the last hero-vs-hero strike of the
+            // combat; when the other partner has been eliminated that strike lands on Lady Deathwhisper,
+            // which has HEALTH=30 DAMAGE=30 before it is hit. Its Health+ARMOR is therefore 0, so every strike
+            // compares as lethal. Use GetDuosStartingHealth instead - which is the value the simulation used.
+            if attackingHero.isControlled(by: game.player.id) {
+                totalDefenderHealth = Int(SimulatorProxy.getDuosStartingHealth(input.opponent.health, (input.opponentTeammate.get() != nil ? input.opponentTeammate.health : nil)))
+            } else {
+                totalDefenderHealth = Int(SimulatorProxy.getDuosStartingHealth(input.player.health, (input.playerTeammate.get() != nil ? input.playerTeammate.health : nil)))
+            }
+        }
         if attackingHero.attack >= totalDefenderHealth {
             if attackingHero.isControlled(by: game.player.id) {
                 return .opponentDied
@@ -562,7 +632,7 @@ class BobsBuddyInvoker {
                 return .friendlyDied
             }
         }
-        return .noOneDied
+        return .noOneDied // damage was dealt, but defender still alive
     }
     
     private func validateSimulationResult() {
@@ -709,38 +779,38 @@ class BobsBuddyInvoker {
         return hand.sorted(by: { $0[.zone_position] < $1[.zone_position] })
     }
     
-    static func getMinionFromEntity(sim: SimulatorProxy, player: Bool, ent: Entity, attachedEntities: [Entity], allEntities: SynchronizedDictionary<Int, Entity>? = nil) -> MinionProxy {
-        let cardId = ent.info.latestCardId
+    static func getMinionFromEntity(sim: SimulatorProxy, player: Bool, entity: Entity, attachedEntities: [Entity], allEntities: SynchronizedDictionary<Int, Entity>? = nil) -> MinionProxy {
+        let cardId = entity.info.latestCardId
         let minion = sim.minionFactory.createFromCardid(id: cardId, player: player)
         
-        minion.primaryRace = Int32(ent[.cardrace])
-        minion.baseAttack = Int32(ent[GameTag.atk])
-        minion.baseHealth = Int32(ent[GameTag.health] - ent[.damage])
-        minion.maxAttack = Int32(ent[GameTag.atk])
-        minion.maxHealth = Int32(ent[GameTag.health])
-        minion.taunt = ent.has(tag: GameTag.taunt)
-        minion.div = ent.has(tag: GameTag.divine_shield)
+        minion.primaryRace = Int32(entity[.cardrace])
+        minion.baseAttack = Int32(entity[GameTag.atk])
+        minion.baseHealth = Int32(entity[GameTag.health] - entity[.damage])
+        minion.maxAttack = Int32(entity[GameTag.atk])
+        minion.maxHealth = Int32(entity[GameTag.health])
+        minion.taunt = entity.has(tag: GameTag.taunt)
+        minion.div = entity.has(tag: GameTag.divine_shield)
         if cardIdsWithCleave.contains(cardId) {
             minion.cleave = true
         }
-        minion.poisonous = ent.has(tag: GameTag.poisonous)
-        minion.venomous = ent.has(tag: GameTag.venomous)
-        minion.windfury = ent.has(tag: GameTag.windfury)
-        minion.megaWindfury = ent.has(tag: GameTag.mega_windfury) || cardIdsWithMegaWindfury.contains(cardId)
-        minion.stealth = ent.has(tag: .stealth)
+        minion.poisonous = entity.has(tag: GameTag.poisonous)
+        minion.venomous = entity.has(tag: GameTag.venomous)
+        minion.windfury = entity.has(tag: GameTag.windfury)
+        minion.megaWindfury = entity.has(tag: GameTag.mega_windfury) || cardIdsWithMegaWindfury.contains(cardId)
+        minion.stealth = entity.has(tag: .stealth)
         
-        let golden = ent.has(tag: GameTag.premium)
+        let golden = entity.has(tag: GameTag.premium)
         minion.golden = golden
-        minion.tier = Int32(ent[GameTag.tech_level])
-        minion.reborn = ent.has(tag: GameTag.reborn)
-        minion.scriptDataNum1 = Int32(ent[.tag_script_data_num_1])
-        minion.scriptDataNum2 = Int32(ent[.tag_script_data_num_2])
-        minion.scriptDataNum3 = Int32(ent[.tag_script_data_num_3])
-        minion.scriptDataNum4 = Int32(ent[.tag_script_data_num_4])
+        minion.tier = Int32(entity[GameTag.tech_level])
+        minion.reborn = entity.has(tag: GameTag.reborn)
+        minion.scriptDataNum1 = Int32(entity[.tag_script_data_num_1])
+        minion.scriptDataNum2 = Int32(entity[.tag_script_data_num_2])
+        minion.scriptDataNum3 = Int32(entity[.tag_script_data_num_3])
+        minion.scriptDataNum4 = Int32(entity[.tag_script_data_num_4])
 
-        let dbfId = ent.card.dbfId
-        let m1 = ent[.modular_entity_part_1]
-        let m2 = ent[.modular_entity_part_2]
+        let dbfId = entity.card.dbfId
+        let m1 = entity[.modular_entity_part_1]
+        let m2 = entity[.modular_entity_part_2]
         
         if m1 > 0 && m2 > 0 && (m1 == dbfId || m2 == dbfId) {
             if let modularCard = Cards.by(dbfId: m1 == dbfId ? m2 : m1, collectible: false) {
@@ -748,11 +818,6 @@ class BobsBuddyInvoker {
                 minion.attachedModularEntity = modularMinion
                 modularMinion.attachedTo = minion
             }
-        }
-        
-        if golden && (BobsBuddyInvoker.cardIdsWithoutPremiumImplementation.firstIndex(of: cardId) != nil) {
-            minion.vanillaAttack *= 2
-            minion.vanillaHealth *= 2
         }
         
         for attached in attachedEntities {
@@ -817,17 +882,22 @@ class BobsBuddyInvoker {
             }
         }
         
-        if minion.isMech() && attachedEntities.any({ e in e.has(tag: .modular)}) {
-            checkForMagneticDeathrattles(minion: minion, attachedEntities: attachedEntities, allEntities: allEntities)
+        if attachedEntities.any({ e in e.has(tag: GameTag.modular)}) {
+            if minion.isMech() {
+                checkForMagnetizedDeathrattles(minion, attachedEntities, allEntities)
+            }
+            // Not just mech here, because Technical Element can magnetize to Elementals
+            checkForSurfnSurfFromMagnetizedModules(minion, entity, allEntities)
         }
         
-        minion.gameId = Int32(ent.id)
+        minion.gameId = Int32(entity.id)
         
         return minion
     }
     
-    // Magnetic deathrattles can be *hiding* if initially attached to a magnetic minion that was then tripled and magnetized to another mech
-    static func checkForMagneticDeathrattles(minion: MinionProxy, attachedEntities: [Entity], allEntities: SynchronizedDictionary<Int, Entity>?) {
+    // Magnetized deathrattles (e.g., Auto Assembler) can be *hiding* if initially attached
+    // to a magnetic minion that was then tripled and magnetized to another mech.
+    private static func checkForMagnetizedDeathrattles(_ minion: MinionProxy, _ attachedEntities: [Entity], _ allEntities: SynchronizedDictionary<Int, Entity>?) {
         // Required to resolve the chain of magnetized
         guard let allEntities else {
             return
@@ -840,20 +910,51 @@ class BobsBuddyInvoker {
                 continue
             }
 
-            // Count the Auto Assembler enchantments attached to the magnetic (directly-magnetized Auto Assemblers).
             let enchantCount = allEntities.values.count { x in x.isAttachedTo(entityId: magneticId) && x.cardId == CardIds.NonCollectible.Neutral.AutoAssembler_AutoAssemblerEnchantment }
-            if enchantCount == 0 {
-                continue
+            let goldenEnchantCount = allEntities.values.count { x in x.isAttachedTo(entityId: magneticId) && x.cardId == CardIds.NonCollectible.Neutral.AutoAssembler_AutoAssembler2 }
+            
+            for _ in 0 ..< enchantCount {
+                minion.addDeathrattle(deathrattle: AutoAssemblerProxy.deathrattle())
             }
 
-            for _ in 0 ..< enchantCount {
-                minion.addDeathrattle(deathrattle: AutoAssembler.deathrattle(golden: false))
-            }
-        }
+            for _ in 0 ..< goldenEnchantCount {
+                minion.addDeathrattle(deathrattle: AutoAssemblerProxy.goldenDeathrattle())
+            }        }
 
         // Future magnetic deathrattles can be added/handled here.
     }
     
+    // A magnetized module keeps its own attached enchantments, including Surf n' Surf Spellcraft spells
+    // cast on a Technical Element, which is then magnetized to another host minion.
+    // The magnetized module records its host in TAG_SCRIPT_DATA_NUM_1 when it magnetizes.
+    private static func checkForSurfnSurfFromMagnetizedModules(_ minion: MinionProxy, _ host: Entity, _ allEntities: SynchronizedDictionary<Int, Entity>?) {
+        guard let allEntities else {
+            return
+        }
+
+        let magnetizedModules = allEntities.values
+            .filter({ x in x[GameTag.tag_script_data_num_1] == host.id
+                && x.has(tag: GameTag.modular)
+                && x.card.type == CardType.minion })
+            .sorted(by: { $0.id < $1.id })
+
+        for module in magnetizedModules {
+            let granted = allEntities.values
+                .filter({ x in x.isAttachedTo(entityId: module.id) })
+                .sorted(by: { $0.id < $1.id })
+            for attached in granted {
+                switch attached.cardId {
+                case CardIds.NonCollectible.Neutral.SurfnSurf_CrabRidingEnchantment:
+                    minion.addDeathrattle(deathrattle: GenericDeathrattles.crab())
+                case CardIds.NonCollectible.Neutral.SurfnSurf_CrabRiding:
+                    minion.addDeathrattle(deathrattle: GenericDeathrattles.crabGolden())
+                default:
+                    break
+                }
+            }
+        }
+    }
+
     static func getObjectiveFromEntity(factory: ObjectiveFactoryProxy, player: Bool, entity: Entity) -> ObjectiveProxy {
         let objective = factory.create(cardId: entity.cardId, controlledByPlayer: player)
         let scriptDataNum1 = entity[.tag_script_data_num_1]
@@ -868,7 +969,11 @@ class BobsBuddyInvoker {
     }
     
     static func getTrinketFromEntity(factory: TrinketFactoryProxy, player: Bool, entity: Entity) -> TrinketProxy {
-        let trinket = factory.create(id: entity.cardId, friendly: player)
+        // Use LatestCardId, not CardId. A Lesser/Greater Crystal Ball that has transformed into a
+        // copy of a trinket keeps its stale token CardId (BACON trinket entities are not updated by
+        // CHANGE_ENTITY), while LatestCardId always reflects the copied card.
+        let cardId = entity.info.latestCardId
+        let trinket = factory.create(id: cardId, friendly: player)
         let scriptDataNum1 = entity[.tag_script_data_num_1]
         let scriptDataNum2 = trinket.scriptDataNum2
         if scriptDataNum1 > 0 {
@@ -877,7 +982,15 @@ class BobsBuddyInvoker {
         if scriptDataNum2 > 0 {
             trinket.scriptDataNum2 = Int32(scriptDataNum2)
         }
-        if entity.cardId == CardIds.NonCollectible.Neutral.ReplicaCathedral {
+        
+        // Set slot that holds the trinket (i.e., Fantastic Treasure, Growing Collection,
+        // Lesser Trinket, Greater Trinket); necessary to order friendly start of combat triggers
+        let containerCardId = entity.info.cardIdBeforeReveal ?? entity.cardId
+        if !containerCardId.isEmpty && containerCardId != cardId {
+            trinket.containerCardId = containerCardId
+        }
+        // Special handling for replica cathedral
+        if cardId == CardIds.NonCollectible.Neutral.ReplicaCathedral {
             trinket.scriptDataNum1 = Int32(entity[GameTag.gametag_4696])
         }
         trinket.game_id = Int32(entity.id)
@@ -888,7 +1001,7 @@ class BobsBuddyInvoker {
         return game.entities.values.filter({ $0.isAttachedTo(entityId: entityId) && ($0.isInPlay || $0.isInSetAside || $0.isInGraveyard) }).map({ $0.copy() })
     }
     
-    private func setupInputPlayer(simulator: SimulatorProxy, gamePlayer: Player, inputPlayer: PlayerProxy, playerEntity: Entity?, friendly: Bool) throws {
+    private func setupInputPlayer(simulator: SimulatorProxy, gamePlayer: Player, inputPlayer: PlayerProxy, playerEntity: Entity?, friendly: Bool, isDuosTeammate: Bool = false) throws {
         let playerGameHero = gamePlayer.hero
         
         guard let playerEntity else {
@@ -951,7 +1064,7 @@ class BobsBuddyInvoker {
             if heroPower.cardId == CardIds.NonCollectible.Neutral.TavishStormpike_LockAndLoad {
                 let attachedEntityId = heroPower[.tag_script_data_ent_1]
                 if let attachedEntity = gamePlayer.setAside.first(where: {e in e.id == attachedEntityId }) {
-                    pHpAttachedMinion = BobsBuddyInvoker.getMinionFromEntity(sim: simulator, player: friendly, ent: attachedEntity,
+                    pHpAttachedMinion = BobsBuddyInvoker.getMinionFromEntity(sim: simulator, player: friendly, entity: attachedEntity,
                                                                              attachedEntities: getAttachedEntities(entityId: attachedEntityId))
                 }
             }
@@ -989,7 +1102,7 @@ class BobsBuddyInvoker {
             MonoHelper.addToList(list: playerObjectives, element: BobsBuddyInvoker.getObjectiveFromEntity(factory: simulator.objectiveFactory, player: friendly, entity: objective))
         }
         
-        let playerSide = BobsBuddyInvoker.getOrderedMinions(board: gamePlayer.board).filter { e in e.isControlled(by: gamePlayer.id) }.map { e in BobsBuddyInvoker.getMinionFromEntity(sim: simulator, player: friendly, ent: e, attachedEntities: getAttachedEntities(entityId: e.id), allEntities: game.entities)}
+        let playerSide = BobsBuddyInvoker.getOrderedMinions(board: gamePlayer.board).filter { e in e.isControlled(by: gamePlayer.id) }.map { e in BobsBuddyInvoker.getMinionFromEntity(sim: simulator, player: friendly, entity: e, attachedEntities: getAttachedEntities(entityId: e.id), allEntities: game.entities)}
         let inputPlayerSide = inputPlayer.side
         for m in playerSide {
             MonoHelper.addToList(list: inputPlayerSide, element: m)
@@ -1006,11 +1119,13 @@ class BobsBuddyInvoker {
             let friendlyHandEntities = BobsBuddyInvoker.getOrderedHandEntities(gamePlayer.hand)
             for e in friendlyHandEntities {
                 if e.isMinion {
-                    let minionEntity = MinionCardEntityProxy(minion: BobsBuddyInvoker.getMinionFromEntity(sim: simulator, player: true, ent: e, attachedEntities: getAttachedEntities(entityId: e.id)), simulator: simulator)
+                    let minionEntity = MinionCardEntityProxy(minion: BobsBuddyInvoker.getMinionFromEntity(sim: simulator, player: true, entity: e, attachedEntities: getAttachedEntities(entityId: e.id)), simulator: simulator)
                     minionEntity.canSummon = !e.has(tag: .literally_unplayable)
                     MonoHelper.addToList(list: playerHand, element: minionEntity)
                 } else if e.cardId == CardIds.NonCollectible.Neutral.BloodGem1 {
                     MonoHelper.addToList(list: playerHand, element: BloodGemProxy(simulator: simulator))
+                } else if e.cardId == CardIds.NonCollectible.Neutral.BilgewaterBreakout_LockboxToken {
+                    MonoHelper.addToList(list: inputPlayer.hand, element: LockboxCardEntityProxy(simulator: simulator))
                 } else if e.isSpell {
                     MonoHelper.addToList(list: playerHand, element: SpellCardEntityProxy(simulator: simulator))
                 } else {
@@ -1046,79 +1161,126 @@ class BobsBuddyInvoker {
             }
         }
         
-        let playerAttached = getAttachedEntities(entityId: playerEntity.id)
+        // DUOS TEAMMATE (validated/verified against 276 duos combats):
+        // Per-player enchants only ever attach to the two Player entities (Player and Opponent). When the
+        // displayed warband swaps to the teammate's, the game creates FRESH copies of the teammate's per-player
+        // enchants attached to the same Player entity in zone PLAY, and moves the local player's own copies
+        // to SETASIDE; therefore filter to to IsInPlay.
+        let playerAttached = isDuosTeammate
+        ? getAttachedEntities(entityId: playerEntity.id).filter { x in x.isInPlay }
+        : getAttachedEntities(entityId: playerEntity.id)
+
+        // captured inputPlayer values below are marked as either 'attached' or 'direct'
+        // attached: obtained from GetAttachedEntities (requires isDuosTeammate to work properly in duos games)
+        // direct: comes directly from the playerEntity using GetTag (no special handling needed for duos)
+        
         let pEternalLegion = playerAttached.first { x in x.cardId == CardIds.NonCollectible.Neutral.EternalKnight_EternalKnightPlayerEnchant }
         if let pEternalLegion {
-            inputPlayer.eternalKnightCounter = Int32(pEternalLegion[.tag_script_data_num_1])
+            inputPlayer.eternalKnightCounter = Int32(pEternalLegion[.tag_script_data_num_1]) // attached
         }
         let pUndeadBonus = playerAttached.first { x in x.cardId == CardIds.NonCollectible.Neutral.NerubianDeathswarmer_UndeadBonusAttackPlayerEnchantDnt }
         if let pUndeadBonus {
-            inputPlayer.undeadAttackBonus = Int32(pUndeadBonus[.tag_script_data_num_1])
-            inputPlayer.undeadHealthBonus = Int32(pUndeadBonus[.tag_script_data_num_2])
+            inputPlayer.undeadAttackBonus = Int32(pUndeadBonus[.tag_script_data_num_1]) // attached
+            inputPlayer.undeadHealthBonus = Int32(pUndeadBonus[.tag_script_data_num_2]) // attached
         }
         
         if let pBeastBonus = playerAttached.first(where: { x in x.cardId == CardIds.NonCollectible.Neutral.TimewarpedGoldrinn_TimewarpedGoldrinnPlayerEnchantDnt }) {
-            inputPlayer.beastAttackBonus = Int32(pBeastBonus[GameTag.tag_script_data_num_1])
-            inputPlayer.beastHealthBonus = Int32(pBeastBonus[GameTag.tag_script_data_num_2])
+            inputPlayer.beastAttackBonus = Int32(pBeastBonus[GameTag.tag_script_data_num_1]) // attached
+            inputPlayer.beastHealthBonus = Int32(pBeastBonus[GameTag.tag_script_data_num_2]) // attached
             logger.info("pBeastAttack=\(inputPlayer.beastAttackBonus), pBeastHealth=\(inputPlayer.beastHealthBonus), friendly=\(friendly)")
         }
         
         if let pAncestralAutomaton = playerAttached.first(where: { x in x.cardId == CardIds.Invalid.AncestralAutomaton_AncestralAutomatonPlayerEnchantDnt }) {
-            inputPlayer.ancestralAutomatonCounter = Int32( pAncestralAutomaton[.tag_script_data_num_1])
+            inputPlayer.ancestralAutomatonCounter = Int32( pAncestralAutomaton[.tag_script_data_num_1]) // attached
         }
         if let pBeetle = playerAttached.first(where: { x in x.cardId == CardIds.NonCollectible.Neutral.RunedProgenitor_BeetleArmyPlayerEnchantDnt }) {
-            inputPlayer.beetlesAtkBuff = Int32(pBeetle[.tag_script_data_num_1])
-            inputPlayer.beetlesHealthBuff = Int32(pBeetle[.tag_script_data_num_2])
+            inputPlayer.beetlesAtkBuff = Int32(pBeetle[.tag_script_data_num_1]) // attached
+            inputPlayer.beetlesHealthBuff = Int32(pBeetle[.tag_script_data_num_2]) // attached
             logger.info("pBeetleAtk=\(inputPlayer.beetlesAtkBuff), pBeetleHealth=\(inputPlayer.beetlesHealthBuff), friendly=\(friendly)")
         }
         
         if let pWhelpBonus = playerAttached.first(where: { x in
             x.cardId == CardIds.NonCollectible.Neutral.BurgeoningWhelp_WhelpBuffPlayerEnchantDnt }) {
-            inputPlayer.whelpAttackBonus = Int32(pWhelpBonus[GameTag.tag_script_data_num_1])
-            inputPlayer.whelpHealthBonus = Int32(pWhelpBonus[GameTag.tag_script_data_num_2])
+            inputPlayer.whelpAttackBonus = Int32(pWhelpBonus[GameTag.tag_script_data_num_1]) // attached
+            inputPlayer.whelpHealthBonus = Int32(pWhelpBonus[GameTag.tag_script_data_num_2]) // attached
             logger.info("pWhelpAttack=\(inputPlayer.whelpAttackBonus), pWhelpHealth=\(inputPlayer.whelpHealthBonus), friendly=\(friendly)")
         }
         
-        inputPlayer.elementalPlayCounter = Int32(game.playerEntity?[.gametag_2878] ?? 0)
+        inputPlayer.elementalPlayCounter = Int32(game.playerEntity?[.gametag_2878] ?? 0) // direct
         
         logger.info("pEternal=\(inputPlayer.eternalKnightCounter), pUndead=\(inputPlayer.undeadAttackBonus), pElemental=\(inputPlayer.elementalPlayCounter), friendly=\(friendly)")
         
-        inputPlayer.piratesSummonCounter = Int32(game.playerEntity?[.gametag_2358] ?? 0)
+        inputPlayer.piratesSummonCounter = Int32(game.playerEntity?[.gametag_2358] ?? 0) // direct
         
-        inputPlayer.resourcesSpentThisGame = Int32(game.playerEntity?[.num_resources_spent_this_game] ?? 0)
+        inputPlayer.resourcesSpentThisGame = Int32(game.playerEntity?[.num_resources_spent_this_game] ?? 0) // direct
         
-        inputPlayer.beastsSummonCounter = Int32(game.playerEntity?[.gametag_3962] ?? 0)
+        // The tag is never sent for the opponent — derive the value if there is a Malorne on their board.
+        if inputPlayer.resourcesSpentThisGame == 0 && !friendly {
+            if let malorne = gamePlayer.board.first(where: { e in e.cardId == CardIds.NonCollectible.Neutral.ForestLordCenarius_Malorne1 || e.cardId == CardIds.NonCollectible.Neutral.ForestLordCenarius_Malorne2 }) {
+                inputPlayer.resourcesSpentThisGame = Int32(BobsBuddyInvoker.getResourcesSpentThisGameFromMalorne(malorne, getAttachedEntities(entityId: malorne.id))) // derived
+            }
+        }
         
-        inputPlayer.friendlyMinionsDeadLastCombatCounter = Int32(game.playerEntity?[.gametag_2717] ?? 0)
+        inputPlayer.beastsSummonCounter = Int32(game.playerEntity?[.gametag_3962] ?? 0) // direct
         
-        inputPlayer.battlecryCounter = Int32(game.playerEntity?[.gametag_3236] ?? 0)
+        inputPlayer.friendlyMinionsDeadLastCombatCounter = Int32(game.playerEntity?[.gametag_2717] ?? 0) // direct
+        
+        inputPlayer.battlecryCounter = Int32(game.playerEntity?[.gametag_3236] ?? 0) // direct
         
         logger.info("pPirates=\(inputPlayer.piratesSummonCounter), pBeasts=\(inputPlayer.beastsSummonCounter), pDeadLastCombat=\(inputPlayer.friendlyMinionsDeadLastCombatCounter), pBattlecry=\(inputPlayer.battlecryCounter), friendly=\(friendly)")
         
-        inputPlayer.bloodGemAtkBuff = Int32(playerEntity[.bacon_bloodgembuffatkvalue])
-        inputPlayer.bloodGemHealthBuff = Int32(playerEntity[.bacon_bloodgembuffhealthvalue])
+        // Two places carry the Blood Gem buff and each has a measured way to under-count
+        // both only ever accumulate, so take the per-source maximum.
+        let pBloodGemBonus = playerAttached.first(where: { x in x.cardId == CardIds.NonCollectible.Neutral.MoonBaconJazzer_BloodGemPlayerEnchantDnt })
+        let bloodGemAtkFromEnchant = pBloodGemBonus?[GameTag.tag_script_data_num_1] ?? 0   // attached
+        let bloodGemHealthFromEnchant = pBloodGemBonus?[GameTag.tag_script_data_num_2] ?? 0   // attached
+        let bloodGemAtkFromTag = playerEntity[GameTag.bacon_bloodgembuffatkvalue]   // direct
+        let bloodGemHealthFromTag = playerEntity[GameTag.bacon_bloodgembuffhealthvalue]   // direct
+        inputPlayer.bloodGemAtkBuff = Int32(max(bloodGemAtkFromEnchant, bloodGemAtkFromTag))
+        inputPlayer.bloodGemHealthBuff = Int32(max(bloodGemHealthFromEnchant, bloodGemHealthFromTag))
         
         logger.info("pBloodGem=+\(inputPlayer.bloodGemAtkBuff)/+\(inputPlayer.bloodGemHealthBuff), friendly=\(friendly)")
         
-        let pTagTransfer = friendly ? nil : playerAttached.first(where: { x in x.cardId == CardIds.NonCollectible.Neutral.TagtransferplayerenchantDnt && x.isInPlay })
-        inputPlayer.tavernSpellAtkBuff = Int32(pTagTransfer?[.tavern_spell_attack_increase] ?? playerEntity[GameTag.tavern_spell_attack_increase])
-        inputPlayer.tavernSpellHealthBuff = Int32(pTagTransfer?[.tavern_spell_health_increase] ?? playerEntity[GameTag.tavern_spell_health_increase])
+        let pTagTransfer = friendly ? nil : playerAttached.first(where: { x in x.cardId == CardIds.NonCollectible.Neutral.TagtransferplayerenchantDnt && x.isInPlay }) // attached (opponent-only transfer enchant)
+        inputPlayer.tavernSpellAtkBuff = Int32(playerEntity.has(tag: GameTag.tavern_spell_attack_increase) ?
+                                               playerEntity[GameTag.tavern_spell_attack_increase] // direct
+                                               : pTagTransfer?[GameTag.tavern_spell_attack_increase] ?? 0) // attached (fallback)
+        inputPlayer.tavernSpellHealthBuff = Int32(playerEntity.has(tag: GameTag.tavern_spell_health_increase) ?
+                                                  playerEntity[GameTag.tavern_spell_health_increase] // direct
+                                                  : pTagTransfer?[GameTag.tavern_spell_health_increase] ?? 0) // attached (fallback)
         logger.info("pTavernSpell=+\(inputPlayer.tavernSpellAtkBuff)/+\(inputPlayer.tavernSpellHealthBuff) (opponentTransferEnchant=\(pTagTransfer != nil)), friendly=\(friendly)")
         
-        inputPlayer.tavernSpellCounter = Int32(playerEntity[GameTag.gametag_3088])
+        inputPlayer.tavernSpellCounter = Int32(playerEntity[GameTag.gametag_3088]) // direct
         
-        inputPlayer.deathrattleCounter = Int32(playerEntity[GameTag.gametag_4639])
+        inputPlayer.deathrattleCounter = Int32(playerEntity[GameTag.gametag_4639]) // direct
          
         if let pHaunted = playerAttached.first(where: { x in x.cardId == CardIds.NonCollectible.Neutral.HauntedCarapace_HauntedCarapacePlayerEnchantDnt }) {
-            inputPlayer.hauntedAtkBuff = Int32(pHaunted[GameTag.tag_script_data_num_1])
-            inputPlayer.hauntedHealthBuff = Int32(pHaunted[GameTag.tag_script_data_num_2])
+            inputPlayer.hauntedAtkBuff = Int32(pHaunted[GameTag.tag_script_data_num_1]) // attached
+            inputPlayer.hauntedHealthBuff = Int32(pHaunted[GameTag.tag_script_data_num_2]) // attached
             logger.info("pHauntedAtk=\(inputPlayer.hauntedAtkBuff), pHauntedHealth=\(inputPlayer.hauntedHealthBuff), friendly=\(friendly)")
         }
+    }
+    
+    private func listAny<T: MonoHandle>(_ list: MonoHandle, _ predicate: (T) -> Bool) -> T? {
+        let count = MonoHelper.listCount(obj: list)
+        var minion: T?
+        for i in 0 ..< count {
+            let item = MonoHelper.listItem(obj: list, index: i).get()
+            let m = T(obj: item)
+            if predicate(m) {
+                minion = m
+                break
+            }
+        }
+        return minion
     }
 
     func snapshotBoardState(turn: Int) {
         logger.debug("Snapshotting board state...")
         LastAttackingHero = nil
+        _attackingHero = nil
+        _defendingHero = nil
+        _reconnectCounterAtSnapshot = BobsBuddyInvoker._reconnectCounter
         
         let simulator = SimulatorProxy()
         let input = InputProxy()
@@ -1141,7 +1303,14 @@ class BobsBuddyInvoker {
         }
         
         do {
-            if self.input == nil {
+            // In solos, each invoker instance snapshots exactly once, and _input=null here is the expected case.
+            // Only a duos teammate re-snapshot will legitimately arrive with _input set.
+            // However, a non-null solos _input CAN occur from a third-party plugin that saves/restores input
+            // mid-combat. Allowing setup to always proceed for solos, regardless of _input, solves this.
+            if self.input == nil || !game.isBattlegroundsDuosMatch() {
+                if self.input != nil {
+                    logger.debug("Input was already set before this instance's first snapshot; Rebuilding the input from the current game state.")
+                }
                 try setupInputPlayer(simulator: simulator, gamePlayer: game.player, inputPlayer: input.player, playerEntity: game.playerEntity, friendly: true)
                 try setupInputPlayer(simulator: simulator, gamePlayer: game.opponent, inputPlayer: input.opponent, playerEntity: game.opponentEntity, friendly: false)
                 duosInputPlayer = input.player
@@ -1150,11 +1319,11 @@ class BobsBuddyInvoker {
                 duosInputOpponentTeammate = nil
             } else {
                 if game.duosWasPlayerHeroModified && duosInputPlayerTeammate == nil && input.playerTeammate.get() != nil {
-                    try setupInputPlayer(simulator: simulator, gamePlayer: game.player, inputPlayer: input.playerTeammate, playerEntity: game.playerEntity, friendly: true)
+                    try setupInputPlayer(simulator: simulator, gamePlayer: game.player, inputPlayer: input.playerTeammate, playerEntity: game.playerEntity, friendly: true, isDuosTeammate: true)
                     duosInputPlayerTeammate = input.playerTeammate
                 }
                 if game.duosWasOpponentHeroModified && duosInputOpponentTeammate == nil && input.opponentTeammate.get() != nil {
-                    try setupInputPlayer(simulator: simulator, gamePlayer: game.opponent, inputPlayer: input.opponentTeammate, playerEntity: game.opponentEntity, friendly: false)
+                    try setupInputPlayer(simulator: simulator, gamePlayer: game.opponent, inputPlayer: input.opponentTeammate, playerEntity: game.opponentEntity, friendly: false, isDuosTeammate: true)
                     duosInputOpponentTeammate = input.opponentTeammate
                 }
                 if game.isBattlegroundsDuosMatch() {
@@ -1180,12 +1349,44 @@ class BobsBuddyInvoker {
         self.input = input
         self._turn = turn
         
+        // Flag checking for Dr. Boom's Monster (to optimize redundantly checking in TagChangeAction)
+        // Predicate for MinionProxy objects (board)
+        let boomCheckMinion: (MinionProxy) -> Bool = { minion in
+            guard minion.get() != nil else { return false } // Ensure the underlying MonoObject is not nil
+            return minion.cardID == CardIds.NonCollectible.Neutral.DrBoomsMonster || minion.cardID == CardIds.NonCollectible.Neutral.DrBoomsMonster_DrBoomsMonster1
+        }
+        
+        // Predicate for CardEntityProxy objects (hand)
+        let boomCheckCard: (CardEntityProxy) -> Bool = { cardEntity in
+            guard cardEntity.get() != nil else { return false } // Ensure the underlying MonoObject is not nil
+            return cardEntity.id == CardIds.NonCollectible.Neutral.DrBoomsMonster || cardEntity.id == CardIds.NonCollectible.Neutral.DrBoomsMonster_DrBoomsMonster1
+        }
+        
+        BobsBuddyInvoker.currentCombatHasDrBoomsMonster = (listAny(input.player.side, boomCheckMinion) != nil) ||
+                                                          (listAny(input.opponent.side, boomCheckMinion) != nil) || // Corrected: input.player.opponent.side -> input.opponent.side
+                                                          (listAny(input.player.hand, boomCheckCard) != nil) ||
+                                                          (listAny(input.opponent.hand, boomCheckCard) != nil)
+        
+        // Flag checking it's possible to summon Malorne during combat (to optimize redundantly checking in TagChangeAction).
+        BobsBuddyInvoker.currentCombatMayHaveOpponentMalorne = input.anomaly.get() != nil && input.anomaly.cardID == CardIds.NonCollectible.Neutral.BringInTheBuddies
+        
+        // A stale observation from a combat that never reached StartShoppingAsync (e.g., disconnect) must not trigger flushes in the next combat.
+        BobsBuddyInvoker.currentCombatHasPendingAutoAssemblerObservations = false
+        BobsBuddyInvoker.currentCombatHasPendingCrabObservations = false
+        
         logger.debug("Successfully snapshotted board state")
     }
     
     private var reRunCount = 0
     
     func tryRerun() {
+        if state == BobsBuddyState.initial {
+            // For duos, revealed cards can happen during BobsBuddyState.Initial since the entire first
+            // fight parses before any state is assigned. The upcoming partial/full simulator run will have
+            // this updated input, so there is no need to continue with TryRerun()
+            return
+        }
+        
         reRunCount += 1
         if reRunCount <= 11 {
             logger.debug("Input changed, re-running simulation! (\(reRunCount))")
@@ -1201,8 +1402,8 @@ class BobsBuddyInvoker {
         }
     }
     
-    func updateOpponentHand(entity: Entity, copy: Entity) {
-        guard let input, state != .combat  else {
+    func updateCardOpponentHand(entity: Entity, copy: Entity) {
+        guard let input, updateRevealedEntityValidStates else {
             return
         }
         
@@ -1216,10 +1417,12 @@ class BobsBuddyInvoker {
             return
         }
 
-        MonoHelper.listClear(obj: input.opponent.hand)
+        let cls = mono_object_get_class(input.opponent.hand.get())
+        let newHand = MonoHandle(obj: MonoHelper.objectNew(clazz: cls))
         for ent in entities {
-            MonoHelper.addToList(list: input.opponent.hand, element: ent)
+            MonoHelper.addToList(list: newHand, element: ent)
         }
+        input.opponent.hand = newHand
         
         tryRerun()
     }
@@ -1248,7 +1451,7 @@ class BobsBuddyInvoker {
     }
     
     func updateLockAndLoadHeroPower(attachedEntity: Entity, isOpponent: Bool) {
-        guard let input, state == .combat else {
+        guard let input, updateRevealedEntityValidStates else {
             return
         }
         
@@ -1265,20 +1468,21 @@ class BobsBuddyInvoker {
             if tavishLockAndLoad == nil {
                 tryDuos = true // Will fallback and try duos anyways
             } else if let tavishLockAndLoad, tavishLockAndLoad.attachedMinion.get() == nil && tavishLockAndLoad.data3 == 0 {
-                tavishLockAndLoad.attachedMinion = BobsBuddyInvoker.getMinionFromEntity(sim: SimulatorProxy(), player: false, ent: attachedEntity, attachedEntities: getAttachedEntities(entityId: attachedEntity.id))
+                tavishLockAndLoad.attachedMinion = BobsBuddyInvoker.getMinionFromEntity(sim: SimulatorProxy(), player: false, entity: attachedEntity, attachedEntities: getAttachedEntities(entityId: attachedEntity.id))
+                tavishLockAndLoad.attachedMinionCapturedDuringCombat = true
                 tryRerun = true
             }
         }
         if tryDuos {
-            updateDuosLockAndLoadHeroPower(attachedEntity.card.dbfId)
+            updateDuosLockAndLoadHeroPower(attachedEntity)
         }
         if tryRerun {
             self.tryRerun()
         }
     }
     
-    func updateDuosLockAndLoadHeroPower(_ cardDbfId: Int) {
-        guard let input, state == .combat else {
+    func updateDuosLockAndLoadHeroPower(_ firedMinionEntity: Entity) {
+        guard let input, updateRevealedEntityValidStates else {
             return
         }
 
@@ -1288,29 +1492,35 @@ class BobsBuddyInvoker {
             mono_thread_detach(opaque)
         }
         
-        func getTavishHP(_ heroPowers: MonoHandle) -> HeroPowerDataProxy? {
-            let count = MonoHelper.listCount(obj: heroPowers)
-            for idx in 0 ..< count {
-                let hp = HeroPowerDataProxy(obj: MonoHelper.listItem(obj: heroPowers, index: idx).get())
-                if hp.cardId == CardIds.NonCollectible.Neutral.TavishStormpike_LockAndLoad {
-                    return hp
-                }
+        let creatorId = firedMinionEntity[.creator]
+        let sides: [(MonoHandle, Bool)] = [
+            ( input.player.heroPowers, true ),
+            ( input.playerTeammate.get() != nil ? input.playerTeammate.heroPowers : MonoHandle(), true ),
+            ( input.opponent.heroPowers, false ),
+            ( input.opponentTeammate.get() != nil ? input.opponentTeammate.heroPowers : MonoHandle(), false )
+        ]
+        var tavishLockAndLoad: HeroPowerDataProxy?
+        var friendly = false
+        for (heroPowers, sideFriendly) in sides where heroPowers.get() != nil {
+            if let match = listFirst(heroPowers, { (hp: HeroPowerDataProxy) in
+                hp.cardId
+                == CardIds.NonCollectible.Neutral.TavishStormpike_LockAndLoad && hp.attachedMinion.game_id == creatorId }) {
+                tavishLockAndLoad = match
+                friendly = sideFriendly
+                break
             }
-            return nil
-        }
-        
-        var tavishLockAndLoad: HeroPowerDataProxy? = getTavishHP(input.opponent.heroPowers)
-        
-        if tavishLockAndLoad == nil && input.playerTeammate.get() != nil {
-            tavishLockAndLoad = getTavishHP(input.playerTeammate.heroPowers)
         }
         
         if tavishLockAndLoad == nil {
-            tavishLockAndLoad = getTavishHP(input.opponent.heroPowers)
-        }
-        
-        if tavishLockAndLoad == nil && input.opponentTeammate.get() != nil {
-            tavishLockAndLoad = getTavishHP(input.opponentTeammate.heroPowers)
+            for (heroPowers, sideFriendly) in sides where heroPowers.get() != nil {
+                if let match = listFirst(heroPowers, { (hp: HeroPowerDataProxy) in
+                    hp.cardId
+                    == CardIds.NonCollectible.Neutral.TavishStormpike_LockAndLoad }) {
+                    tavishLockAndLoad = match
+                    friendly = sideFriendly
+                    break
+                }
+            }
         }
         
         guard let tavishLockAndLoad else {
@@ -1320,8 +1530,17 @@ class BobsBuddyInvoker {
         if tavishLockAndLoad.attachedMinion.get() != nil || tavishLockAndLoad.data3 > 0 {
             return
         }
-        tavishLockAndLoad.data3 = Int32(cardDbfId)
-        
+        // COPIED_FROM_ENTITY_ID capture (TagChangeActions) fires before the fired minion attacks,
+        // so its stats are clean. The BLOCK_END capture (PowerHandler) can run after the shot, and the minion
+        // may carry damage or already be dead, and the simulation replays the shot, if so, fall back to dbf_id.
+        if firedMinionEntity[GameTag.damage] == 0 && firedMinionEntity.isInZone(zone: Zone.play) {
+            tavishLockAndLoad.attachedMinion = BobsBuddyInvoker.getMinionFromEntity(sim: SimulatorProxy(), player: friendly, entity: firedMinionEntity, attachedEntities: getAttachedEntities(entityId: firedMinionEntity.id))
+            tavishLockAndLoad.attachedMinionCapturedDuringCombat = true
+        } else if tavishLockAndLoad.data3 == 0 {
+            tavishLockAndLoad.data3 = Int32(firedMinionEntity.card.dbfId)
+        } else {
+            return
+        }
         tryRerun()
     }
     
@@ -1340,7 +1559,7 @@ class BobsBuddyInvoker {
     }
     
     func updateBackToBackSpellBonus(_ backToBackEnchantmentEntity: Entity, _ isOpponent: Bool) {
-        guard let input, state == BobsBuddyState.combat else {
+        guard let input, updateRevealedEntityValidStates else {
             return
         }
         
@@ -1369,8 +1588,8 @@ class BobsBuddyInvoker {
         tryRerun()
     }
     
-    func updateSandyTransformDuos(_ attachedEntity: Entity, _ sandyEntityId: Int32) {
-        guard let input, state == BobsBuddyState.combat else {
+    func updateSandyTransformDuos(_ transformedSandyEntity: Entity) {
+        guard let input, updateRevealedEntityValidStates else {
             return
         }
         
@@ -1381,38 +1600,36 @@ class BobsBuddyInvoker {
         }
         
         var friendly = true
-        var sandyMinion = listFirst(input.player.side, { (m: MinionProxy) in m.game_id == sandyEntityId })
+        // True to a "transform", transformedSandyEntity has the same Id as the original Sandy
+        var sandyMinion = listFirst(input.player.side, { (m: MinionProxy) in m.game_id == transformedSandyEntity.id })
         if sandyMinion == nil && input.playerTeammate.get() != nil {
-            sandyMinion = listFirst(input.playerTeammate.side, { (m: MinionProxy) in m.game_id == sandyEntityId })
+            sandyMinion = listFirst(input.playerTeammate.side, { (m: MinionProxy) in m.game_id == transformedSandyEntity.id })
         }
         if sandyMinion == nil {
             friendly = false
-            sandyMinion = listFirst(input.opponent.side, { (m: MinionProxy) in m.game_id == sandyEntityId })
+            sandyMinion = listFirst(input.opponent.side, { (m: MinionProxy) in m.game_id == transformedSandyEntity.id })
         }
         if sandyMinion == nil && input.opponentTeammate.get() != nil {
-            sandyMinion = listFirst(input.opponentTeammate.side, { (m: MinionProxy) in m.game_id == sandyEntityId })
+            sandyMinion = listFirst(input.opponentTeammate.side, { (m: MinionProxy) in m.game_id == transformedSandyEntity.id })
         }
         guard let sandyMinion, sandyMinion.get() != nil else {
             return
         }
-        let cl = mono_class_get_name(mono_object_get_class(sandyMinion.get()))
-        var className = "Unknown"
-        if let cl {
-            className = String(cString: cl)
-        }
-        Influx.breadcrumb(eventName: "sandy_minion_found", withProperties: ["sandyEntityId": "\(sandyEntityId)", className: className])
+
         let sandy = SandyProxy(obj: sandyMinion.get())
         if sandy.attachedMinion.get() != nil {
             return
         }
 
-        sandy.attachedMinion = BobsBuddyInvoker.getMinionFromEntity(sim: SimulatorProxy(), player: friendly, ent: attachedEntity, attachedEntities: getAttachedEntities(entityId: attachedEntity.id))
+        sandy.attachedMinion = BobsBuddyInvoker.getMinionFromEntity(sim: SimulatorProxy(), player: friendly, entity: transformedSandyEntity, attachedEntities: getAttachedEntities(entityId: transformedSandyEntity.id))
+        
+        sandyMinion.minionUpdatedDuringCombat = true
 
         tryRerun()
     }
     
-    func updateFlobbidinousFloopTransformDuos(_ attachedEntity: Entity) {
-        guard let input, state == BobsBuddyState.combat else {
+    func updateFlobbidinousFloopTransformDuos(_ attachedEntity: Entity, _ floopEntityId: Int) {
+        guard let input, updateRevealedEntityValidStates else {
             return
         }
 
@@ -1423,16 +1640,17 @@ class BobsBuddyInvoker {
         }
         
         var friendly = true
-        var flobbidinousFloop = listFirst(input.player.heroPowers, { (hp: HeroPowerDataProxy) in hp.cardId == CardIds.NonCollectible.Neutral.FlobbidinousFloop_GloriousGloop })
+        
+        var flobbidinousFloop = listFirst(input.player.heroPowers, { (hp: HeroPowerDataProxy) in hp.game_id == floopEntityId && hp.cardId == CardIds.NonCollectible.Neutral.FlobbidinousFloop_GloriousGloop })
         if flobbidinousFloop == nil && input.playerTeammate.get() != nil {
-            flobbidinousFloop = listFirst(input.playerTeammate.heroPowers, { (hp: HeroPowerDataProxy) in hp.cardId == CardIds.NonCollectible.Neutral.FlobbidinousFloop_GloriousGloop })
+            flobbidinousFloop = listFirst(input.playerTeammate.heroPowers, { (hp: HeroPowerDataProxy) in hp.game_id == floopEntityId && hp.cardId == CardIds.NonCollectible.Neutral.FlobbidinousFloop_GloriousGloop })
         }
         if flobbidinousFloop == nil {
             friendly = false
-            flobbidinousFloop = listFirst(input.opponent.heroPowers, { (hp: HeroPowerDataProxy) in hp.cardId == CardIds.NonCollectible.Neutral.FlobbidinousFloop_GloriousGloop })
+            flobbidinousFloop = listFirst(input.opponent.heroPowers, { (hp: HeroPowerDataProxy) in hp.game_id == floopEntityId && hp.cardId == CardIds.NonCollectible.Neutral.FlobbidinousFloop_GloriousGloop })
         }
         if flobbidinousFloop == nil && input.opponentTeammate.get() != nil {
-            flobbidinousFloop = listFirst(input.opponentTeammate.heroPowers, { (hp: HeroPowerDataProxy) in hp.cardId == CardIds.NonCollectible.Neutral.FlobbidinousFloop_GloriousGloop })
+            flobbidinousFloop = listFirst(input.opponentTeammate.heroPowers, { (hp: HeroPowerDataProxy) in hp.game_id == floopEntityId && hp.cardId == CardIds.NonCollectible.Neutral.FlobbidinousFloop_GloriousGloop })
         }
         guard let flobbidinousFloop else {
             return
@@ -1441,13 +1659,46 @@ class BobsBuddyInvoker {
             return
         }
 
-        flobbidinousFloop.attachedMinion = BobsBuddyInvoker.getMinionFromEntity(sim: SimulatorProxy(), player: friendly, ent: attachedEntity, attachedEntities: getAttachedEntities(entityId: attachedEntity.id))
+        flobbidinousFloop.attachedMinion = BobsBuddyInvoker.getMinionFromEntity(sim: SimulatorProxy(), player: friendly, entity: attachedEntity, attachedEntities: getAttachedEntities(entityId: attachedEntity.id))
+
+        tryRerun()
+    }
+    
+    // Invoked at the END of Glorious Gloop's Start of Combat trigger block. Set AttachedMinionCapturedDuringCombat
+    // with AttachedMinion still null, so the simulator skips UnsupportedInteractionException.
+    func updateFlobbidinousFloopConfirmedNoTransformDuos(_ floopEntityId: Int) {
+        guard let input, updateRevealedEntityValidStates else {
+            return
+        }
+        
+        let opaque = mono_thread_attach(MonoHelper._monoInstance)
+        
+        defer {
+            mono_thread_detach(opaque)
+        }
+
+        var flobbidinousFloop = listFirst(input.player.heroPowers, { (hp: HeroPowerDataProxy) in hp.game_id == floopEntityId && hp.cardId == CardIds.NonCollectible.Neutral.FlobbidinousFloop_GloriousGloop })
+
+        if flobbidinousFloop == nil && input.playerTeammate.get() != nil {
+            flobbidinousFloop = listFirst(input.playerTeammate.heroPowers, { (hp: HeroPowerDataProxy) in hp.game_id == floopEntityId && hp.cardId == CardIds.NonCollectible.Neutral.FlobbidinousFloop_GloriousGloop })
+        }
+        if flobbidinousFloop == nil {
+            flobbidinousFloop = listFirst(input.opponent.heroPowers, { (hp: HeroPowerDataProxy) in hp.game_id == floopEntityId && hp.cardId == CardIds.NonCollectible.Neutral.FlobbidinousFloop_GloriousGloop })
+        }
+        if flobbidinousFloop == nil && input.opponentTeammate.get() != nil {
+            flobbidinousFloop = listFirst(input.opponentTeammate.heroPowers, { (hp: HeroPowerDataProxy) in hp.game_id == floopEntityId && hp.cardId == CardIds.NonCollectible.Neutral.FlobbidinousFloop_GloriousGloop })
+        }
+        guard let flobbidinousFloop, flobbidinousFloop.attachedMinion.get() == nil && !flobbidinousFloop.attachedMinionCapturedDuringCombat else {
+            return
+        }
+
+        flobbidinousFloop.attachedMinionCapturedDuringCombat = true
 
         tryRerun()
     }
     
     func updateSummoningSphereDuos(_ attachedEntity: Entity, _ trinketEntityId: Int32) {
-        guard let input, state == BobsBuddyState.combat else {
+        guard let input, updateRevealedEntityValidStates else {
             return
         }
 
@@ -1485,13 +1736,134 @@ class BobsBuddyInvoker {
             return
         }
 
-        summoningSphere.attachedMinion = BobsBuddyInvoker.getMinionFromEntity(sim: SimulatorProxy(), player: friendly, ent: attachedEntity, attachedEntities: getAttachedEntities(entityId: attachedEntity.id))
+        summoningSphere.attachedMinion = BobsBuddyInvoker.getMinionFromEntity(sim: SimulatorProxy(), player: friendly, entity: attachedEntity, attachedEntities: getAttachedEntities(entityId: attachedEntity.id))
 
         tryRerun()
     }
     
+    func updateSummoningSphereConfirmedNoSummonDuos(_ trinketEntityId: Int) {
+        guard let input, updateRevealedEntityValidStates else {
+            return
+        }
+        
+        let opaque = mono_thread_attach(MonoHelper._monoInstance)
+        
+        defer {
+            mono_thread_detach(opaque)
+        }
+        
+        var summoningSphereTrinket = listFirst(input.player.trinkets, { (t: TrinketProxy) in t.game_id == trinketEntityId && t.cardID == CardIds.NonCollectible.Neutral.SummoningSphere })
+        if summoningSphereTrinket == nil && input.playerTeammate.get() != nil {
+            summoningSphereTrinket = listFirst(input.playerTeammate.trinkets, { (t: TrinketProxy) in t.game_id == trinketEntityId && t.cardID == CardIds.NonCollectible.Neutral.SummoningSphere })
+        }
+        if summoningSphereTrinket == nil {
+            summoningSphereTrinket = listFirst(input.opponent.trinkets, { (t: TrinketProxy) in t.game_id == trinketEntityId && t.cardID == CardIds.NonCollectible.Neutral.SummoningSphere })
+        }
+        if summoningSphereTrinket == nil && input.opponentTeammate.get() != nil {
+            summoningSphereTrinket = listFirst(input.opponentTeammate.trinkets, { (t: TrinketProxy) in t.game_id == trinketEntityId && t.cardID == CardIds.NonCollectible.Neutral.SummoningSphere })
+        }
+        guard let summoningSphereTrinket, SummoningSphereProxy(obj: summoningSphereTrinket.get()).attachedMinion.get() == nil && !summoningSphereTrinket.trinketUpdatedDuringCombat else {
+            return
+        }
+
+        summoningSphereTrinket.trinketUpdatedDuringCombat = true
+
+        tryRerun()
+    }
+    
+    func updateMagnanimooseSummonPoolDuos(_ summonedEntities: [Entity], _ magnanimooseEntityId: Int, _ isPlayerMinion: Bool) {
+        guard let input, updateRevealedEntityValidStates else {
+            return
+        }
+        let opaque = mono_thread_attach(MonoHelper._monoInstance)
+        
+        defer {
+            mono_thread_detach(opaque)
+        }
+        
+        // Determine which of the four players owns this Magnanimoose by finding its entity id on one of the captured boards.
+        var playerToUpdate: PlayerProxy?
+        if isPlayerMinion {
+            if listFirst(input.player.side, { (m: MinionProxy) in m.game_id == magnanimooseEntityId }) != nil {
+                playerToUpdate = input.player
+            } else if input.playerTeammate.get() != nil && listFirst(input.playerTeammate.side, { (m: MinionProxy) in m.game_id == magnanimooseEntityId }) != nil {
+                playerToUpdate = input.playerTeammate
+            }
+        } else {
+            if listFirst(input.opponent.side, { (m: MinionProxy) in m.game_id == magnanimooseEntityId }) != nil {
+                playerToUpdate = input.opponent
+            } else if input.opponentTeammate.get() != nil && listFirst(input.opponentTeammate.side, { (m: MinionProxy) in m.game_id == magnanimooseEntityId }) != nil {
+                playerToUpdate = input.opponentTeammate
+            }
+        }
+
+        if playerToUpdate == nil {
+            // A Magnanimoose summoned during combat is not on any captured board; match its controller to the correct player.
+            let controller = game.entities[magnanimooseEntityId]?[.controller] ?? 0
+            playerToUpdate = controllingPlayer(controller, isPlayerMinion)
+        }
+
+        // Last resort if the controller could not be matched (e.g. a teammate board not yet snapshot).
+        if playerToUpdate == nil {
+            playerToUpdate = isPlayerMinion ? input.player : input.opponent
+        }
+        guard let playerToUpdate else {
+            return
+        }
+
+        let simulator = SimulatorProxy()
+        let summonedMinions = summonedEntities.compactMap { e in
+            let minion = BobsBuddyInvoker.getMinionFromEntity(sim: simulator, player: isPlayerMinion, entity: e, attachedEntities: getAttachedEntities(entityId: e.id))
+            let copiedFrom = e[GameTag.copied_from_entity_id]
+            
+            // The game writes a minion's aggregate ATK/HEALTH when it enters PLAY. A copy that did not
+            // fit stays in SETASIDE holding the card's printed stats, so read the real values off the
+            // entity it was copied from.
+            if !e.isInPlay && copiedFrom > 0, let copySource = game.entities[copiedFrom],
+               copySource.isInPlay || copySource.isInSetAside {
+                minion.baseAttack = Int32(copySource[GameTag.atk])
+                minion.maxAttack = Int32(copySource[GameTag.atk])
+                minion.baseHealth = Int32(copySource[GameTag.health] - copySource[GameTag.damage])
+                minion.maxHealth = Int32(copySource[GameTag.health])
+            }
+            if copiedFrom > 0 {
+                minion.game_id = Int32(copiedFrom)
+            }
+            return minion
+        }
+        let list = playerToUpdate.magnanimooseSummonPoolDuos
+        for minion in summonedMinions {
+            MonoHelper.addToList(list: list, element: minion)
+        }
+
+        tryRerun()
+    }
+
+    private func controllingPlayer(_ controller: Int, _ isPlayerMinion: Bool) -> PlayerProxy? {
+        guard let input, controller != 0 else {
+            return nil
+        }
+        let relevantSides = isPlayerMinion
+            ? [ input.player, input.playerTeammate ]
+            : [ input.opponent, input.opponentTeammate ]
+        for player in relevantSides {
+            if player.get() == nil {
+                continue
+            }
+            let side = player.side
+            let cnt = MonoHelper.listCount(obj: side)
+            for i in 0 ..< cnt {
+                let minion = MinionProxy(obj: MonoHelper.listItem(obj: side, index: i).get())
+                if let entity = game.entities[Int(minion.game_id)], entity[GameTag.controller] == controller {
+                    return player
+                }
+            }
+        }
+        return nil
+    }
+    
     func updateMinionEnchantment(_ enchantmentEntity: Entity, _ attachedToEntityId: Int, _ isPlayerMinion: Bool) {
-        guard let input, state == .combat else {
+        guard let input, updateRevealedEntityValidStates else {
             return
         }
         
@@ -1524,6 +1896,7 @@ class BobsBuddyInvoker {
                 enchantment.scriptDataNum1 = Int32(enchantmentEntity[GameTag.tag_script_data_num_1])
                 enchantment.scriptDataNum2 = Int32(enchantmentEntity[GameTag.tag_script_data_num_2])
                 minion.attachEnchantment(enchantment: enchantment)
+                minion.minionUpdatedDuringCombat = true
             }
         }
 
@@ -1532,8 +1905,68 @@ class BobsBuddyInvoker {
     
     static let timewarpedMagnanimooseEnchantment = "BACON_FAKE_Magnanimoose_Enchantment"
     
+    func updateDrBoomsMonsterReborn(_ sourceEntityId: Int, _ rebornMaxHealth: Int, _ isPlayerMinion: Bool) {
+        guard let input, updateRevealedEntityValidStates else {
+            return
+        }
+        let opaque = mono_thread_attach(MonoHelper._monoInstance)
+        defer {
+            mono_thread_detach(opaque)
+        }
+
+        // We need to know the magnetized count when a Dr. Boom's Monster is reborn
+        let targetPlayer = isPlayerMinion ? input.player : input.opponent
+        if targetPlayer.magnetizeCounter.get() != nil {
+            return
+        }
+
+        guard let source = listFirst(targetPlayer.side, { (m: MinionProxy) in m.game_id == sourceEntityId
+            && (m.cardID == CardIds.NonCollectible.Neutral.DrBoomsMonster || m.cardID == CardIds.NonCollectible.Neutral.DrBoomsMonster_DrBoomsMonster1) }) else {
+            return
+        }
+
+        let statsGrantedPerMagnetize = source.golden ? 4 : 2
+        var count = (rebornMaxHealth - statsGrantedPerMagnetize) / statsGrantedPerMagnetize
+        if count <= 0 {
+            return
+        }
+
+        let boxedInt = mono_value_box(MonoHelper._monoInstance, mono_get_int32_class(), &count)
+        targetPlayer.magnetizeCounter = MonoHandle(obj: boxedInt)
+        tryRerun()
+    }
+    
+    func updateOpponentResourcesSpentThisGame(_ malorneEntityId: Int, _ prevAtk: Int, _ atk: Int, _ golden: Bool) {
+        guard let input, updateRevealedEntityValidStates else {
+            return
+        }
+        if input.opponent.resourcesSpentThisGame > 0 {
+            return
+        }
+
+        // The entity's creation also carries as tag change (prevAtk=0 -> atk=base_attack).
+        // The buff we care about is the first ATK change after that (once Power of Ancients is attached).
+        if prevAtk <= 0 {
+            return
+        }
+        if !getAttachedEntities(entityId: malorneEntityId).any({ x in x.cardId == CardIds.NonCollectible.Neutral.ForestLordCenarius_PowerOfAncients }) {
+            return
+        }
+
+        var powerOfAncientsbuff = atk - prevAtk
+        if golden {
+            powerOfAncientsbuff /= 2
+        }
+        if powerOfAncientsbuff <= 0 {
+            return
+        }
+
+        input.opponent.resourcesSpentThisGame = Int32(powerOfAncientsbuff * 3)
+        tryRerun()
+    }
+    
     func updateTimewarpedMagnanimoose(_ summonedEntities: [Entity], _ magnanimooseEntityId: Int, _ isPlayerMinion: Bool) {
-        guard let input, state == .combat else {
+        guard let input, updateRevealedEntityValidStates else {
             return
         }
         
@@ -1559,7 +1992,7 @@ class BobsBuddyInvoker {
         }
 
         let simulator = SimulatorProxy()
-        let summonedMinions = summonedEntities.compactMap { e in BobsBuddyInvoker.getMinionFromEntity(sim: simulator, player: isPlayerMinion, ent: e, attachedEntities: getAttachedEntities(entityId: e.id)) }
+        let summonedMinions = summonedEntities.compactMap { e in BobsBuddyInvoker.getMinionFromEntity(sim: simulator, player: isPlayerMinion, entity: e, attachedEntities: getAttachedEntities(entityId: e.id)) }
 
         let enchantment = simulator.enchantmentFactory.create(cardId: BobsBuddyInvoker.timewarpedMagnanimooseEnchantment, controlledByPlayer: minion.controlledByPlayer)
         if enchantment.get() != nil {
@@ -1569,6 +2002,7 @@ class BobsBuddyInvoker {
                 MonoHelper.addToList(list: magnanimooseEnchant.summonedMinions, element: m)
             }
             minion.attachEnchantment(enchantment: enchantment)
+            minion.minionUpdatedDuringCombat = true
         }
 
         tryRerun()
@@ -1580,7 +2014,7 @@ class BobsBuddyInvoker {
         guard let input else {
             return
         }
-        guard state == .combat else {
+        guard updateRevealedEntityValidStates else {
             return
         }
         
@@ -1611,9 +2045,232 @@ class BobsBuddyInvoker {
             enchantment.scriptDataNum1 = Int32(cardDbfids.count > 0 ? cardDbfids[0] : 0)
             enchantment.scriptDataNum2 = Int32(cardDbfids.count > 1 ? cardDbfids[1] : 0)
             minion.attachEnchantment(enchantment: enchantment)
+            minion.minionUpdatedDuringCombat = true
         }
 
         tryRerun()
+    }
+
+    // Minions whose death firings summoned Ancestral Automatons, awaiting reconciliation:
+    // source entity id -> (trigger multiplier, summoned Automatons in creation order)
+    private var _pendingAutoAssemblerDeathrattleSources = [Int: (triggerMultiplier: Int, summonedIsPremium: [Bool])]()
+    
+    func observeMagnetizedAutoAssemblerDeathrattles(_ sourceEntityId: Int, _ extraDeathrattles: Int, _ isGolden: Bool) {
+        if _pendingAutoAssemblerDeathrattleSources[sourceEntityId] == nil {
+            let observation = (1 + extraDeathrattles, [Bool]())
+            _pendingAutoAssemblerDeathrattleSources[sourceEntityId] = observation
+        }
+        var observation = _pendingAutoAssemblerDeathrattleSources[sourceEntityId]
+        observation?.summonedIsPremium.append(isGolden)
+        BobsBuddyInvoker.currentCombatHasPendingAutoAssemblerObservations = true
+    }
+
+    func flushAndUpdateObservedAutoAssemblerDeathrattlesAsync() {
+        BobsBuddyInvoker.currentCombatHasPendingAutoAssemblerObservations = false
+        guard !_pendingAutoAssemblerDeathrattleSources.isEmpty else { return }
+        
+        let opaque = mono_thread_attach(MonoHelper._monoInstance)
+        defer {
+            mono_thread_detach(opaque)
+        }
+        
+        let sourceThatSummoned = Array(_pendingAutoAssemblerDeathrattleSources)
+        _pendingAutoAssemblerDeathrattleSources.removeAll()
+        
+        guard input != nil && updateRevealedEntityValidStates else { return }
+
+        var changed = false
+        for kv_pair in sourceThatSummoned {
+            changed = reconcileAutoAssemblerDeathrattles(kv_pair.key, kv_pair.value.triggerMultiplier, kv_pair.value.summonedIsPremium) || changed
+        }
+
+        if changed {
+            tryRerun()
+        }
+    }
+
+    private func reconcileAutoAssemblerDeathrattles(_ sourceEntityId: Int, _ triggerMultiplier: Int, _ summonedByIsPremium: [Bool]) -> Bool {
+        guard let input = input else { return false }
+        
+        let sides = [input.player, input.playerTeammate, input.opponent, input.opponentTeammate]
+            .compactMap { $0 }
+        
+        let minion = sides
+            .filter { $0.get() != nil }
+            .map { MonoHelper.listItems(obj: $0.side) }
+            .flatMap { $0 }
+            .map { MinionProxy(obj: $0.get()) }
+            .first(where: { $0.gameId == sourceEntityId })
+        
+        guard let minion, !minion.minionUpdatedDuringCombat else {
+            return false
+        }
+        
+        // Ignore minions that copy/gain deathrattles during combat (e.g., Fish of N'Zoth, Timewraped Whirl-O-Tron)
+        if MonoHelper.isInstance(obj: minion, klass: ICopiesDeathrattlesProxy._class!) {
+            return false
+        }
+        
+        // Extra deathrattles (e.g., Titus Rivendare) resolve as full repeats of the whole deathrattle list —
+        // so the first (observed / triggerMultiplier) summons are the distinct deathrattles in their real order.
+        var automatons = summonedByIsPremium.take(summonedByIsPremium.count / triggerMultiplier)
+        
+        // A minion's own innate deathrattles and deathrattles from attached enchantments resolve before these
+        // AdditionalDeathrattles, and appear as the leading elements; drop them so automatons map to AdditionalDeathrattles only.
+        let leadingCaptured = (MonoHelper.isInstance(obj: minion, klass: AutoAssemblerProxy._class!) ? 1 : 0)
+        + MonoHelper.listItems(obj: minion.enchantments).filter { MonoHelper.isInstance(obj: $0, klass: AutoAssemblerEnchantmentProxy._class!) || MonoHelper.isInstance(obj: $0, klass: AutoAssemblerEnchantmentGoldenProxy._class!) }.count
+            
+        if leadingCaptured > 0 {
+            automatons = Array(automatons.dropFirst(leadingCaptured))
+        }
+
+        let getAction = { (m: MonoHandle) -> UnsafeMutablePointer<MonoObject>? in
+            return mono_property_get_value(mono_class_get_property_from_name(mono_object_get_class(m.get()), "Method"), m.get(), nil, nil)
+        }
+        let autoAssemblerAction = getAction(AutoAssemblerProxy.deathrattle())
+        let autoAssemblerGoldenAction = getAction(AutoAssemblerProxy.goldenDeathrattle())
+        
+        // Get any existing AutoAssembler deathrattles already tracked on AdditionalDeathrattles
+        var currentIndices = [Int]()
+        for i in 0 ..< MonoHelper.listCount(obj: minion.additionalDeathrattles) {
+            let deathrattleAction = getAction(MonoHelper.listItem(obj: minion.additionalDeathrattles, index: i))
+            if deathrattleAction == autoAssemblerAction || deathrattleAction == autoAssemblerGoldenAction {
+                currentIndices.append(Int(i))
+            }
+        }
+
+        // If observed summons not more than entries already captured — nothing to add.
+        if automatons.count <= currentIndices.count {
+            return false
+        }
+
+        // Replace the Auto Assembler entries with the observed sequence, in place: the simulator
+        // fires AdditionalDeathrattles in list order, so the order decides summon order — board
+        // positions, and which summons no longer fit once the board fills.
+        var insertAt = !currentIndices.isEmpty ? Int32(currentIndices[0]) : MonoHelper.listCount(obj: minion.additionalDeathrattles)
+        for i in currentIndices.reversed() {
+            MonoHelper.listRemoveAt(obj: minion.additionalDeathrattles, index: Int32(i))
+        }
+        
+        let newDeathrattles = automatons.map { golden in
+            golden ? AutoAssemblerProxy.goldenDeathrattle() : AutoAssemblerProxy.deathrattle()
+        }
+        for newItem in newDeathrattles {
+            MonoHelper.listInsert(obj: minion.additionalDeathrattles, index: insertAt, value: newItem)
+            insertAt += 1
+        }
+        minion.minionUpdatedDuringCombat = true
+
+        let goldenCount = automatons.filter { $0 }.count
+        logger.debug("Set \(automatons.count) Auto Assembler deathrattles (\(goldenCount) golden) on \(minion.cardID) (entity \(sourceEntityId), \(summonedByIsPremium.count) Automatons observed, \(triggerMultiplier) triggers per deathrattle)")
+
+        return true
+    }
+    
+    // Minions whose death firings summoned Crabs (granted Surf n' Surf "Crab Riding"), awaiting reconciliation:
+    // source entity id -> (trigger multiplier, summoned Crabs in creation order)
+    private var _pendingCrabDeathrattleSources = [Int: (triggerMultiplier: Int, summonedIsPremium: [Bool])]()
+
+    func observeGrantedCrabDeathrattles(_ sourceEntityId: Int, _ extraDeathrattles: Int, _ isGolden: Bool) {
+        var observation = _pendingCrabDeathrattleSources[sourceEntityId]
+        if observation == nil {
+            observation = (1 + extraDeathrattles, [Bool]())
+            _pendingCrabDeathrattleSources[sourceEntityId] = observation
+        }
+        observation?.summonedIsPremium.append(isGolden)
+        BobsBuddyInvoker.currentCombatHasPendingCrabObservations = true
+    }
+
+    func flushAndUpdateObservedCrabDeathrattlesAsync() {
+        BobsBuddyInvoker.currentCombatHasPendingCrabObservations = false
+        if _pendingCrabDeathrattleSources.count == 0 {
+            return
+        }
+        let sourceThatSummoned = Array(_pendingCrabDeathrattleSources)
+        _pendingCrabDeathrattleSources.removeAll()
+        
+        if input == nil || !updateRevealedEntityValidStates {
+            return
+        }
+        
+        var changed = false
+        for kv_pair in sourceThatSummoned {
+            changed = reconcileCrabDeathrattles(kv_pair.key, kv_pair.value.triggerMultiplier, kv_pair.value.summonedIsPremium) || changed
+        }
+        
+        if changed {
+            tryRerun()
+        }
+    }
+
+    private func reconcileCrabDeathrattles(_ sourceEntityId: Int, _ triggerMultiplier: Int, _  summonedByIsPremium: [Bool]) -> Bool {
+        guard let input else {
+            return false
+        }
+        let sides = [ input.player, input.playerTeammate, input.opponent, input.opponentTeammate ]
+        let minion = sides
+            .filter { $0.get() != nil }
+            .map { MonoHelper.listItems(obj: $0.side) }
+            .flatMap { $0 }
+            .map { MinionProxy(obj: $0.get()) }
+            .first(where: { $0.gameId == sourceEntityId })
+        guard let minion, !minion.minionUpdatedDuringCombat else {
+            return false
+        }
+        
+        // Ignore minions that copy/gain deathrattles during combat (e.g., Fish of N'Zoth, Timewraped Whirl-O-Tron)
+        if MonoHelper.isInstance(obj: minion, klass: ICopiesDeathrattlesProxy._class!) {
+            return false
+        }
+
+        // Extra deathrattles (e.g., Titus Rivendare) resolve as full repeats of the whole deathrattle list —
+        // so the first (observed / triggerMultiplier) summons are the distinct deathrattles in their real order.
+        // Unlike Auto Assembler there is no innate summoner of Crabs to skip: every observed firing maps to
+        // one granted "Crab Riding" entry on AdditionalDeathrattles.
+        let crabs = summonedByIsPremium.take(summonedByIsPremium.count / triggerMultiplier)
+        
+        let getAction = { (m: MonoHandle) -> UnsafeMutablePointer<MonoObject>? in
+            return mono_property_get_value(mono_class_get_property_from_name(mono_object_get_class(m.get()), "Method"), m.get(), nil, nil)
+        }
+        let crabAction = getAction(GenericDeathrattles.crab())
+        let crabGoldenAction = getAction(GenericDeathrattles.crabGolden())
+        
+        // Get any Crab deathrattles already captured on AdditionalDeathrattles (visible grant enchantments)
+        var currentIndices = [Int]()
+        for i in 0 ..< MonoHelper.listCount(obj: minion.additionalDeathrattles) {
+            let deathrattleAction = getAction(MonoHelper.listItem(obj: minion.additionalDeathrattles, index: i))
+            if deathrattleAction == crabAction {
+                currentIndices.append(Int(i))
+            } else if deathrattleAction == crabGoldenAction {
+                currentIndices.append(Int(i))
+            }
+        }
+        
+        // If observed summons not more than entries already captured — nothing to add.
+        if crabs.count <= currentIndices.count {
+            return false
+        }
+        
+        // Replace the Crab entries with the observed sequence, in place: the simulator fires
+        // AdditionalDeathrattles in list order, so the order decides summon order — board
+        // positions, and which summons no longer fit once the board fills.
+        var insertAt = currentIndices.count > 0 ? Int32(currentIndices[0]) : MonoHelper.listCount(obj: minion.additionalDeathrattles)
+        for i in currentIndices.reversed() {
+            MonoHelper.listRemoveAt(obj: minion.additionalDeathrattles, index: Int32(currentIndices[i]))
+        }
+        let newDeathrattles = crabs.map { golden in
+            golden ? GenericDeathrattles.crabGolden() : GenericDeathrattles.crab()
+        }
+        for newItem in newDeathrattles {
+            MonoHelper.listInsert(obj: minion.additionalDeathrattles, index: insertAt, value: newItem)
+            insertAt += 1
+        }
+        minion.minionUpdatedDuringCombat = true
+        
+        let goldenCount = crabs.filter { $0 }.count
+        logger.debug("Set \(crabs.count) Crab deathrattles (\(goldenCount) golden) on \(minion.cardID) (entity \(sourceEntityId), \(summonedByIsPremium.count) Crabs observed, \(triggerMultiplier) triggers per deathrattle)")
+        
+        return true
     }
 
     private func getOpponentHandEntities(simulator: SimulatorProxy) -> [MonoHandle] {
@@ -1622,11 +2279,13 @@ class BobsBuddyInvoker {
             let e = opponentHandMap[_e] ?? _e
             if e.isMinion {
                 let attached = getAttachedEntities(entityId: e.id)
-                let minion = MinionCardEntityProxy(minion: BobsBuddyInvoker.getMinionFromEntity(sim: simulator, player: false, ent: e, attachedEntities: attached), simulator: simulator)
+                let minion = MinionCardEntityProxy(minion: BobsBuddyInvoker.getMinionFromEntity(sim: simulator, player: false, entity: e, attachedEntities: attached), simulator: simulator)
                 minion.canSummon = !e.has(tag: .literally_unplayable)
                 result.append(minion)
             } else if e.cardId == CardIds.NonCollectible.Neutral.BloodGem1 {
                 result.append(BloodGemProxy(simulator: simulator))
+            } else if e.cardId == CardIds.NonCollectible.Neutral.BilgewaterBreakout_LockboxToken {
+                result.append(LockboxCardEntityProxy(simulator: simulator))
             } else if e.isSpell {
                 result.append(SpellCardEntityProxy(simulator: simulator))
             } else if !e.cardId.isEmpty {
@@ -1642,5 +2301,22 @@ class BobsBuddyInvoker {
         let heroEntityId = game.opponentEntity?[.hero_entity]
         let heroEntity = game.opponent.playerEntities.first { x in x.id == heroEntityId }
         return heroEntity?.cardId == CardIds.NonCollectible.Neutral.KelthuzadTavernBrawl2
+    }
+    
+    // NUM_RESOURCES_SPENT_THIS_GAME is never set for the opponent, but can be inferred from Malorne
+    private static func getResourcesSpentThisGameFromMalorne(_ malorne: Entity, _ attachedEntities: [Entity]) -> Int {
+        let enchantments = attachedEntities
+            .filter { x in x.cardId != CardIds.NonCollectible.Neutral.ForestLordCenarius_PowerOfAncients }
+        let attackBuffs = enchantments.reduce(0, { $0 + $1[GameTag.tag_script_data_num_1] })
+        let healthBuffs = enchantments.reduce(0, { $0 + $1[GameTag.tag_script_data_num_2]})
+        // GetTag(HEALTH) is the max health, unaffected by damage. Taking the min of the two increases accuracy
+        // in case there is a buff that never appears as an enchantment attached to the minion.
+        var aura = min(
+                    malorne[GameTag.atk] - malorne.card.attack - attackBuffs,
+                    malorne[GameTag.health] - malorne.card.health - healthBuffs)
+        if malorne.cardId == CardIds.NonCollectible.Neutral.ForestLordCenarius_Malorne2 {
+            aura /= 2
+        }
+        return aura > 0 ? aura * 3 : 0
     }
 }

@@ -770,6 +770,7 @@ extension CardIds.Collectible {
         static let CultivatingSprite = "MEND_100"
         static let CapturedArchmage = "JAIL_974"
         static let RecklessDetective = "JAIL_447"
+        static let WizenedTruthseeker = "TIME_057"
     }
 }
 
@@ -1140,5 +1141,28 @@ extension CardIds.NonCollectible {
         static let AutoAssembler_AutoAssemblerEnchantment = "BG32_172e"
         static let TagtransferplayerenchantDnt = "Bacon_TagTransferPlayerE"
         static let RecklessDetective_DetectivesClothesToken = "JAIL_447t"
+        static let AutoAssembler_AutoAssembler2 = "BG32_172_Ge"
+        static let Kaleidoscope = "BG35_MagicItem_821"
+        static let DrBoomsMonster = "BG31_176"
+        static let DrBoomsMonster_DrBoomsMonster1 = "BG31_176_G"
+        static let Magnanimoose = "BGDUO_105"
+        static let ForestLordCenarius_Malorne1 = "BG32_HERO_001_Buddy"
+        static let ForestLordCenarius_Malorne2 = "BG32_HERO_001_Buddy_G"
+        static let BringInTheBuddies = "BG27_Anomaly_810"
+        static let ForestLordCenarius_PowerOfAncients = "BG32_HERO_001_Buddye"
+        static let TimewarpedMagnanimoose_TimewarpedMagnanimoose = "BG34_Giant_619_G"
+        static let TimewarpedNelliesShipToken2 = "BG34_Giant_074t_G"
+        static let Magnanimoose_Magnanimoose = "BGDUO_105_G"
+        static let Sandy_Sandy = "BGDUO_125_G"
+        static let MoonBaconJazzer_BloodGemPlayerEnchantDnt = "BG26_159pe"
+        static let AncestralAutomaton = "BG_TTN_401"
+        static let AncestralAutomaton_AncestralAutomaton = "BG_TTN_401_G"
+        static let SurfnSurf_CrabToken = "BG27_004t2"
+        static let SurfnSurf_Crab = "BG27_004_Gt2"
+        static let SphereofSapience_ANewFateToken = "SCH_259t"
+        static let LadyDeathwhisperTavernBrawl1 = "TB_BaconShop_HERO_Deathwhisper"
+        static let AccordoTron_AccordOTron = "BG26_147_G"
+        static let AccordoTron_AccordOTronEnchantment = "BG26_147e"
+        static let BilgewaterBreakout_LockboxToken = "BG36_520t"
     }
 }

@@ -9,12 +9,12 @@
 import Foundation
 import Preferences
 
-class GeneralPreferences: NSViewController, PreferencePane {
+class GeneralPreferences: PreferencePaneController, PreferencePane {
     var preferencePaneIdentifier = Preferences.PaneIdentifier.general
-    
+
     var preferencePaneTitle = String.localizedString("General", comment: "")
-    
-    var toolbarItemIcon = NSImage(named: NSImage.preferencesGeneralName)!
+
+    var toolbarItemIcon = NSImage(named: "settings-general")!
 
     @IBOutlet var notifyGameStart: NSButton!
     @IBOutlet var notifyTurnStart: NSButton!
@@ -24,10 +24,10 @@ class GeneralPreferences: NSViewController, PreferencePane {
     @IBOutlet var enableDockBadge: NSButton!
     @IBOutlet var preferGoldenCards: NSButton!
     @IBOutlet var useToastNotifications: NSButton!
-	
+
     override func viewWillAppear() {
         super.viewWillAppear()
-        
+
         guard notifyGameStart != nil else {
             return
         }
@@ -39,7 +39,7 @@ class GeneralPreferences: NSViewController, PreferencePane {
         saveReplays.state = Settings.saveReplays ? .on : .off
         enableDockBadge.state = Settings.showAppHealth ? .on : .off
         preferGoldenCards.state = Settings.preferGoldenCards ? .on : .off
-		useToastNotifications.state = Settings.useToastNotification ? .on : .off
+        useToastNotifications.state = Settings.useToastNotification ? .on : .off
     }
 
     @IBAction func checkboxClicked(_ sender: NSButton) {
@@ -58,9 +58,9 @@ class GeneralPreferences: NSViewController, PreferencePane {
             AppHealth.instance.updateBadge()
         } else if sender == preferGoldenCards {
             Settings.preferGoldenCards = preferGoldenCards.state == .on
-		} else if sender == useToastNotifications {
-			Settings.useToastNotification = useToastNotifications.state == .on
-		}
+        } else if sender == useToastNotifications {
+            Settings.useToastNotification = useToastNotifications.state == .on
+        }
     }
 
 }

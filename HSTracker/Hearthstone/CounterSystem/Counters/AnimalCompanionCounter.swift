@@ -38,6 +38,8 @@ class AnimalCompanionCounter: NumericCounter {
 
     required init(controlledByPlayer: Bool, game: Game) {
         super.init(controlledByPlayer: controlledByPlayer, game: game)
+        
+        counter = 3
     }
 
     override func shouldShow() -> Bool {
@@ -62,12 +64,25 @@ class AnimalCompanionCounter: NumericCounter {
         guard isPlayerController == isPlayerCounter else { return }
 
         // Check for specific companion-generating spells
-        let cardId = entity.cardId
+        let cardId = entity.info.latestCardId
         if cardId == CardIds.Collectible.Hunter.TamePet ||
            cardId == CardIds.Collectible.Hunter.MigratingElekk ||
            cardId == CardIds.Collectible.Hunter.RoamFree {
             
-            guard tag == .tag_script_data_num_4 || tag == .tag_script_data_num_5 || tag == .tag_script_data_num_6 else {
+            if !isPlayerCounter && tag == GameTag.zone && value == Zone.play.rawValue {
+                _opponentKnownCompanions.removeAll()
+
+                let delta = switch cardId {
+                case CardIds.Collectible.Hunter.TamePet: 1
+                case CardIds.Collectible.Hunter.MigratingElekk: 1
+                case CardIds.Collectible.Hunter.RoamFree: 2
+                default:  0
+                }
+
+                counter = min(counter + delta, 10)
+            }
+            
+            guard tag == .hidden_script_data_4 || tag == .hidden_script_data_5 || tag == .hidden_script_data_6 else {
                 return
             }
 
@@ -78,13 +93,13 @@ class AnimalCompanionCounter: NumericCounter {
             }
             
             switch tag {
-            case .tag_script_data_num_4:
+            case .hidden_script_data_4:
                 companions[0] = card.id
                 onCounterChanged()
-            case .tag_script_data_num_5:
+            case .hidden_script_data_5:
                 companions[1] = card.id
                 onCounterChanged()
-            case .tag_script_data_num_6:
+            case .hidden_script_data_6:
                 companions[2] = card.id
                 onCounterChanged()
             default:
@@ -115,11 +130,11 @@ class AnimalCompanionCounter: NumericCounter {
             return false
         }
 
-        if !entity.card.isBeast() {
+        if !entity.latestCard.isBeast() {
             return false
         }
 
-        if entity.card.cost != counter {
+        if entity.latestCard.cost != counter {
             return false
         }
 

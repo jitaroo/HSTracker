@@ -133,6 +133,8 @@ final class Player {
     }
     var deadMinionsCards = [Entity]()
     var secretsTriggeredCards = [Entity]()
+    var beatrixCardIds: Set<Int> = []
+    var beatrixCopiedCard: String?
 
     var hasCoin: Bool {
         return hand.any { $0.isTheCoin }
@@ -190,12 +192,12 @@ final class Player {
     var setAside: [Entity] { return playerEntities.filter({ $0.isInSetAside }) }
     static var knownOpponentDeck: [Card]?
     var entity: Entity? {
-        return game.entities.values.filter({ $0[.player_id] == self.id }).first
+        return game.entities.values.filter({ $0[.player_id] == self.id }).sorted(by: { $0.id < $1.id }).first
     }
 
     fileprivate(set) lazy var inDeckPredictions = [PredictedCard]()
     var hero: Entity? {
-        return board.first { x in x.isHero }
+        return board.filter { x in x.isHero }.min(by: { $0.id < $1.id })
     }
     
     private let pastHPLock = UnfairLock()
@@ -250,6 +252,8 @@ final class Player {
         }
         playedSpellSchools.removeAll()
         isPlayingWhizbang = false
+        beatrixCardIds.removeAll()
+        beatrixCopiedCard = nil
     }
     
     var currentMana: Int {
@@ -1005,6 +1009,15 @@ final class Player {
             logger.info("\(debugName) \(#function) \(entity)")
         }
     }
+    
+    func removePredictedCardsInDeckCosting(_ maxCost: Int) {
+        inDeckPredictions.removeAll(where: { x in
+            if let card = Cards.by(cardId: x.cardId) {
+                return card.isKnownCard && card.cost <= maxCost
+            }
+            return false
+        })
+    }
 
     func joustReveal(entity: Entity, turn: Int) {
         entity.info.turn = turn
@@ -1045,6 +1058,20 @@ final class Player {
                 
                 if let last = options.last {
                     creator.info.storedCardIds.append(last)
+                }
+            } else if creator.cardId == CardIds.NonCollectible.Mage.TheForbiddenSequence_TheOriginStoneToken {
+                // The Origin Stone reveals a copy of each unchosen discover option immediately
+                // before casting it, so the secret it puts into play is public information.
+                if let revealedCast = game.entities.values
+                    .filter({ e in e.id < entity.id && e.isSecret && e.hasCardId
+                    && e.isControlled(by: entity[GameTag.controller])
+                    && e[GameTag.copied_from_entity_id] > 0
+                    && e.isInZone(zone: Zone.setaside) })
+                    .sorted(by: { $0.id > $1.id })
+                    .first {
+                    if !revealedCast.cardId.isEmpty {
+                        entity.info.storedCardIds.append(revealedCast.cardId)
+                    }
                 }
             }
         }

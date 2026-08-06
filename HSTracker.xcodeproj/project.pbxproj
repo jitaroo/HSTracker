@@ -38,7 +38,6 @@
 		432AD9591DAD46AA00D8F959 /* HttpMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432AD9581DAD46AA00D8F959 /* HttpMethod.swift */; };
 		432AD95B1DAD46FF00D8F959 /* Http.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432AD95A1DAD46FF00D8F959 /* Http.swift */; };
 		432AD95D1DAD81B500D8F959 /* HttpEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432AD95C1DAD81B500D8F959 /* HttpEncoding.swift */; };
-		432B5FAF1CB5351800B05D19 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 432B5FAD1CB5351800B05D19 /* Localizable.strings */; };
 		432B5FB31CB5371C00B05D19 /* PlayerTrackersPreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 432B5FB51CB5371C00B05D19 /* PlayerTrackersPreferences.xib */; };
 		432B5FB61CB5372600B05D19 /* GamePreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 432B5FB81CB5372600B05D19 /* GamePreferences.xib */; };
 		432B5FB91CB5372C00B05D19 /* GeneralPreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 432B5FBB1CB5372C00B05D19 /* GeneralPreferences.xib */; };
@@ -293,7 +292,7 @@
 		43C1CA971E96CD6F008C20B1 /* InitialConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439C7ED11C777FA900D29859 /* InitialConfiguration.swift */; };
 		43C1CA981E96CD6F008C20B1 /* Splashscreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439C7ED31C777FA900D29859 /* Splashscreen.swift */; };
 		43C1CA991E96CD6F008C20B1 /* GeneralPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D308031C842DC000480488 /* GeneralPreferences.swift */; };
-		43C1CA9A1E96CD6F008C20B1 /* GamePrefences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D308051C842DC900480488 /* GamePrefences.swift */; };
+		43C1CA9A1E96CD6F008C20B1 /* GamePreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D308051C842DC900480488 /* GamePreferences.swift */; };
 		43C1CA9B1E96CD6F008C20B1 /* TrackersPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437B5BC11CD2568100DE0A41 /* TrackersPreferences.swift */; };
 		43C1CA9C1E96CD6F008C20B1 /* PlayerTrackersPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D308071C84410000480488 /* PlayerTrackersPreferences.swift */; };
 		43C1CA9D1E96CD6F008C20B1 /* OpponentTrackersPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437B5BB41CD2558500DE0A41 /* OpponentTrackersPreferences.swift */; };
@@ -338,7 +337,7 @@
 		43C568051D5E5BFF00451B6F /* UploadMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C568041D5E5BFF00451B6F /* UploadMetaData.swift */; };
 		43D307FB1C83159C00480488 /* SizeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D307FA1C83159C00480488 /* SizeHelper.swift */; };
 		43D308041C842DC000480488 /* GeneralPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D308031C842DC000480488 /* GeneralPreferences.swift */; };
-		43D308061C842DC900480488 /* GamePrefences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D308051C842DC900480488 /* GamePrefences.swift */; };
+		43D308061C842DC900480488 /* GamePreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D308051C842DC900480488 /* GamePreferences.swift */; };
 		43D308081C84410000480488 /* PlayerTrackersPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D308071C84410000480488 /* PlayerTrackersPreferences.swift */; };
 		43E5C0041EB9152A00D49D8A /* HeroPower.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43F4D0481EB7A23D006B4479 /* HeroPower.swift */; };
 		43E77EE01C949C6D00C26950 /* TimerHud.xib in Resources */ = {isa = PBXBuildFile; fileRef = 43E77EDF1C949C6D00C26950 /* TimerHud.xib */; };
@@ -389,6 +388,8 @@
 		4CFF95AB23C0C3B3006AB461 /* BattlegroundsTierOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CFF95AA23C0C3B3006AB461 /* BattlegroundsTierOverlay.swift */; };
 		4CFF95AD23C0C48E006AB461 /* BattlegroundsTierOverlay.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4CFF95AC23C0C48E006AB461 /* BattlegroundsTierOverlay.xib */; };
 		4CFF95AF23C0C56A006AB461 /* BattlegroundsTierOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CFF95AE23C0C56A006AB461 /* BattlegroundsTierOverlayView.swift */; };
+		7BA4A8162FF3EA91000B3784 /* PreferencePaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA4A8152FF3EA91000B3784 /* PreferencePaneController.swift */; };
+		7BA4A8172FF3EA91000B3784 /* PreferencePaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA4A8152FF3EA91000B3784 /* PreferencePaneController.swift */; };
 		B800FCA42732AA7C00AFBD51 /* MercenariesTaskListButton.xib in Resources */ = {isa = PBXBuildFile; fileRef = B800FCA32732AA7C00AFBD51 /* MercenariesTaskListButton.xib */; };
 		B800FCA62732AA9100AFBD51 /* MercenariesTaskListButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B800FCA52732AA9100AFBD51 /* MercenariesTaskListButton.swift */; };
 		B800FCAA2732FABD00AFBD51 /* MercenariesTaskListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B800FCA92732FABD00AFBD51 /* MercenariesTaskListView.swift */; };
@@ -881,6 +882,8 @@
 		B87DFF872DEF38AE006F39CF /* EndbringerUmbra.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87DFF862DEF38AE006F39CF /* EndbringerUmbra.swift */; };
 		B87DFF8A2DFC74D3006F39CF /* ArenaLastDrafts.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87DFF892DFC74D3006F39CF /* ArenaLastDrafts.swift */; };
 		B87DFF8B2DFC74D3006F39CF /* ArenaLastDrafts.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87DFF892DFC74D3006F39CF /* ArenaLastDrafts.swift */; };
+		B8815BF0302162F50016D77A /* ICopiesDeathrattlesProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8815BEF302162F50016D77A /* ICopiesDeathrattlesProxy.swift */; };
+		B8815BF23022BEC40016D77A /* LockboxCardEntityProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8815BF13022BEC40016D77A /* LockboxCardEntityProxy.swift */; };
 		B8820CD025603FB00072ECBC /* RemoteConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8820CCF25603FB00072ECBC /* RemoteConfig.swift */; };
 		B882CC902FBBE364002234D6 /* libcoreclr.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = B882CC8F2FBBE364002234D6 /* libcoreclr.dylib */; };
 		B882CC922FBD46AC002234D6 /* SandyProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B882CC912FBD46AC002234D6 /* SandyProxy.swift */; };
@@ -1043,7 +1046,7 @@
 		B89899642CB5DC790011B184 /* ActiveEffectsOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89899632CB5DC790011B184 /* ActiveEffectsOverlay.swift */; };
 		B89899662CB5DD510011B184 /* ActiveEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89899652CB5DD510011B184 /* ActiveEffect.swift */; };
 		B89899682CB5F94C0011B184 /* ActiveEffectsOverlay.xib in Resources */ = {isa = PBXBuildFile; fileRef = B89899672CB5F94C0011B184 /* ActiveEffectsOverlay.xib */; };
-		B89BCE042FF463400095F011 /* AutoAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89BCE032FF463360095F011 /* AutoAssembler.swift */; };
+		B89BCE042FF463400095F011 /* AutoAssemblerProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89BCE032FF463360095F011 /* AutoAssemblerProxy.swift */; };
 		B89BCE062FF4721B0095F011 /* SketchyInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89BCE052FF4721B0095F011 /* SketchyInformation.swift */; };
 		B89BCE082FF4729F0095F011 /* IceFishing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89BCE072FF4729F0095F011 /* IceFishing.swift */; };
 		B89BCE0A2FF4768B0095F011 /* CapturedArchmageCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89BCE092FF4768B0095F011 /* CapturedArchmageCounter.swift */; };
@@ -1054,6 +1057,10 @@
 		B89BCE142FF47CC70095F011 /* UndeathSentence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89BCE132FF47CC70095F011 /* UndeathSentence.swift */; };
 		B89BCE162FF47D060095F011 /* SliceAndDice.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89BCE152FF47D060095F011 /* SliceAndDice.swift */; };
 		B89BCE182FF47D5A0095F011 /* Moragg.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89BCE172FF47D5A0095F011 /* Moragg.swift */; };
+		B89BCED430042CD60095F011 /* VoidSoulCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89BCED330042CD60095F011 /* VoidSoulCounter.swift */; };
+		B89BCED630042DA90095F011 /* CardsPlayedFor2ManaCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89BCED530042DA90095F011 /* CardsPlayedFor2ManaCounter.swift */; };
+		B89BCED830042EAF0095F011 /* JailhouseManastormEnchantment.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89BCED730042EAF0095F011 /* JailhouseManastormEnchantment.swift */; };
+		B89BCF3E300851CE0095F011 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B89BCF3D300851CE0095F011 /* Localizable.xcstrings */; };
 		B89C9894280A113A005E9315 /* AnimatedCardList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89C9893280A113A005E9315 /* AnimatedCardList.swift */; };
 		B89C9896280C610C005E9315 /* DeckLens.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89C9895280C610C005E9315 /* DeckLens.swift */; };
 		B89F51EA2C9CF8D600E31195 /* ActiveEffect.xib in Resources */ = {isa = PBXBuildFile; fileRef = B89F51E92C9CF8D600E31195 /* ActiveEffect.xib */; };
@@ -1272,6 +1279,9 @@
 		B8D02E5C2F24230300DC55C1 /* PlayerResourcesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D02E5B2F24230300DC55C1 /* PlayerResourcesView.swift */; };
 		B8D02E5E2F2454E700DC55C1 /* PlayerResourcesWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D02E5D2F2454E700DC55C1 /* PlayerResourcesWindow.swift */; };
 		B8D02E602F24592D00DC55C1 /* PlayerResourcesWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = B8D02E5F2F24592D00DC55C1 /* PlayerResourcesWindow.xib */; };
+		B8D22EA73015965F00E44909 /* InfestTheSculleryCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D22EA63015965F00E44909 /* InfestTheSculleryCounter.swift */; };
+		B8D22EAB30169C9600E44909 /* BattlegroundsLobbyInfoWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D22EAA30169C9600E44909 /* BattlegroundsLobbyInfoWatcher.swift */; };
+		B8D22EAD301BC61600E44909 /* AutoAssemblerEnchantment.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D22EAC301BC61600E44909 /* AutoAssemblerEnchantment.swift */; };
 		B8D34D35294FB0C100CACC5A /* BattlegroundsHeroHeaderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D34D34294FB0C100CACC5A /* BattlegroundsHeroHeaderViewModel.swift */; };
 		B8D34D37294FE74700CACC5A /* BattlegroundsHeroPickStatsParams .swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D34D36294FE74700CACC5A /* BattlegroundsHeroPickStatsParams .swift */; };
 		B8D75B8F25A9DC9A00446923 /* ExperienceOverlay.xib in Resources */ = {isa = PBXBuildFile; fileRef = B8D75B8E25A9DC9A00446923 /* ExperienceOverlay.xib */; };
@@ -1533,7 +1543,6 @@
 		1CF204F81E83B74300037A42 /* MirrorHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MirrorHelper.swift; sourceTree = "<group>"; };
 		340AAC041D0544AD0015FE33 /* StringTracker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringTracker.swift; sourceTree = "<group>"; };
 		3CB1A35E2E8C63010090486F /* MixpanelEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MixpanelEvents.swift; sourceTree = "<group>"; };
-		43050C601E6B2C0E007600EA /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/TrackersPreferences.strings; sourceTree = "<group>"; };
 		43050C611E6B484D007600EA /* Hearthstone.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Hearthstone.xcassets; sourceTree = "<group>"; };
 		4305CA461CF434E30048E7EC /* Cards.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cards.swift; sourceTree = "<group>"; };
 		4308EB7D1D76AFE6000897C8 /* ReleaseChannel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReleaseChannel.swift; sourceTree = "<group>"; };
@@ -1544,7 +1553,6 @@
 		431AA0CC1D362ECB0030AD22 /* Race.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Race.swift; sourceTree = "<group>"; };
 		431AA0CE1D3632BC0030AD22 /* CardClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardClass.swift; sourceTree = "<group>"; };
 		4323C5E71E16963200C97896 /* MatchInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MatchInfo.swift; sourceTree = "<group>"; };
-		4323C5F01E1BBE8300C97896 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/GamePreferences.strings; sourceTree = "<group>"; };
 		4323C5F41E1BC09500C97896 /* ArenaInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArenaInfo.swift; sourceTree = "<group>"; };
 		4323C5F61E1BE28800C97896 /* BrawlInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrawlInfo.swift; sourceTree = "<group>"; };
 		432A077B1E93B0F100921E34 /* Secrets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
@@ -1553,7 +1561,6 @@
 		432AD9581DAD46AA00D8F959 /* HttpMethod.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpMethod.swift; sourceTree = "<group>"; };
 		432AD95A1DAD46FF00D8F959 /* Http.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Http.swift; sourceTree = "<group>"; };
 		432AD95C1DAD81B500D8F959 /* HttpEncoding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpEncoding.swift; sourceTree = "<group>"; };
-		432B5FAE1CB5351800B05D19 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		432B5FB41CB5371C00B05D19 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PlayerTrackersPreferences.xib; sourceTree = "<group>"; };
 		432B5FB71CB5372600B05D19 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/GamePreferences.xib; sourceTree = "<group>"; };
 		432B5FBA1CB5372C00B05D19 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/GeneralPreferences.xib; sourceTree = "<group>"; };
@@ -1563,63 +1570,6 @@
 		432B5FC61CB5374100B05D19 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/EditDeck.xib; sourceTree = "<group>"; };
 		432B5FC91CB5374600B05D19 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/NewDeck.xib; sourceTree = "<group>"; };
 		432B5FCC1CB5375500B05D19 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/DeckManager.xib; sourceTree = "<group>"; };
-		432B5FCE1CB5378B00B05D19 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/DeckManager.strings; sourceTree = "<group>"; };
-		432B5FCF1CB5378B00B05D19 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/NewDeck.strings; sourceTree = "<group>"; };
-		432B5FD01CB5378B00B05D19 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/EditDeck.strings; sourceTree = "<group>"; };
-		432B5FD11CB5378B00B05D19 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SaveDeck.strings; sourceTree = "<group>"; };
-		432B5FD21CB5378B00B05D19 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InitialConfiguration.strings; sourceTree = "<group>"; };
-		432B5FD31CB5378B00B05D19 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Splashscreen.strings; sourceTree = "<group>"; };
-		432B5FD81CB5378C00B05D19 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
-		432B5FD91CB5492500B05D19 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/DeckManager.strings; sourceTree = "<group>"; };
-		432B5FDA1CB5492600B05D19 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/NewDeck.strings; sourceTree = "<group>"; };
-		432B5FDB1CB5492600B05D19 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/EditDeck.strings; sourceTree = "<group>"; };
-		432B5FDC1CB5492600B05D19 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SaveDeck.strings; sourceTree = "<group>"; };
-		432B5FDD1CB5492600B05D19 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InitialConfiguration.strings; sourceTree = "<group>"; };
-		432B5FDE1CB5492600B05D19 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Splashscreen.strings; sourceTree = "<group>"; };
-		432B5FDF1CB5492600B05D19 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/GeneralPreferences.strings; sourceTree = "<group>"; };
-		432B5FE01CB5492600B05D19 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/GamePreferences.strings; sourceTree = "<group>"; };
-		432B5FE11CB5492600B05D19 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/PlayerTrackersPreferences.strings; sourceTree = "<group>"; };
-		432B5FE31CB5492700B05D19 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
-		432B5FE41CB549F000B05D19 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/DeckManager.strings; sourceTree = "<group>"; };
-		432B5FE51CB549F000B05D19 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/NewDeck.strings; sourceTree = "<group>"; };
-		432B5FE61CB549F100B05D19 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/EditDeck.strings; sourceTree = "<group>"; };
-		432B5FE71CB549F100B05D19 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/SaveDeck.strings; sourceTree = "<group>"; };
-		432B5FE81CB549F100B05D19 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InitialConfiguration.strings; sourceTree = "<group>"; };
-		432B5FE91CB549F100B05D19 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Splashscreen.strings; sourceTree = "<group>"; };
-		432B5FEA1CB549F100B05D19 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/GeneralPreferences.strings; sourceTree = "<group>"; };
-		432B5FEB1CB549F100B05D19 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/GamePreferences.strings; sourceTree = "<group>"; };
-		432B5FEC1CB549F100B05D19 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/PlayerTrackersPreferences.strings; sourceTree = "<group>"; };
-		432B5FEE1CB549F100B05D19 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
-		432B5FEF1CB54A3500B05D19 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/DeckManager.strings; sourceTree = "<group>"; };
-		432B5FF01CB54A3500B05D19 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/NewDeck.strings; sourceTree = "<group>"; };
-		432B5FF11CB54A3600B05D19 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/EditDeck.strings; sourceTree = "<group>"; };
-		432B5FF21CB54A3600B05D19 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/SaveDeck.strings; sourceTree = "<group>"; };
-		432B5FF31CB54A3600B05D19 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/InitialConfiguration.strings; sourceTree = "<group>"; };
-		432B5FF41CB54A3600B05D19 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Splashscreen.strings; sourceTree = "<group>"; };
-		432B5FF51CB54A3600B05D19 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/GeneralPreferences.strings; sourceTree = "<group>"; };
-		432B5FF61CB54A3600B05D19 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/GamePreferences.strings; sourceTree = "<group>"; };
-		432B5FF71CB54A3600B05D19 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/PlayerTrackersPreferences.strings; sourceTree = "<group>"; };
-		432B5FF91CB54A3600B05D19 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
-		432B5FFA1CB54A6700B05D19 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/DeckManager.strings"; sourceTree = "<group>"; };
-		432B5FFB1CB54A6700B05D19 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/NewDeck.strings"; sourceTree = "<group>"; };
-		432B5FFC1CB54A6700B05D19 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/EditDeck.strings"; sourceTree = "<group>"; };
-		432B5FFD1CB54A6700B05D19 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/SaveDeck.strings"; sourceTree = "<group>"; };
-		432B5FFE1CB54A6700B05D19 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/InitialConfiguration.strings"; sourceTree = "<group>"; };
-		432B5FFF1CB54A6800B05D19 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Splashscreen.strings"; sourceTree = "<group>"; };
-		432B60001CB54A6800B05D19 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/GeneralPreferences.strings"; sourceTree = "<group>"; };
-		432B60011CB54A6800B05D19 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/GamePreferences.strings"; sourceTree = "<group>"; };
-		432B60021CB54A6800B05D19 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/PlayerTrackersPreferences.strings"; sourceTree = "<group>"; };
-		432B60041CB54A6800B05D19 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		432B60051CB54AD600B05D19 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/DeckManager.strings"; sourceTree = "<group>"; };
-		432B60061CB54AD600B05D19 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/NewDeck.strings"; sourceTree = "<group>"; };
-		432B60071CB54AD600B05D19 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/EditDeck.strings"; sourceTree = "<group>"; };
-		432B60081CB54AD600B05D19 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/SaveDeck.strings"; sourceTree = "<group>"; };
-		432B60091CB54AD600B05D19 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InitialConfiguration.strings"; sourceTree = "<group>"; };
-		432B600A1CB54AD600B05D19 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Splashscreen.strings"; sourceTree = "<group>"; };
-		432B600B1CB54AD700B05D19 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/GeneralPreferences.strings"; sourceTree = "<group>"; };
-		432B600C1CB54AD700B05D19 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/GamePreferences.strings"; sourceTree = "<group>"; };
-		432B600D1CB54AD700B05D19 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/PlayerTrackersPreferences.strings"; sourceTree = "<group>"; };
-		432B600F1CB54AD700B05D19 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		432B60321CB69FA600B05D19 /* FloatingCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingCard.swift; sourceTree = "<group>"; };
 		432B60341CB6A8CC00B05D19 /* FloatingCard.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FloatingCard.xib; sourceTree = "<group>"; };
 		432B60381CBF9AD700B05D19 /* ManaGemButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManaGemButton.swift; sourceTree = "<group>"; };
@@ -1627,14 +1577,8 @@
 		433554321D5F6B4400277B27 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		433554381D5FABD600277B27 /* HSReplayPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HSReplayPreferences.swift; sourceTree = "<group>"; };
 		4335543B1D5FAF0300277B27 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/HSReplayPreferences.xib; sourceTree = "<group>"; };
-		4335543E1D5FAF0600277B27 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/HSReplayPreferences.strings"; sourceTree = "<group>"; };
-		433554401D5FAF0800277B27 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/HSReplayPreferences.strings"; sourceTree = "<group>"; };
-		433554421D5FAF0A00277B27 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/HSReplayPreferences.strings; sourceTree = "<group>"; };
-		433554441D5FAF0B00277B27 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/HSReplayPreferences.strings; sourceTree = "<group>"; };
-		433554461D5FAF0F00277B27 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/HSReplayPreferences.strings; sourceTree = "<group>"; };
 		433554551D62EE1200277B27 /* PlayerType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerType.swift; sourceTree = "<group>"; };
 		4335545A1D65944700277B27 /* Toast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
-		433D8E241DFC498D0083BD33 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/HSReplayPreferences.strings; sourceTree = "<group>"; };
 		434106A11C9868620045655A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		434106A21C9868620045655A /* Classes.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Classes.xcassets; sourceTree = "<group>"; };
 		4345FE941DF54CA900E8936B /* Block.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Block.swift; sourceTree = "<group>"; };
@@ -1650,12 +1594,6 @@
 		434D1CAE1D0C500300222B8E /* ImageUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageUtilities.swift; sourceTree = "<group>"; };
 		434D1CB01D0C507900222B8E /* ImageCompare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCompare.swift; sourceTree = "<group>"; };
 		434D1CB51D10947200222B8E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Statistics.xib; sourceTree = "<group>"; };
-		434D1CB81D10947700222B8E /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Statistics.strings; sourceTree = "<group>"; };
-		434D1CBA1D10947D00222B8E /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Statistics.strings; sourceTree = "<group>"; };
-		434D1CBC1D10948000222B8E /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Statistics.strings; sourceTree = "<group>"; };
-		434D1CBE1D10948200222B8E /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Statistics.strings; sourceTree = "<group>"; };
-		434D1CC01D10948400222B8E /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Statistics.strings"; sourceTree = "<group>"; };
-		434D1CC21D10948700222B8E /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Statistics.strings"; sourceTree = "<group>"; };
 		434EAC951DBCD3E8009C7636 /* NSAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSAlert.swift; sourceTree = "<group>"; };
 		435907EB1CB13835008D4363 /* FileImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileImporter.swift; sourceTree = "<group>"; };
 		4359BF931D52142D00F61993 /* PlayedCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayedCard.swift; sourceTree = "<group>"; };
@@ -1679,18 +1617,8 @@
 		437B5BAB1CD1E6AF00DE0A41 /* Step.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Step.swift; sourceTree = "<group>"; };
 		437B5BB41CD2558500DE0A41 /* OpponentTrackersPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpponentTrackersPreferences.swift; sourceTree = "<group>"; };
 		437B5BB71CD2559300DE0A41 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/OpponentTrackersPreferences.xib; sourceTree = "<group>"; };
-		437B5BBC1CD255B200DE0A41 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/OpponentTrackersPreferences.strings; sourceTree = "<group>"; };
-		437B5BBD1CD255B300DE0A41 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/OpponentTrackersPreferences.strings; sourceTree = "<group>"; };
-		437B5BBE1CD255B500DE0A41 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/OpponentTrackersPreferences.strings; sourceTree = "<group>"; };
-		437B5BBF1CD255B600DE0A41 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/OpponentTrackersPreferences.strings"; sourceTree = "<group>"; };
-		437B5BC01CD255B800DE0A41 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/OpponentTrackersPreferences.strings"; sourceTree = "<group>"; };
 		437B5BC11CD2568100DE0A41 /* TrackersPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackersPreferences.swift; sourceTree = "<group>"; };
 		437B5BC41CD2568E00DE0A41 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/TrackersPreferences.xib; sourceTree = "<group>"; };
-		437B5BC61CD256AE00DE0A41 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/TrackersPreferences.strings"; sourceTree = "<group>"; };
-		437B5BC71CD256AF00DE0A41 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/TrackersPreferences.strings"; sourceTree = "<group>"; };
-		437B5BC81CD256B000DE0A41 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/TrackersPreferences.strings; sourceTree = "<group>"; };
-		437B5BC91CD256B100DE0A41 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/TrackersPreferences.strings; sourceTree = "<group>"; };
-		437B5BCA1CD256B200DE0A41 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/TrackersPreferences.strings; sourceTree = "<group>"; };
 		437C582F1EBC7E8400FFD888 /* NSImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSImage.swift; sourceTree = "<group>"; };
 		437E56E91DAAB81400FC0FC1 /* Array.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Array.swift; sourceTree = "<group>"; };
 		437E56EA1DAAB81400FC0FC1 /* Color.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
@@ -1747,13 +1675,10 @@
 		439DD8F91DB236A4004EBE47 /* ThemeElement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThemeElement.swift; sourceTree = "<group>"; };
 		439DD8FB1DB237C0004EBE47 /* EntityInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntityInfo.swift; sourceTree = "<group>"; };
 		43A12C861CA3D24800090BFE /* SaveDeck.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SaveDeck.swift; sourceTree = "<group>"; };
-		43A8A0ED1E0BBA4600AF34FD /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/PlayerTrackersPreferences.strings; sourceTree = "<group>"; };
-		43A8A0EF1E0BBB4700AF34FD /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/OpponentTrackersPreferences.strings; sourceTree = "<group>"; };
 		43A8A0F01E0BC08F00AF34FD /* JadeCounter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JadeCounter.swift; sourceTree = "<group>"; };
 		43A8A0F61E1557C900AF34FD /* FormatType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FormatType.swift; sourceTree = "<group>"; };
 		43A8A0F81E15596000AF34FD /* GameType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameType.swift; sourceTree = "<group>"; };
 		43AFA0021FA11F11008ED490 /* SecretsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretsManager.swift; sourceTree = "<group>"; };
-		43AFEEE91E218B0800F6045A /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/GeneralPreferences.strings; sourceTree = "<group>"; };
 		43B6954C1C9014FA00F4D0AC /* TagChangeActions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagChangeActions.swift; sourceTree = "<group>"; };
 		43B6955A1C9065AC00F4D0AC /* Secret.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Secret.swift; sourceTree = "<group>"; };
 		43B695621C920A0500F4D0AC /* CardList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardList.swift; sourceTree = "<group>"; };
@@ -1775,7 +1700,7 @@
 		43C568041D5E5BFF00451B6F /* UploadMetaData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadMetaData.swift; sourceTree = "<group>"; };
 		43D307FA1C83159C00480488 /* SizeHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SizeHelper.swift; sourceTree = "<group>"; };
 		43D308031C842DC000480488 /* GeneralPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeneralPreferences.swift; sourceTree = "<group>"; };
-		43D308051C842DC900480488 /* GamePrefences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GamePrefences.swift; sourceTree = "<group>"; };
+		43D308051C842DC900480488 /* GamePreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GamePreferences.swift; sourceTree = "<group>"; };
 		43D308071C84410000480488 /* PlayerTrackersPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerTrackersPreferences.swift; sourceTree = "<group>"; };
 		43E6632A1DC743BC007AB06E /* .travis.yml */ = {isa = PBXFileReference; lastKnownFileType = text; path = .travis.yml; sourceTree = "<group>"; };
 		43E77EDF1C949C6D00C26950 /* TimerHud.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TimerHud.xib; sourceTree = "<group>"; };
@@ -1827,6 +1752,7 @@
 		4CFF95AC23C0C48E006AB461 /* BattlegroundsTierOverlay.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BattlegroundsTierOverlay.xib; sourceTree = "<group>"; };
 		4CFF95AE23C0C56A006AB461 /* BattlegroundsTierOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlegroundsTierOverlayView.swift; sourceTree = "<group>"; };
 		5B0AB88C2313083700654A03 /* HSTracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HSTracker.entitlements; sourceTree = "<group>"; };
+		7BA4A8152FF3EA91000B3784 /* PreferencePaneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencePaneController.swift; sourceTree = "<group>"; };
 		B800FCA32732AA7C00AFBD51 /* MercenariesTaskListButton.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MercenariesTaskListButton.xib; sourceTree = "<group>"; };
 		B800FCA52732AA9100AFBD51 /* MercenariesTaskListButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MercenariesTaskListButton.swift; sourceTree = "<group>"; };
 		B800FCA92732FABD00AFBD51 /* MercenariesTaskListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MercenariesTaskListView.swift; sourceTree = "<group>"; };
@@ -2163,7 +2089,7 @@
 		B8591FF72B24919F00B907A4 /* MulliganState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MulliganState.swift; sourceTree = "<group>"; };
 		B8591FF92B24F7C900B907A4 /* ObjectiveFactoryProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectiveFactoryProxy.swift; sourceTree = "<group>"; };
 		B8591FFB2B24F87C00B907A4 /* ObjectiveProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectiveProxy.swift; sourceTree = "<group>"; };
-		B85A0D52272CDDFB006D2648 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = HSTracker/UIs/Preferences/Base.lproj/MercenariesPreferences.xib; sourceTree = "<group>"; };
+		B85A0D52272CDDFB006D2648 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MercenariesPreferences.xib; sourceTree = "<group>"; };
 		B85A0D53272CDEFE006D2648 /* MercenariesPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MercenariesPreferences.swift; sourceTree = "<group>"; };
 		B85F1AC8258A558200A6F8C3 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		B8621F192746A785004DD0E9 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
@@ -2175,7 +2101,7 @@
 		B864AE232597BB0500793F36 /* AdventureConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureConfig.swift; sourceTree = "<group>"; };
 		B864AE262597DD9400793F36 /* GameSaveKeyId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSaveKeyId.swift; sourceTree = "<group>"; };
 		B864AE282599359400793F36 /* DeckType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckType.swift; sourceTree = "<group>"; };
-		B864AE3925A4CC1200793F36 /* ImportingPreferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImportingPreferences.xib; sourceTree = "<group>"; };
+		B864AE3B25A4CC1200793F36 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ImportingPreferences.xib; sourceTree = "<group>"; };
 		B864AE3B25A4D15C00793F36 /* ImportingPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportingPreferences.swift; sourceTree = "<group>"; };
 		B86C9EAA27A17B3A00195C0A /* BrukanInvocationDeathrattles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrukanInvocationDeathrattles.swift; sourceTree = "<group>"; };
 		B86D89C12D95A04200AB65A5 /* FriendlyMinionsDiedThisGameCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendlyMinionsDiedThisGameCounter.swift; sourceTree = "<group>"; };
@@ -2243,6 +2169,8 @@
 		B8795EAB27516DBC00469B6E /* MercenariesTask.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MercenariesTask.xib; sourceTree = "<group>"; };
 		B87DFF862DEF38AE006F39CF /* EndbringerUmbra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndbringerUmbra.swift; sourceTree = "<group>"; };
 		B87DFF892DFC74D3006F39CF /* ArenaLastDrafts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArenaLastDrafts.swift; sourceTree = "<group>"; };
+		B8815BEF302162F50016D77A /* ICopiesDeathrattlesProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICopiesDeathrattlesProxy.swift; sourceTree = "<group>"; };
+		B8815BF13022BEC40016D77A /* LockboxCardEntityProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockboxCardEntityProxy.swift; sourceTree = "<group>"; };
 		B8820CCF25603FB00072ECBC /* RemoteConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfig.swift; sourceTree = "<group>"; };
 		B882CC8F2FBBE364002234D6 /* libcoreclr.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcoreclr.dylib; path = "downloaded-frameworks/mono/universal/libcoreclr.dylib"; sourceTree = "<group>"; };
 		B882CC912FBD46AC002234D6 /* SandyProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SandyProxy.swift; sourceTree = "<group>"; };
@@ -2400,7 +2328,7 @@
 		B89899632CB5DC790011B184 /* ActiveEffectsOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveEffectsOverlay.swift; sourceTree = "<group>"; };
 		B89899652CB5DD510011B184 /* ActiveEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveEffect.swift; sourceTree = "<group>"; };
 		B89899672CB5F94C0011B184 /* ActiveEffectsOverlay.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ActiveEffectsOverlay.xib; sourceTree = "<group>"; };
-		B89BCE032FF463360095F011 /* AutoAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoAssembler.swift; sourceTree = "<group>"; };
+		B89BCE032FF463360095F011 /* AutoAssemblerProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoAssemblerProxy.swift; sourceTree = "<group>"; };
 		B89BCE052FF4721B0095F011 /* SketchyInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SketchyInformation.swift; sourceTree = "<group>"; };
 		B89BCE072FF4729F0095F011 /* IceFishing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IceFishing.swift; sourceTree = "<group>"; };
 		B89BCE092FF4768B0095F011 /* CapturedArchmageCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturedArchmageCounter.swift; sourceTree = "<group>"; };
@@ -2411,6 +2339,32 @@
 		B89BCE132FF47CC70095F011 /* UndeathSentence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndeathSentence.swift; sourceTree = "<group>"; };
 		B89BCE152FF47D060095F011 /* SliceAndDice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliceAndDice.swift; sourceTree = "<group>"; };
 		B89BCE172FF47D5A0095F011 /* Moragg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Moragg.swift; sourceTree = "<group>"; };
+		B89BCED330042CD60095F011 /* VoidSoulCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoidSoulCounter.swift; sourceTree = "<group>"; };
+		B89BCED530042DA90095F011 /* CardsPlayedFor2ManaCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardsPlayedFor2ManaCounter.swift; sourceTree = "<group>"; };
+		B89BCED730042EAF0095F011 /* JailhouseManastormEnchantment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JailhouseManastormEnchantment.swift; sourceTree = "<group>"; };
+		B89BCF37300851CD0095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/LinkOpponentDeckPanel.xcstrings; sourceTree = "<group>"; };
+		B89BCF38300851CE0095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/HSReplayPreferences.xcstrings; sourceTree = "<group>"; };
+		B89BCF39300851CE0095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/OpponentTrackersPreferences.xcstrings; sourceTree = "<group>"; };
+		B89BCF3A300851CE0095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/DeckManager.xcstrings; sourceTree = "<group>"; };
+		B89BCF3B300851CE0095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/Splashscreen.xcstrings; sourceTree = "<group>"; };
+		B89BCF3C300851CE0095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/InitialConfiguration.xcstrings; sourceTree = "<group>"; };
+		B89BCF3D300851CE0095F011 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		B89BCF3F300851CE0095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/GeneralPreferences.xcstrings; sourceTree = "<group>"; };
+		B89BCF40300851CF0095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/TrackersPreferences.xcstrings; sourceTree = "<group>"; };
+		B89BCF41300851CF0095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/BattlegroundsSession.xcstrings; sourceTree = "<group>"; };
+		B89BCF42300851D00095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/SaveDeck.xcstrings; sourceTree = "<group>"; };
+		B89BCF43300851D00095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/EditDeck.xcstrings; sourceTree = "<group>"; };
+		B89BCF44300851D10095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/StatsTab.xcstrings; sourceTree = "<group>"; };
+		B89BCF45300851D10095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/GamePreferences.xcstrings; sourceTree = "<group>"; };
+		B89BCF46300851D10095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/BattlegroundsPreferences.xcstrings; sourceTree = "<group>"; };
+		B89BCF47300851D10095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/MainMenu.xcstrings; sourceTree = "<group>"; };
+		B89BCF48300851D10095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/Statistics.xcstrings; sourceTree = "<group>"; };
+		B89BCF49300851D10095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/MercenariesPreferences.xcstrings; sourceTree = "<group>"; };
+		B89BCF4A300851D10095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/ImportingPreferences.xcstrings; sourceTree = "<group>"; };
+		B89BCF4B300851D20095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/PlayerTrackersPreferences.xcstrings; sourceTree = "<group>"; };
+		B89BCF4C300851D20095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/LadderTab.xcstrings; sourceTree = "<group>"; };
+		B89BCF4D300851D20095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/BobsBuddyPanel.xcstrings; sourceTree = "<group>"; };
+		B89BCF4E300851D20095F011 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/NewDeck.xcstrings; sourceTree = "<group>"; };
 		B89C9893280A113A005E9315 /* AnimatedCardList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedCardList.swift; sourceTree = "<group>"; };
 		B89C9895280C610C005E9315 /* DeckLens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckLens.swift; sourceTree = "<group>"; };
 		B89F51E92C9CF8D600E31195 /* ActiveEffect.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ActiveEffect.xib; sourceTree = "<group>"; };
@@ -2566,35 +2520,9 @@
 		B8B790782C98A70800DD33EC /* EffectFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EffectFactory.swift; sourceTree = "<group>"; };
 		B8B7CC1E253C721400033758 /* BattlegroundsPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlegroundsPreferences.swift; sourceTree = "<group>"; };
 		B8B7CC21253C74D100033758 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/BattlegroundsPreferences.xib; sourceTree = "<group>"; };
-		B8B7CC24253C74DB00033758 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/BattlegroundsPreferences.strings; sourceTree = "<group>"; };
-		B8B7CC26253C74E100033758 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/BattlegroundsPreferences.strings; sourceTree = "<group>"; };
-		B8B7CC28253C74E400033758 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/BattlegroundsPreferences.strings; sourceTree = "<group>"; };
-		B8B7CC2A253C74E700033758 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/BattlegroundsPreferences.strings"; sourceTree = "<group>"; };
-		B8B7CC2C253C74EC00033758 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/BattlegroundsPreferences.strings"; sourceTree = "<group>"; };
-		B8B7CC2E253C74EF00033758 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/BattlegroundsPreferences.strings; sourceTree = "<group>"; };
-		B8B7CC30253C74F300033758 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/BattlegroundsPreferences.strings"; sourceTree = "<group>"; };
-		B8B7CC32253C74F600033758 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/BattlegroundsPreferences.strings; sourceTree = "<group>"; };
-		B8B7CC34253C74FA00033758 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/BattlegroundsPreferences.strings; sourceTree = "<group>"; };
-		B8B7CC36253C74FD00033758 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/BattlegroundsPreferences.strings; sourceTree = "<group>"; };
-		B8B7CC38253C750100033758 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/BattlegroundsPreferences.strings; sourceTree = "<group>"; };
-		B8B7CC3A253C750600033758 /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/BattlegroundsPreferences.strings"; sourceTree = "<group>"; };
-		B8B7CC3C253C750700033758 /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/BattlegroundsPreferences.strings"; sourceTree = "<group>"; };
 		B8BA17D628E91C52004D40ED /* LinkOpponentDeckPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkOpponentDeckPanel.swift; sourceTree = "<group>"; };
 		B8BA17D828EFAF73004D40ED /* ClipboardImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardImporter.swift; sourceTree = "<group>"; };
 		B8BA17DB28EFC8F8004D40ED /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LinkOpponentDeckPanel.xib; sourceTree = "<group>"; };
-		B8BA17DE28EFC915004D40ED /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LinkOpponentDeckPanel.strings"; sourceTree = "<group>"; };
-		B8BA17E028EFC919004D40ED /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/LinkOpponentDeckPanel.strings"; sourceTree = "<group>"; };
-		B8BA17E228EFC91B004D40ED /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/LinkOpponentDeckPanel.strings; sourceTree = "<group>"; };
-		B8BA17E428EFC91D004D40ED /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LinkOpponentDeckPanel.strings; sourceTree = "<group>"; };
-		B8BA17E628EFC91E004D40ED /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/LinkOpponentDeckPanel.strings; sourceTree = "<group>"; };
-		B8BA17E828EFC91F004D40ED /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LinkOpponentDeckPanel.strings; sourceTree = "<group>"; };
-		B8BA17EA28EFC921004D40ED /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/LinkOpponentDeckPanel.strings; sourceTree = "<group>"; };
-		B8BA17EC28EFC922004D40ED /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/LinkOpponentDeckPanel.strings; sourceTree = "<group>"; };
-		B8BA17EE28EFC923004D40ED /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/LinkOpponentDeckPanel.strings"; sourceTree = "<group>"; };
-		B8BA17F028EFC924004D40ED /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LinkOpponentDeckPanel.strings; sourceTree = "<group>"; };
-		B8BA17F228EFC925004D40ED /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/LinkOpponentDeckPanel.strings; sourceTree = "<group>"; };
-		B8BA17F428EFC926004D40ED /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/LinkOpponentDeckPanel.strings"; sourceTree = "<group>"; };
-		B8BA17F628EFC927004D40ED /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/LinkOpponentDeckPanel.strings"; sourceTree = "<group>"; };
 		B8BB7AB12831ABE0008239CA /* BattlegroundsLastGames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlegroundsLastGames.swift; sourceTree = "<group>"; };
 		B8BB7AB32832F02D008239CA /* BattlegroundsUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlegroundsUtils.swift; sourceTree = "<group>"; };
 		B8BB7AB728351890008239CA /* NSFont+NSTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSFont+NSTextField.swift"; sourceTree = "<group>"; };
@@ -2612,20 +2540,6 @@
 		B8BD3BAF2C435CA7001E85B7 /* BattlegroundsCompositionStatsRow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BattlegroundsCompositionStatsRow.xib; sourceTree = "<group>"; };
 		B8BD3BB12C4360B1001E85B7 /* BattlegroundsCompositionStatsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlegroundsCompositionStatsRow.swift; sourceTree = "<group>"; };
 		B8BD8442284AB92700F4F224 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/BattlegroundsSession.xib; sourceTree = "<group>"; };
-		B8BD8444284AB93400F4F224 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BattlegroundsSession.strings; sourceTree = "<group>"; };
-		B8BD8445284AB93700F4F224 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/BattlegroundsSession.strings"; sourceTree = "<group>"; };
-		B8BD8446284AB93A00F4F224 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/BattlegroundsSession.strings"; sourceTree = "<group>"; };
-		B8BD8447284AB93D00F4F224 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/BattlegroundsSession.strings; sourceTree = "<group>"; };
-		B8BD8448284AB93F00F4F224 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/BattlegroundsSession.strings; sourceTree = "<group>"; };
-		B8BD8449284AB94200F4F224 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/BattlegroundsSession.strings; sourceTree = "<group>"; };
-		B8BD844A284AB94400F4F224 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/BattlegroundsSession.strings; sourceTree = "<group>"; };
-		B8BD844B284AB94600F4F224 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/BattlegroundsSession.strings; sourceTree = "<group>"; };
-		B8BD844C284AB94800F4F224 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/BattlegroundsSession.strings; sourceTree = "<group>"; };
-		B8BD844D284AB94B00F4F224 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/BattlegroundsSession.strings"; sourceTree = "<group>"; };
-		B8BD844E284AB94D00F4F224 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/BattlegroundsSession.strings; sourceTree = "<group>"; };
-		B8BD844F284AB94F00F4F224 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/BattlegroundsSession.strings; sourceTree = "<group>"; };
-		B8BD8450284AB95100F4F224 /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/BattlegroundsSession.strings"; sourceTree = "<group>"; };
-		B8BD8451284AB95300F4F224 /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/BattlegroundsSession.strings"; sourceTree = "<group>"; };
 		B8BD8452285D23C500F4F224 /* UnfairLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnfairLock.swift; sourceTree = "<group>"; };
 		B8BD84542860058400F4F224 /* SynchronizedDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedDictionary.swift; sourceTree = "<group>"; tabWidth = 3; };
 		B8BD84562861394100F4F224 /* Regex.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Regex.swift; sourceTree = "<group>"; };
@@ -2652,6 +2566,9 @@
 		B8D02E5B2F24230300DC55C1 /* PlayerResourcesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerResourcesView.swift; sourceTree = "<group>"; };
 		B8D02E5D2F2454E700DC55C1 /* PlayerResourcesWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerResourcesWindow.swift; sourceTree = "<group>"; };
 		B8D02E5F2F24592D00DC55C1 /* PlayerResourcesWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PlayerResourcesWindow.xib; sourceTree = "<group>"; };
+		B8D22EA63015965F00E44909 /* InfestTheSculleryCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfestTheSculleryCounter.swift; sourceTree = "<group>"; };
+		B8D22EAA30169C9600E44909 /* BattlegroundsLobbyInfoWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlegroundsLobbyInfoWatcher.swift; sourceTree = "<group>"; };
+		B8D22EAC301BC61600E44909 /* AutoAssemblerEnchantment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoAssemblerEnchantment.swift; sourceTree = "<group>"; };
 		B8D34D34294FB0C100CACC5A /* BattlegroundsHeroHeaderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlegroundsHeroHeaderViewModel.swift; sourceTree = "<group>"; };
 		B8D34D36294FE74700CACC5A /* BattlegroundsHeroPickStatsParams .swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BattlegroundsHeroPickStatsParams .swift"; sourceTree = "<group>"; };
 		B8D75B8E25A9DC9A00446923 /* ExperienceOverlay.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ExperienceOverlay.xib; sourceTree = "<group>"; };
@@ -2784,133 +2701,9 @@
 		C99C0C971D0A6079000DD6FB /* Statistics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Statistics.swift; path = StatsManager/Statistics.swift; sourceTree = "<group>"; };
 		C99C0C9C1D0A608C000DD6FB /* StatsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = StatsHelper.swift; path = Statistics/StatsHelper.swift; sourceTree = "<group>"; };
 		C9BDB3C91D20BC4C00886A11 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/StatsTab.xib; sourceTree = "<group>"; };
-		C9BDB3CC1D20BCAF00886A11 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/StatsTab.strings; sourceTree = "<group>"; };
-		C9BDB3CE1D20BCC000886A11 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/StatsTab.strings; sourceTree = "<group>"; };
-		C9BDB3D01D20BCC200886A11 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/StatsTab.strings; sourceTree = "<group>"; };
-		C9BDB3D21D20BCC300886A11 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/StatsTab.strings; sourceTree = "<group>"; };
-		C9BDB3D41D20BCC800886A11 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/StatsTab.strings"; sourceTree = "<group>"; };
-		C9BDB3D61D20BCCA00886A11 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/StatsTab.strings"; sourceTree = "<group>"; };
 		C9BDB3D81D20BE9500886A11 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LadderTab.xib; sourceTree = "<group>"; };
-		C9BDB3DB1D20BEAB00886A11 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/LadderTab.strings; sourceTree = "<group>"; };
-		C9BDB3DD1D20BED400886A11 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LadderTab.strings; sourceTree = "<group>"; };
-		C9BDB3DF1D20BED600886A11 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/LadderTab.strings; sourceTree = "<group>"; };
-		C9BDB3E11D20BEDD00886A11 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/LadderTab.strings; sourceTree = "<group>"; };
-		C9BDB3E31D20BEDF00886A11 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/LadderTab.strings"; sourceTree = "<group>"; };
-		C9BDB3E51D20BEE000886A11 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LadderTab.strings"; sourceTree = "<group>"; };
-		CE9D9905200770E8003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/HSReplayPreferences.strings"; sourceTree = "<group>"; };
-		CE9D9908200770E8003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Statistics.strings"; sourceTree = "<group>"; };
-		CE9D9909200770E8003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/StatsTab.strings"; sourceTree = "<group>"; };
-		CE9D990A200770E8003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/LadderTab.strings"; sourceTree = "<group>"; };
-		CE9D990B200770E8003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/DeckManager.strings"; sourceTree = "<group>"; };
-		CE9D990C200770E9003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/NewDeck.strings"; sourceTree = "<group>"; };
-		CE9D990D200770E9003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/EditDeck.strings"; sourceTree = "<group>"; };
-		CE9D990E200770E9003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/SaveDeck.strings"; sourceTree = "<group>"; };
-		CE9D990F200770E9003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InitialConfiguration.strings"; sourceTree = "<group>"; };
-		CE9D9910200770E9003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Splashscreen.strings"; sourceTree = "<group>"; };
-		CE9D9911200770EA003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/GeneralPreferences.strings"; sourceTree = "<group>"; };
-		CE9D9912200770EA003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/GamePreferences.strings"; sourceTree = "<group>"; };
-		CE9D9913200770EA003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/TrackersPreferences.strings"; sourceTree = "<group>"; };
-		CE9D9914200770EA003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/PlayerTrackersPreferences.strings"; sourceTree = "<group>"; };
-		CE9D9915200770EA003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/OpponentTrackersPreferences.strings"; sourceTree = "<group>"; };
-		CE9D9917200770EA003505D3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		E30590BA21174FC900679D66 /* UploadCollectionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadCollectionData.swift; sourceTree = "<group>"; };
 		F719B889200ACAE3004F5E36 /* DefaultDecks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultDecks.swift; sourceTree = "<group>"; };
-		F731044F211FF1410082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/HSReplayPreferences.strings; sourceTree = "<group>"; };
-		F7310450211FF1410082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Statistics.strings; sourceTree = "<group>"; };
-		F7310451211FF1410082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/StatsTab.strings; sourceTree = "<group>"; };
-		F7310452211FF1420082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/LadderTab.strings; sourceTree = "<group>"; };
-		F7310453211FF1420082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/DeckManager.strings; sourceTree = "<group>"; };
-		F7310454211FF1420082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/NewDeck.strings; sourceTree = "<group>"; };
-		F7310455211FF1420082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/EditDeck.strings; sourceTree = "<group>"; };
-		F7310456211FF1420082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/SaveDeck.strings; sourceTree = "<group>"; };
-		F7310457211FF1430082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InitialConfiguration.strings; sourceTree = "<group>"; };
-		F7310458211FF1430082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Splashscreen.strings; sourceTree = "<group>"; };
-		F7310459211FF1430082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/GeneralPreferences.strings; sourceTree = "<group>"; };
-		F731045A211FF1430082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/GamePreferences.strings; sourceTree = "<group>"; };
-		F731045B211FF1430082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/TrackersPreferences.strings; sourceTree = "<group>"; };
-		F731045C211FF1430082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/PlayerTrackersPreferences.strings; sourceTree = "<group>"; };
-		F731045D211FF1440082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/OpponentTrackersPreferences.strings; sourceTree = "<group>"; };
-		F731045F211FF1440082651C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
-		F7310460211FF2280082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/HSReplayPreferences.strings; sourceTree = "<group>"; };
-		F7310461211FF2280082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Statistics.strings; sourceTree = "<group>"; };
-		F7310462211FF2280082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/StatsTab.strings; sourceTree = "<group>"; };
-		F7310463211FF2280082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LadderTab.strings; sourceTree = "<group>"; };
-		F7310464211FF2290082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/DeckManager.strings; sourceTree = "<group>"; };
-		F7310465211FF2290082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/NewDeck.strings; sourceTree = "<group>"; };
-		F7310466211FF2290082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/EditDeck.strings; sourceTree = "<group>"; };
-		F7310467211FF2290082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/SaveDeck.strings; sourceTree = "<group>"; };
-		F7310468211FF2290082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InitialConfiguration.strings; sourceTree = "<group>"; };
-		F7310469211FF22A0082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Splashscreen.strings; sourceTree = "<group>"; };
-		F731046A211FF22A0082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/GeneralPreferences.strings; sourceTree = "<group>"; };
-		F731046B211FF22A0082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/GamePreferences.strings; sourceTree = "<group>"; };
-		F731046C211FF22A0082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/TrackersPreferences.strings; sourceTree = "<group>"; };
-		F731046D211FF22A0082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/PlayerTrackersPreferences.strings; sourceTree = "<group>"; };
-		F731046E211FF22A0082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/OpponentTrackersPreferences.strings; sourceTree = "<group>"; };
-		F7310470211FF22B0082651C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
-		F7310471211FF23B0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/HSReplayPreferences.strings; sourceTree = "<group>"; };
-		F7310472211FF23B0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Statistics.strings; sourceTree = "<group>"; };
-		F7310473211FF23B0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/StatsTab.strings; sourceTree = "<group>"; };
-		F7310474211FF23C0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/LadderTab.strings; sourceTree = "<group>"; };
-		F7310475211FF23C0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/DeckManager.strings; sourceTree = "<group>"; };
-		F7310476211FF23C0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/NewDeck.strings; sourceTree = "<group>"; };
-		F7310477211FF23C0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/EditDeck.strings; sourceTree = "<group>"; };
-		F7310478211FF23C0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/SaveDeck.strings; sourceTree = "<group>"; };
-		F7310479211FF23C0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/InitialConfiguration.strings; sourceTree = "<group>"; };
-		F731047A211FF23D0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Splashscreen.strings; sourceTree = "<group>"; };
-		F731047B211FF23D0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/GeneralPreferences.strings; sourceTree = "<group>"; };
-		F731047C211FF23D0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/GamePreferences.strings; sourceTree = "<group>"; };
-		F731047D211FF23D0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/TrackersPreferences.strings; sourceTree = "<group>"; };
-		F731047E211FF23D0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/PlayerTrackersPreferences.strings; sourceTree = "<group>"; };
-		F731047F211FF23D0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/OpponentTrackersPreferences.strings; sourceTree = "<group>"; };
-		F7310481211FF23E0082651C /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
-		F7310482211FF26A0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/HSReplayPreferences.strings; sourceTree = "<group>"; };
-		F7310483211FF26A0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Statistics.strings; sourceTree = "<group>"; };
-		F7310484211FF26B0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/StatsTab.strings; sourceTree = "<group>"; };
-		F7310485211FF26B0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LadderTab.strings; sourceTree = "<group>"; };
-		F7310486211FF26B0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/DeckManager.strings; sourceTree = "<group>"; };
-		F7310487211FF26B0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/NewDeck.strings; sourceTree = "<group>"; };
-		F7310488211FF26B0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/EditDeck.strings; sourceTree = "<group>"; };
-		F7310489211FF26B0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SaveDeck.strings; sourceTree = "<group>"; };
-		F731048A211FF26C0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InitialConfiguration.strings; sourceTree = "<group>"; };
-		F731048B211FF26C0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Splashscreen.strings; sourceTree = "<group>"; };
-		F731048C211FF26C0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/GeneralPreferences.strings; sourceTree = "<group>"; };
-		F731048D211FF26C0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/GamePreferences.strings; sourceTree = "<group>"; };
-		F731048E211FF26C0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/TrackersPreferences.strings; sourceTree = "<group>"; };
-		F731048F211FF26C0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PlayerTrackersPreferences.strings; sourceTree = "<group>"; };
-		F7310490211FF26D0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/OpponentTrackersPreferences.strings; sourceTree = "<group>"; };
-		F7310492211FF26D0082651C /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
-		F7310493211FF2850082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/HSReplayPreferences.strings"; sourceTree = "<group>"; };
-		F7310494211FF2850082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/Statistics.strings"; sourceTree = "<group>"; };
-		F7310495211FF2850082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/StatsTab.strings"; sourceTree = "<group>"; };
-		F7310496211FF2850082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/LadderTab.strings"; sourceTree = "<group>"; };
-		F7310497211FF2850082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/DeckManager.strings"; sourceTree = "<group>"; };
-		F7310498211FF2850082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/NewDeck.strings"; sourceTree = "<group>"; };
-		F7310499211FF2860082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/EditDeck.strings"; sourceTree = "<group>"; };
-		F731049A211FF2860082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/SaveDeck.strings"; sourceTree = "<group>"; };
-		F731049B211FF2860082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/InitialConfiguration.strings"; sourceTree = "<group>"; };
-		F731049C211FF2860082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/Splashscreen.strings"; sourceTree = "<group>"; };
-		F731049D211FF2860082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/GeneralPreferences.strings"; sourceTree = "<group>"; };
-		F731049E211FF2860082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/GamePreferences.strings"; sourceTree = "<group>"; };
-		F731049F211FF2870082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/TrackersPreferences.strings"; sourceTree = "<group>"; };
-		F73104A0211FF2870082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/PlayerTrackersPreferences.strings"; sourceTree = "<group>"; };
-		F73104A1211FF2870082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/OpponentTrackersPreferences.strings"; sourceTree = "<group>"; };
-		F73104A3211FF2870082651C /* es-MX */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-MX"; path = "es-MX.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		F73104A4211FF2A10082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/HSReplayPreferences.strings"; sourceTree = "<group>"; };
-		F73104A5211FF2A10082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/Statistics.strings"; sourceTree = "<group>"; };
-		F73104A6211FF2A20082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/StatsTab.strings"; sourceTree = "<group>"; };
-		F73104A7211FF2A20082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/LadderTab.strings"; sourceTree = "<group>"; };
-		F73104A8211FF2A20082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/DeckManager.strings"; sourceTree = "<group>"; };
-		F73104A9211FF2A20082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/NewDeck.strings"; sourceTree = "<group>"; };
-		F73104AA211FF2A20082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/EditDeck.strings"; sourceTree = "<group>"; };
-		F73104AB211FF2A30082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/SaveDeck.strings"; sourceTree = "<group>"; };
-		F73104AC211FF2A30082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/InitialConfiguration.strings"; sourceTree = "<group>"; };
-		F73104AD211FF2A30082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/Splashscreen.strings"; sourceTree = "<group>"; };
-		F73104AE211FF2A30082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/GeneralPreferences.strings"; sourceTree = "<group>"; };
-		F73104AF211FF2A30082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/GamePreferences.strings"; sourceTree = "<group>"; };
-		F73104B0211FF2A30082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/TrackersPreferences.strings"; sourceTree = "<group>"; };
-		F73104B1211FF2A40082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/PlayerTrackersPreferences.strings"; sourceTree = "<group>"; };
-		F73104B2211FF2A40082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/OpponentTrackersPreferences.strings"; sourceTree = "<group>"; };
-		F73104B4211FF2A40082651C /* th-TH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "th-TH"; path = "th-TH.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		F79833961FFF324200D2893E /* Events.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Events.swift; sourceTree = "<group>"; };
 		F7D7A3A52011B67D00E3A5F0 /* Hearthstone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hearthstone.swift; sourceTree = "<group>"; };
 		F7D7A3AD2017B51300E3A5F0 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = HSTracker/Resources/dsa_pub.pem; sourceTree = SOURCE_ROOT; };
@@ -3076,9 +2869,10 @@
 		436032991C7B4C34005F1893 /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
+				7BA4A8152FF3EA91000B3784 /* PreferencePaneController.swift */,
 				B8B7CC1E253C721400033758 /* BattlegroundsPreferences.swift */,
 				B8B7CC22253C74D100033758 /* BattlegroundsPreferences.xib */,
-				43D308051C842DC900480488 /* GamePrefences.swift */,
+				43D308051C842DC900480488 /* GamePreferences.swift */,
 				432B5FB81CB5372600B05D19 /* GamePreferences.xib */,
 				43D308031C842DC000480488 /* GeneralPreferences.swift */,
 				432B5FBB1CB5372C00B05D19 /* GeneralPreferences.xib */,
@@ -3648,6 +3442,7 @@
 				B89BCE092FF4768B0095F011 /* CapturedArchmageCounter.swift */,
 				B889F60A2CED5D26001506F4 /* CardsDrawnThisGameCounter.swift */,
 				B889F60C2CED6151001506F4 /* CardsDrawnThisTurnCounter.swift */,
+				B89BCED530042DA90095F011 /* CardsPlayedFor2ManaCounter.swift */,
 				B852D81C2DDDF59D00884B26 /* CardsPlayedThisTurnCounter.swift */,
 				B88339742E710457007D9754 /* CardsThatDidntStartInDeckPlayedCounter.swift */,
 				B89343372CD00858009A8727 /* ChaoticTendrilCounter.swift */,
@@ -3668,6 +3463,7 @@
 				B86D89C32D95A24F00AB65A5 /* HeroPowersThisGameCounter.swift */,
 				B872E0D62DB059410023B24B /* HolySpellsPlayedCounter.swift */,
 				B8889C1E2DA4AAEB0053DD57 /* ImbueCounter.swift */,
+				B8D22EA63015965F00E44909 /* InfestTheSculleryCounter.swift */,
 				B89343432CD11C13009A8727 /* JadeDisplayCounter.swift */,
 				B89343452CD11D03009A8727 /* JadeGolemCounter.swift */,
 				B82029322CD2C65D00C19A8C /* KiljaedenCounter.swift */,
@@ -3691,6 +3487,7 @@
 				B85462292CDED2FE0083BB31 /* TheCeaselessExpanseCounter.swift */,
 				B8DB12C62EBEB93C004268FA /* TimethiefRafaamCounter.swift */,
 				B86D89C72D95A48F00AB65A5 /* TyrandeSpellsPlayedCounter.swift */,
+				B89BCED330042CD60095F011 /* VoidSoulCounter.swift */,
 				B893434D2CD1320F009A8727 /* WheelOfDeathTurnsCounter.swift */,
 				B86D89C92D95A57F00AB65A5 /* YsondreCounter.swift */,
 			);
@@ -3720,7 +3517,8 @@
 				B87856DD2C04B958004C2C40 /* AggregateExceptionProxy.swift */,
 				B8BDF9052A9625D9000DA4ED /* AnomalyFactoryProxy.swift */,
 				B8BDF9072A9626A8000DA4ED /* AnomalyProxy.swift */,
-				B89BCE032FF463360095F011 /* AutoAssembler.swift */,
+				B89BCE032FF463360095F011 /* AutoAssemblerProxy.swift */,
+				B8D22EAC301BC61600E44909 /* AutoAssemblerEnchantment.swift */,
 				B844D3672A0C33AB001704E0 /* BloodGemProxy.swift */,
 				B86C9EAA27A17B3A00195C0A /* BrukanInvocationDeathrattles.swift */,
 				B844D3652A0C3026001704E0 /* CardEntityProxy.swift */,
@@ -3730,9 +3528,11 @@
 				B8449A052781CB6F0094E5B3 /* GenericDeathrattles.swift */,
 				B836821D27873B40007D5740 /* HeroPowerDataProxy.swift */,
 				B898995C2CAA33710011B184 /* HoggyBank.swift */,
+				B8815BEF302162F50016D77A /* ICopiesDeathrattlesProxy.swift */,
 				B82F4EAD24E3229200905024 /* InputProxy.swift */,
 				B898995E2CAA33CF0011B184 /* JarredFrostling.swift */,
 				B89899582CAA31CA0011B184 /* Leapfrogger.swift */,
+				B8815BF13022BEC40016D77A /* LockboxCardEntityProxy.swift */,
 				B844D36D2A0C35A8001704E0 /* MinionCardEntityProxy.swift */,
 				B82F4EB124E4088500905024 /* MinionFactoryProxy.swift */,
 				B82F4EB324E40B9F00905024 /* MinionProxy.swift */,
@@ -4017,6 +3817,7 @@
 				B85462322CE016B80083BB31 /* ArenaWatcher.swift */,
 				B854622C2CE008360083BB31 /* BaconWatcher.swift */,
 				B854623A2CE01C5F0083BB31 /* BattlegroundsLeaderboardWatcher.swift */,
+				B8D22EAA30169C9600E44909 /* BattlegroundsLobbyInfoWatcher.swift */,
 				B85462382CE01B1F0083BB31 /* BattlegroundsTeammateBoardStateWatcher.swift */,
 				B85462302CE00EED0083BB31 /* BigCardWatcher.swift */,
 				B85462362CE019FE0083BB31 /* ChoicesWatcher.swift */,
@@ -4282,6 +4083,7 @@
 				B8B78FE82C96796500DD33EC /* ElementalEvocationEnchantment.swift */,
 				B8B78FEA2C967A7900DD33EC /* HotStreakEnchantment.swift */,
 				B82029342CD2CD9F00C19A8C /* IngeniousArtificerEnchantment.swift */,
+				B89BCED730042EAF0095F011 /* JailhouseManastormEnchantment.swift */,
 				B8B78FEC2C96FC8400DD33EC /* KingTideEnchantment.swift */,
 				B81B3DAA2D444F8600DC9EB0 /* ShieldBatteryEnchantment.swift */,
 				B8B78FF02C96FD4500DD33EC /* SolidAlibiEnchantment.swift */,
@@ -4841,7 +4643,7 @@
 		F73104B5211FF6AD0082651C /* macOS */ = {
 			isa = PBXGroup;
 			children = (
-				432B5FAD1CB5351800B05D19 /* Localizable.strings */,
+				B89BCF3D300851CE0095F011 /* Localizable.xcstrings */,
 			);
 			path = macOS;
 			sourceTree = "<group>";
@@ -5045,7 +4847,6 @@
 				B89899532CA5F0180011B184 /* BattlegroundsSingleTrinket.xib in Resources */,
 				432B5FC81CB5374600B05D19 /* NewDeck.xib in Resources */,
 				B88364FA275D6FE10094D8E1 /* FlavorText.xib in Resources */,
-				432B5FAF1CB5351800B05D19 /* Localizable.strings in Resources */,
 				434910451D09505100B22DB2 /* BoardDamage.xib in Resources */,
 				B812BCEF29495C3A000C6513 /* BattlegroundsSingleQuestView.xib in Resources */,
 				432B5FB91CB5372C00B05D19 /* GeneralPreferences.xib in Resources */,
@@ -5060,6 +4861,7 @@
 				434D1CB41D10947200222B8E /* Statistics.xib in Resources */,
 				B8CE65DE2952442400E8D168 /* BattlegroundsHeroHeader.xib in Resources */,
 				4CECFFD723C10C570093253E /* BattlegroundsTierDetailWindowController.xib in Resources */,
+				B89BCF3E300851CE0095F011 /* Localizable.xcstrings in Resources */,
 				B82AE60028BE8631004A8FE0 /* mono-version.txt in Resources */,
 				432B5FC21CB5373D00B05D19 /* SaveDeck.xib in Resources */,
 				B864AE3A25A4CC1200793F36 /* ImportingPreferences.xib in Resources */,
@@ -5324,6 +5126,7 @@
 				B898655E2D8C93C700BA5649 /* TortollanTraveler.swift in Sources */,
 				B8E1E5B62D0C870F00383975 /* BodyWrapper.swift in Sources */,
 				B8BA17D928EFAF73004D40ED /* ClipboardImporter.swift in Sources */,
+				B89BCED830042EAF0095F011 /* JailhouseManastormEnchantment.swift in Sources */,
 				432A077C1E93B0F100921E34 /* Secrets.swift in Sources */,
 				B89865362D8A343600BA5649 /* MinionsDiedThisGameCounter.swift in Sources */,
 				B87765CD2BB9AE7F003BE49D /* DeckSideboards.swift in Sources */,
@@ -5350,6 +5153,7 @@
 				B8FDE94F2CDD26A20093BFF7 /* TyrsTears.swift in Sources */,
 				B8B790192C9750EC00DD33EC /* CrusaderAura.swift in Sources */,
 				B820293F2CD2D01300C19A8C /* StrandedSpacemanEnchantment.swift in Sources */,
+				B8D22EAD301BC61600E44909 /* AutoAssemblerEnchantment.swift in Sources */,
 				B804FC442946BACF00F74CD9 /* BattlegroundsCompositionPopularityViewModel.swift in Sources */,
 				43F2040E1E93C2E600E0BC4A /* Paladin.swift in Sources */,
 				B844D3682A0C33AB001704E0 /* BloodGemProxy.swift in Sources */,
@@ -5532,6 +5336,7 @@
 				B8E868832B93AF04005B1315 /* SceneHandler.swift in Sources */,
 				B8AB59942742F94900383EC8 /* RateLimiter.swift in Sources */,
 				438B04F91E6F55720071594B /* Date.swift in Sources */,
+				B89BCED630042DA90095F011 /* CardsPlayedFor2ManaCounter.swift in Sources */,
 				B8B78FE92C96796500DD33EC /* ElementalEvocationEnchantment.swift in Sources */,
 				437C58301EBC7E8400FFD888 /* NSImage.swift in Sources */,
 				B8D02E5E2F2454E700DC55C1 /* PlayerResourcesWindow.swift in Sources */,
@@ -5560,6 +5365,7 @@
 				B8B790592C97841400DD33EC /* CommanderUlthokEnchantment.swift in Sources */,
 				B82AE60228BED413004A8FE0 /* QuestDataProxy.swift in Sources */,
 				B8D8859A24F4185200F2F0F2 /* BobsBuddyErrorState.swift in Sources */,
+				B89BCED430042CD60095F011 /* VoidSoulCounter.swift in Sources */,
 				B8591FF02B23CC7D00B907A4 /* ChoiceType.swift in Sources */,
 				43B6954D1C9014FA00F4D0AC /* TagChangeActions.swift in Sources */,
 				B86D8A142D95FAB400AB65A5 /* Dreamwarden.swift in Sources */,
@@ -5585,7 +5391,7 @@
 				B89865C72D9201BC00BA5649 /* PitStop.swift in Sources */,
 				B846CC362E05F73200552F9C /* PhaseStalker.swift in Sources */,
 				B8196F142CC850BB007C0371 /* BaseCounter.swift in Sources */,
-				43D308061C842DC900480488 /* GamePrefences.swift in Sources */,
+				43D308061C842DC900480488 /* GamePreferences.swift in Sources */,
 				B8E1E5AA2D0B891F00383975 /* UndeadBuffCounter.swift in Sources */,
 				B8DC376125D06C2F00452A83 /* OpponentDeadForTracker.swift in Sources */,
 				43A8A0F71E1557C900AF34FD /* FormatType.swift in Sources */,
@@ -5631,6 +5437,7 @@
 				B86D89E82D95EC8F00AB65A5 /* GrimHarvest.swift in Sources */,
 				1C17D2521E82DEE700ED4047 /* RealmHelper.swift in Sources */,
 				B8AEB60D2FB2731E00CDA2C0 /* LeylineCostReductionCounter.swift in Sources */,
+				7BA4A8162FF3EA91000B3784 /* PreferencePaneController.swift in Sources */,
 				B89865AF2D91D6D300BA5649 /* InterstellarResearcher.swift in Sources */,
 				B83336012F620CFC00923513 /* CommanderGeddonEnchantment.swift in Sources */,
 				B83335F92F62095500923513 /* WarlocEnchantment.swift in Sources */,
@@ -5638,6 +5445,7 @@
 				B87216922F16ECBE00E848BA /* OverloadThisGameCounter.swift in Sources */,
 				B8DB12BF2EBAE910004268FA /* TinyRafaam.swift in Sources */,
 				439C7ECB1C777F8900D29859 /* LogReaderManager.swift in Sources */,
+				B8815BF0302162F50016D77A /* ICopiesDeathrattlesProxy.swift in Sources */,
 				B83336052F620E2200923513 /* SupplyRun.swift in Sources */,
 				B846CC862E15B7A600552F9C /* CreatureOfTheSacredCave.swift in Sources */,
 				B852D8392DDFBA4E00884B26 /* PrimordialProtector.swift in Sources */,
@@ -5690,6 +5498,7 @@
 				B846CC902E16C10000552F9C /* EternalBloodpetal.swift in Sources */,
 				B846CC682E09EFDD00552F9C /* NineLives.swift in Sources */,
 				340AAC051D0544AD0015FE33 /* StringTracker.swift in Sources */,
+				B8D22EA73015965F00E44909 /* InfestTheSculleryCounter.swift in Sources */,
 				B8B61C222AEBEA9C00990359 /* AvailableSecretsProvider.swift in Sources */,
 				B83335F52F6207BB00923513 /* TichondriusEnchantment.swift in Sources */,
 				B8AC9A26293F92540047F438 /* BattlegroundsQuestPickingViewModel.swift in Sources */,
@@ -5972,6 +5781,7 @@
 				B8B78FAD2C93C8E400DD33EC /* FrozenOverEnchantment.swift in Sources */,
 				B8B7905F2C97850900DD33EC /* CurseOfWeaknessEnchantment.swift in Sources */,
 				B837D7EA2EAF038B0070DB4B /* FyrakkTheBlazing.swift in Sources */,
+				B8D22EAB30169C9600E44909 /* BattlegroundsLobbyInfoWatcher.swift in Sources */,
 				4335545B1D65944700277B27 /* Toast.swift in Sources */,
 				B8B790292C97571A00DD33EC /* TimeOutEnchantment.swift in Sources */,
 				B89865742D91AE2600BA5649 /* MysteryEgg.swift in Sources */,
@@ -5979,6 +5789,7 @@
 				B86D89D22D95BF6300AB65A5 /* FracturedPowerEnchantment.swift in Sources */,
 				B89865CB2D9206A800BA5649 /* CactusCutter.swift in Sources */,
 				B8AC9A1C293CE3310047F438 /* BattlegroundsHeroPickingViewModel.swift in Sources */,
+				B8815BF23022BEC40016D77A /* LockboxCardEntityProxy.swift in Sources */,
 				B8DB12912EBADA2D004268FA /* Solitude.swift in Sources */,
 				B8B7900A2C974CFA00DD33EC /* LoathebEnchantment.swift in Sources */,
 				B895864B2B81460700989C13 /* ConstructedMulliganSingleCardHeaderViewModel.swift in Sources */,
@@ -6016,7 +5827,7 @@
 				431719711C84911300F5988B /* EditDeck.swift in Sources */,
 				B85462352CE0185B0083BB31 /* QueueWatcher.swift in Sources */,
 				B8CDDCBF2F3D63C8004C3E86 /* TimewarpedMagnanimooseEnchantmentProxy.swift in Sources */,
-				B89BCE042FF463400095F011 /* AutoAssembler.swift in Sources */,
+				B89BCE042FF463400095F011 /* AutoAssemblerProxy.swift in Sources */,
 				B8DB12852EBAD671004268FA /* MurlocRafaamEnchantment.swift in Sources */,
 				B8AC9A28293F9A680047F438 /* BattlegroundsComposition.swift in Sources */,
 				B89865802D91B04300BA5649 /* Saruun.swift in Sources */,
@@ -6556,6 +6367,7 @@
 				43C1CA6A1E96CD6F008C20B1 /* Game.swift in Sources */,
 				B823E801275FB89400747CAF /* FlavorText.swift in Sources */,
 				43C1CA6B1E96CD6F008C20B1 /* CoreManager.swift in Sources */,
+				7BA4A8172FF3EA91000B3784 /* PreferencePaneController.swift in Sources */,
 				43C1CA6C1E96CD6F008C20B1 /* LogLine.swift in Sources */,
 				43C1CA6D1E96CD6F008C20B1 /* LogLineNamespace.swift in Sources */,
 				43C1CA6E1E96CD6F008C20B1 /* LogLineZone.swift in Sources */,
@@ -6602,7 +6414,7 @@
 				43C1CA971E96CD6F008C20B1 /* InitialConfiguration.swift in Sources */,
 				43C1CA981E96CD6F008C20B1 /* Splashscreen.swift in Sources */,
 				43C1CA991E96CD6F008C20B1 /* GeneralPreferences.swift in Sources */,
-				43C1CA9A1E96CD6F008C20B1 /* GamePrefences.swift in Sources */,
+				43C1CA9A1E96CD6F008C20B1 /* GamePreferences.swift in Sources */,
 				B804FC37294446ED00F74CD9 /* TextButton.swift in Sources */,
 				43C1CA9B1E96CD6F008C20B1 /* TrackersPreferences.swift in Sources */,
 				43C1CA9C1E96CD6F008C20B1 /* PlayerTrackersPreferences.swift in Sources */,
@@ -6668,44 +6480,11 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		432B5FAD1CB5351800B05D19 /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				432B5FAE1CB5351800B05D19 /* Base */,
-				432B5FD81CB5378C00B05D19 /* fr */,
-				432B5FE31CB5492700B05D19 /* de */,
-				432B5FEE1CB549F100B05D19 /* es */,
-				432B5FF91CB54A3600B05D19 /* it */,
-				432B60041CB54A6800B05D19 /* pt-BR */,
-				432B600F1CB54AD700B05D19 /* zh-Hans */,
-				CE9D9917200770EA003505D3 /* zh-Hant */,
-				F731045F211FF1440082651C /* ko */,
-				F7310470211FF22B0082651C /* ru */,
-				F7310481211FF23E0082651C /* pl */,
-				F7310492211FF26D0082651C /* ja */,
-				F73104A3211FF2870082651C /* es-MX */,
-				F73104B4211FF2A40082651C /* th-TH */,
-			);
-			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
 		432B5FB51CB5371C00B05D19 /* PlayerTrackersPreferences.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				432B5FB41CB5371C00B05D19 /* Base */,
-				432B5FE11CB5492600B05D19 /* de */,
-				432B5FEC1CB549F100B05D19 /* es */,
-				432B5FF71CB54A3600B05D19 /* it */,
-				432B60021CB54A6800B05D19 /* pt-BR */,
-				432B600D1CB54AD700B05D19 /* zh-Hans */,
-				43A8A0ED1E0BBA4600AF34FD /* fr */,
-				CE9D9914200770EA003505D3 /* zh-Hant */,
-				F731045C211FF1430082651C /* ko */,
-				F731046D211FF22A0082651C /* ru */,
-				F731047E211FF23D0082651C /* pl */,
-				F731048F211FF26C0082651C /* ja */,
-				F73104A0211FF2870082651C /* es-MX */,
-				F73104B1211FF2A40082651C /* th-TH */,
+				B89BCF4B300851D20095F011 /* mul */,
 			);
 			name = PlayerTrackersPreferences.xib;
 			sourceTree = "<group>";
@@ -6714,19 +6493,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				432B5FB71CB5372600B05D19 /* Base */,
-				432B5FE01CB5492600B05D19 /* de */,
-				432B5FEB1CB549F100B05D19 /* es */,
-				432B5FF61CB54A3600B05D19 /* it */,
-				432B60011CB54A6800B05D19 /* pt-BR */,
-				432B600C1CB54AD700B05D19 /* zh-Hans */,
-				4323C5F01E1BBE8300C97896 /* fr */,
-				CE9D9912200770EA003505D3 /* zh-Hant */,
-				F731045A211FF1430082651C /* ko */,
-				F731046B211FF22A0082651C /* ru */,
-				F731047C211FF23D0082651C /* pl */,
-				F731048D211FF26C0082651C /* ja */,
-				F731049E211FF2860082651C /* es-MX */,
-				F73104AF211FF2A30082651C /* th-TH */,
+				B89BCF45300851D10095F011 /* mul */,
 			);
 			name = GamePreferences.xib;
 			sourceTree = "<group>";
@@ -6735,19 +6502,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				432B5FBA1CB5372C00B05D19 /* Base */,
-				432B5FDF1CB5492600B05D19 /* de */,
-				432B5FEA1CB549F100B05D19 /* es */,
-				432B5FF51CB54A3600B05D19 /* it */,
-				432B60001CB54A6800B05D19 /* pt-BR */,
-				432B600B1CB54AD700B05D19 /* zh-Hans */,
-				43AFEEE91E218B0800F6045A /* fr */,
-				CE9D9911200770EA003505D3 /* zh-Hant */,
-				F7310459211FF1430082651C /* ko */,
-				F731046A211FF22A0082651C /* ru */,
-				F731047B211FF23D0082651C /* pl */,
-				F731048C211FF26C0082651C /* ja */,
-				F731049D211FF2860082651C /* es-MX */,
-				F73104AE211FF2A30082651C /* th-TH */,
+				B89BCF3F300851CE0095F011 /* mul */,
 			);
 			name = GeneralPreferences.xib;
 			sourceTree = "<group>";
@@ -6756,19 +6511,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				432B5FBD1CB5373200B05D19 /* Base */,
-				432B5FD31CB5378B00B05D19 /* fr */,
-				432B5FDE1CB5492600B05D19 /* de */,
-				432B5FE91CB549F100B05D19 /* es */,
-				432B5FF41CB54A3600B05D19 /* it */,
-				432B5FFF1CB54A6800B05D19 /* pt-BR */,
-				432B600A1CB54AD600B05D19 /* zh-Hans */,
-				CE9D9910200770E9003505D3 /* zh-Hant */,
-				F7310458211FF1430082651C /* ko */,
-				F7310469211FF22A0082651C /* ru */,
-				F731047A211FF23D0082651C /* pl */,
-				F731048B211FF26C0082651C /* ja */,
-				F731049C211FF2860082651C /* es-MX */,
-				F73104AD211FF2A30082651C /* th-TH */,
+				B89BCF3B300851CE0095F011 /* mul */,
 			);
 			name = Splashscreen.xib;
 			sourceTree = "<group>";
@@ -6777,19 +6520,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				432B5FC01CB5373500B05D19 /* Base */,
-				432B5FD21CB5378B00B05D19 /* fr */,
-				432B5FDD1CB5492600B05D19 /* de */,
-				432B5FE81CB549F100B05D19 /* es */,
-				432B5FF31CB54A3600B05D19 /* it */,
-				432B5FFE1CB54A6700B05D19 /* pt-BR */,
-				432B60091CB54AD600B05D19 /* zh-Hans */,
-				CE9D990F200770E9003505D3 /* zh-Hant */,
-				F7310457211FF1430082651C /* ko */,
-				F7310468211FF2290082651C /* ru */,
-				F7310479211FF23C0082651C /* pl */,
-				F731048A211FF26C0082651C /* ja */,
-				F731049B211FF2860082651C /* es-MX */,
-				F73104AC211FF2A30082651C /* th-TH */,
+				B89BCF3C300851CE0095F011 /* mul */,
 			);
 			name = InitialConfiguration.xib;
 			sourceTree = "<group>";
@@ -6798,19 +6529,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				432B5FC31CB5373D00B05D19 /* Base */,
-				432B5FD11CB5378B00B05D19 /* fr */,
-				432B5FDC1CB5492600B05D19 /* de */,
-				432B5FE71CB549F100B05D19 /* es */,
-				432B5FF21CB54A3600B05D19 /* it */,
-				432B5FFD1CB54A6700B05D19 /* pt-BR */,
-				432B60081CB54AD600B05D19 /* zh-Hans */,
-				CE9D990E200770E9003505D3 /* zh-Hant */,
-				F7310456211FF1420082651C /* ko */,
-				F7310467211FF2290082651C /* ru */,
-				F7310478211FF23C0082651C /* pl */,
-				F7310489211FF26B0082651C /* ja */,
-				F731049A211FF2860082651C /* es-MX */,
-				F73104AB211FF2A30082651C /* th-TH */,
+				B89BCF42300851D00095F011 /* mul */,
 			);
 			name = SaveDeck.xib;
 			sourceTree = "<group>";
@@ -6819,19 +6538,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				432B5FC61CB5374100B05D19 /* Base */,
-				432B5FD01CB5378B00B05D19 /* fr */,
-				432B5FDB1CB5492600B05D19 /* de */,
-				432B5FE61CB549F100B05D19 /* es */,
-				432B5FF11CB54A3600B05D19 /* it */,
-				432B5FFC1CB54A6700B05D19 /* pt-BR */,
-				432B60071CB54AD600B05D19 /* zh-Hans */,
-				CE9D990D200770E9003505D3 /* zh-Hant */,
-				F7310455211FF1420082651C /* ko */,
-				F7310466211FF2290082651C /* ru */,
-				F7310477211FF23C0082651C /* pl */,
-				F7310488211FF26B0082651C /* ja */,
-				F7310499211FF2860082651C /* es-MX */,
-				F73104AA211FF2A20082651C /* th-TH */,
+				B89BCF43300851D00095F011 /* mul */,
 			);
 			name = EditDeck.xib;
 			sourceTree = "<group>";
@@ -6840,19 +6547,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				432B5FC91CB5374600B05D19 /* Base */,
-				432B5FCF1CB5378B00B05D19 /* fr */,
-				432B5FDA1CB5492600B05D19 /* de */,
-				432B5FE51CB549F000B05D19 /* es */,
-				432B5FF01CB54A3500B05D19 /* it */,
-				432B5FFB1CB54A6700B05D19 /* pt-BR */,
-				432B60061CB54AD600B05D19 /* zh-Hans */,
-				CE9D990C200770E9003505D3 /* zh-Hant */,
-				F7310454211FF1420082651C /* ko */,
-				F7310465211FF2290082651C /* ru */,
-				F7310476211FF23C0082651C /* pl */,
-				F7310487211FF26B0082651C /* ja */,
-				F7310498211FF2850082651C /* es-MX */,
-				F73104A9211FF2A20082651C /* th-TH */,
+				B89BCF4E300851D20095F011 /* mul */,
 			);
 			name = NewDeck.xib;
 			sourceTree = "<group>";
@@ -6861,19 +6556,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				432B5FCC1CB5375500B05D19 /* Base */,
-				432B5FCE1CB5378B00B05D19 /* fr */,
-				432B5FD91CB5492500B05D19 /* de */,
-				432B5FE41CB549F000B05D19 /* es */,
-				432B5FEF1CB54A3500B05D19 /* it */,
-				432B5FFA1CB54A6700B05D19 /* pt-BR */,
-				432B60051CB54AD600B05D19 /* zh-Hans */,
-				CE9D990B200770E8003505D3 /* zh-Hant */,
-				F7310453211FF1420082651C /* ko */,
-				F7310464211FF2290082651C /* ru */,
-				F7310475211FF23C0082651C /* pl */,
-				F7310486211FF26B0082651C /* ja */,
-				F7310497211FF2850082651C /* es-MX */,
-				F73104A8211FF2A20082651C /* th-TH */,
+				B89BCF3A300851CE0095F011 /* mul */,
 			);
 			name = DeckManager.xib;
 			sourceTree = "<group>";
@@ -6882,19 +6565,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4335543B1D5FAF0300277B27 /* Base */,
-				4335543E1D5FAF0600277B27 /* zh-Hans */,
-				433554401D5FAF0800277B27 /* pt-BR */,
-				433554421D5FAF0A00277B27 /* it */,
-				433554441D5FAF0B00277B27 /* es */,
-				433554461D5FAF0F00277B27 /* de */,
-				433D8E241DFC498D0083BD33 /* fr */,
-				CE9D9905200770E8003505D3 /* zh-Hant */,
-				F731044F211FF1410082651C /* ko */,
-				F7310460211FF2280082651C /* ru */,
-				F7310471211FF23B0082651C /* pl */,
-				F7310482211FF26A0082651C /* ja */,
-				F7310493211FF2850082651C /* es-MX */,
-				F73104A4211FF2A10082651C /* th-TH */,
+				B89BCF38300851CE0095F011 /* mul */,
 			);
 			name = HSReplayPreferences.xib;
 			sourceTree = "<group>";
@@ -6903,19 +6574,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				434D1CB51D10947200222B8E /* Base */,
-				434D1CB81D10947700222B8E /* fr */,
-				434D1CBA1D10947D00222B8E /* de */,
-				434D1CBC1D10948000222B8E /* es */,
-				434D1CBE1D10948200222B8E /* it */,
-				434D1CC01D10948400222B8E /* pt-BR */,
-				434D1CC21D10948700222B8E /* zh-Hans */,
-				CE9D9908200770E8003505D3 /* zh-Hant */,
-				F7310450211FF1410082651C /* ko */,
-				F7310461211FF2280082651C /* ru */,
-				F7310472211FF23B0082651C /* pl */,
-				F7310483211FF26A0082651C /* ja */,
-				F7310494211FF2850082651C /* es-MX */,
-				F73104A5211FF2A10082651C /* th-TH */,
+				B89BCF48300851D10095F011 /* mul */,
 			);
 			name = Statistics.xib;
 			path = StatsManager;
@@ -6925,19 +6584,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				437B5BB71CD2559300DE0A41 /* Base */,
-				437B5BBC1CD255B200DE0A41 /* de */,
-				437B5BBD1CD255B300DE0A41 /* es */,
-				437B5BBE1CD255B500DE0A41 /* it */,
-				437B5BBF1CD255B600DE0A41 /* pt-BR */,
-				437B5BC01CD255B800DE0A41 /* zh-Hans */,
-				43A8A0EF1E0BBB4700AF34FD /* fr */,
-				CE9D9915200770EA003505D3 /* zh-Hant */,
-				F731045D211FF1440082651C /* ko */,
-				F731046E211FF22A0082651C /* ru */,
-				F731047F211FF23D0082651C /* pl */,
-				F7310490211FF26D0082651C /* ja */,
-				F73104A1211FF2870082651C /* es-MX */,
-				F73104B2211FF2A40082651C /* th-TH */,
+				B89BCF39300851CE0095F011 /* mul */,
 			);
 			name = OpponentTrackersPreferences.xib;
 			sourceTree = "<group>";
@@ -6946,19 +6593,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				437B5BC41CD2568E00DE0A41 /* Base */,
-				437B5BC61CD256AE00DE0A41 /* zh-Hans */,
-				437B5BC71CD256AF00DE0A41 /* pt-BR */,
-				437B5BC81CD256B000DE0A41 /* it */,
-				437B5BC91CD256B100DE0A41 /* es */,
-				437B5BCA1CD256B200DE0A41 /* de */,
-				43050C601E6B2C0E007600EA /* fr */,
-				CE9D9913200770EA003505D3 /* zh-Hant */,
-				F731045B211FF1430082651C /* ko */,
-				F731046C211FF22A0082651C /* ru */,
-				F731047D211FF23D0082651C /* pl */,
-				F731048E211FF26C0082651C /* ja */,
-				F731049F211FF2870082651C /* es-MX */,
-				F73104B0211FF2A30082651C /* th-TH */,
+				B89BCF40300851CF0095F011 /* mul */,
 			);
 			name = TrackersPreferences.xib;
 			sourceTree = "<group>";
@@ -6967,6 +6602,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				B83355AF24F807220025F644 /* Base */,
+				B89BCF4D300851D20095F011 /* mul */,
 			);
 			name = BobsBuddyPanel.xib;
 			sourceTree = "<group>";
@@ -6975,27 +6611,25 @@
 			isa = PBXVariantGroup;
 			children = (
 				B85A0D52272CDDFB006D2648 /* Base */,
+				B89BCF49300851D10095F011 /* mul */,
 			);
 			name = MercenariesPreferences.xib;
+			sourceTree = "<group>";
+		};
+		B864AE3925A4CC1200793F36 /* ImportingPreferences.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B864AE3B25A4CC1200793F36 /* Base */,
+				B89BCF4A300851D10095F011 /* mul */,
+			);
+			name = ImportingPreferences.xib;
 			sourceTree = "<group>";
 		};
 		B8B7CC22253C74D100033758 /* BattlegroundsPreferences.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				B8B7CC21253C74D100033758 /* Base */,
-				B8B7CC24253C74DB00033758 /* de */,
-				B8B7CC26253C74E100033758 /* es */,
-				B8B7CC28253C74E400033758 /* it */,
-				B8B7CC2A253C74E700033758 /* pt-BR */,
-				B8B7CC2C253C74EC00033758 /* zh-Hans */,
-				B8B7CC2E253C74EF00033758 /* fr */,
-				B8B7CC30253C74F300033758 /* zh-Hant */,
-				B8B7CC32253C74F600033758 /* ko */,
-				B8B7CC34253C74FA00033758 /* ru */,
-				B8B7CC36253C74FD00033758 /* pl */,
-				B8B7CC38253C750100033758 /* ja */,
-				B8B7CC3A253C750600033758 /* es-MX */,
-				B8B7CC3C253C750700033758 /* th-TH */,
+				B89BCF46300851D10095F011 /* mul */,
 			);
 			name = BattlegroundsPreferences.xib;
 			sourceTree = "<group>";
@@ -7004,19 +6638,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				B8BA17DB28EFC8F8004D40ED /* Base */,
-				B8BA17DE28EFC915004D40ED /* zh-Hans */,
-				B8BA17E028EFC919004D40ED /* zh-Hant */,
-				B8BA17E228EFC91B004D40ED /* fr */,
-				B8BA17E428EFC91D004D40ED /* de */,
-				B8BA17E628EFC91E004D40ED /* it */,
-				B8BA17E828EFC91F004D40ED /* ja */,
-				B8BA17EA28EFC921004D40ED /* ko */,
-				B8BA17EC28EFC922004D40ED /* pl */,
-				B8BA17EE28EFC923004D40ED /* pt-BR */,
-				B8BA17F028EFC924004D40ED /* ru */,
-				B8BA17F228EFC925004D40ED /* es */,
-				B8BA17F428EFC926004D40ED /* es-MX */,
-				B8BA17F628EFC927004D40ED /* th-TH */,
+				B89BCF37300851CD0095F011 /* mul */,
 			);
 			name = LinkOpponentDeckPanel.xib;
 			sourceTree = "<group>";
@@ -7025,20 +6647,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				B8BD8442284AB92700F4F224 /* Base */,
-				B8BD8444284AB93400F4F224 /* en */,
-				B8BD8445284AB93700F4F224 /* zh-Hans */,
-				B8BD8446284AB93A00F4F224 /* zh-Hant */,
-				B8BD8447284AB93D00F4F224 /* fr */,
-				B8BD8448284AB93F00F4F224 /* de */,
-				B8BD8449284AB94200F4F224 /* it */,
-				B8BD844A284AB94400F4F224 /* ja */,
-				B8BD844B284AB94600F4F224 /* ko */,
-				B8BD844C284AB94800F4F224 /* pl */,
-				B8BD844D284AB94B00F4F224 /* pt-BR */,
-				B8BD844E284AB94D00F4F224 /* ru */,
-				B8BD844F284AB94F00F4F224 /* es */,
-				B8BD8450284AB95100F4F224 /* es-MX */,
-				B8BD8451284AB95300F4F224 /* th-TH */,
+				B89BCF41300851CF0095F011 /* mul */,
 			);
 			name = BattlegroundsSession.xib;
 			sourceTree = "<group>";
@@ -7047,6 +6656,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				B8C1F1BE295553F7001E078C /* Base */,
+				B89BCF47300851D10095F011 /* mul */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -7055,19 +6665,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				C9BDB3C91D20BC4C00886A11 /* Base */,
-				C9BDB3CC1D20BCAF00886A11 /* fr */,
-				C9BDB3CE1D20BCC000886A11 /* de */,
-				C9BDB3D01D20BCC200886A11 /* es */,
-				C9BDB3D21D20BCC300886A11 /* it */,
-				C9BDB3D41D20BCC800886A11 /* pt-BR */,
-				C9BDB3D61D20BCCA00886A11 /* zh-Hans */,
-				CE9D9909200770E8003505D3 /* zh-Hant */,
-				F7310451211FF1410082651C /* ko */,
-				F7310462211FF2280082651C /* ru */,
-				F7310473211FF23B0082651C /* pl */,
-				F7310484211FF26B0082651C /* ja */,
-				F7310495211FF2850082651C /* es-MX */,
-				F73104A6211FF2A20082651C /* th-TH */,
+				B89BCF44300851D10095F011 /* mul */,
 			);
 			name = StatsTab.xib;
 			path = StatsManager;
@@ -7077,19 +6675,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				C9BDB3D81D20BE9500886A11 /* Base */,
-				C9BDB3DB1D20BEAB00886A11 /* fr */,
-				C9BDB3DD1D20BED400886A11 /* de */,
-				C9BDB3DF1D20BED600886A11 /* es */,
-				C9BDB3E11D20BEDD00886A11 /* it */,
-				C9BDB3E31D20BEDF00886A11 /* pt-BR */,
-				C9BDB3E51D20BEE000886A11 /* zh-Hans */,
-				CE9D990A200770E8003505D3 /* zh-Hant */,
-				F7310452211FF1420082651C /* ko */,
-				F7310463211FF2280082651C /* ru */,
-				F7310474211FF23C0082651C /* pl */,
-				F7310485211FF26B0082651C /* ja */,
-				F7310496211FF2850082651C /* es-MX */,
-				F73104A7211FF2A20082651C /* th-TH */,
+				B89BCF4C300851D20095F011 /* mul */,
 			);
 			name = LadderTab.xib;
 			path = StatsManager;
@@ -7146,10 +6732,12 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -7196,10 +6784,12 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
 			name = Release;
@@ -7248,7 +6838,7 @@
 					"$(SDKROOT)/usr/lib/swift",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 3.6.0;
+				MARKETING_VERSION = 3.6.2;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = (
@@ -7312,7 +6902,7 @@
 					"$(SDKROOT)/usr/lib/swift",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 3.6.0;
+				MARKETING_VERSION = 3.6.2;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = (
 					"$(inherited)",

@@ -448,7 +448,7 @@ class MonoHelper {
             e[.atk] = 5
             e[.health] = 5
             e[.tech_level] = 2
-            let minionEntity = MinionCardEntityProxy(minion: BobsBuddyInvoker.getMinionFromEntity(sim: sim, player: false, ent: e, attachedEntities: [Entity]()), simulator: sim)
+            let minionEntity = MinionCardEntityProxy(minion: BobsBuddyInvoker.getMinionFromEntity(sim: sim, player: false, entity: e, attachedEntities: [Entity]()), simulator: sim)
             minionEntity.canSummon = true
             MonoHelper.addToList(list: hand, element: minionEntity)
             MonoHelper.addToList(list: hand, element: BloodGemProxy(simulator: sim))
@@ -543,7 +543,7 @@ class MonoHelper {
         fatalError("Failed to load class \(ns).\(name)")
     }
     
-    static func objectNew(clazz: OpaquePointer) -> UnsafeMutablePointer<MonoObject>? {
+    static func objectNew(clazz: OpaquePointer!) -> UnsafeMutablePointer<MonoObject>? {
         let result = mono_object_new(MonoHelper._monoInstance, clazz)
         
         return result
@@ -758,15 +758,16 @@ class MonoHelper {
         params.deallocate()
     }
 
-    static func setStringBoolBoolIntIntIntIntHandle(obj: MonoHandle, method: OpaquePointer, v1: String, v2: Bool, v3: Bool, v4: Int32, v5: Int32, v6: Int32, v7: MonoHandle, v8: Int32) {
-        let params = UnsafeMutablePointer<OpaquePointer?>.allocate(capacity: 8)
-        let ptrs = UnsafeMutablePointer<Int32>.allocate(capacity: 6)
+    static func setStringBoolBoolIntIntIntIntHandleBool(obj: MonoHandle, method: OpaquePointer, v1: String, v2: Bool, v3: Bool, v4: Int32, v5: Int32, v6: Int32, v7: MonoHandle, v8: Int32, v9: Bool) {
+        let params = UnsafeMutablePointer<OpaquePointer?>.allocate(capacity: 9)
+        let ptrs = UnsafeMutablePointer<Int32>.allocate(capacity: 7)
         ptrs[0] = v2 ? 1 : 0
         ptrs[1] = v3 ? 1 : 0
         ptrs[2] = v4
         ptrs[3] = v5
         ptrs[4] = v6
         ptrs[5] = v8
+        ptrs[6] = v9 ? 1 : 0
         v1.withCString({
             params[0] = mono_string_new(MonoHelper._monoInstance, $0)
         })
@@ -777,8 +778,9 @@ class MonoHelper {
         params[5] = OpaquePointer(ptrs.advanced(by: 4))
         params[6] = OpaquePointer(v7.get())
         params[7] = OpaquePointer(ptrs.advanced(by: 5))
+        params[8] = OpaquePointer(ptrs.advanced(by: 6))
         
-        params.withMemoryRebound(to: UnsafeMutableRawPointer?.self, capacity: 7, {
+        params.withMemoryRebound(to: UnsafeMutableRawPointer?.self, capacity: 9, {
             let inst = obj.get()
 
             mono_runtime_invoke(method, inst, $0, nil)
@@ -928,7 +930,48 @@ class MonoHelper {
         
         return MonoHandle(obj: res)
     }
-    
+
+    static func listRemoveAt(obj: MonoHandle, index: Int32) {
+        let inst = obj.get()
+        
+        let cl = mono_object_get_class(inst)
+        
+        let meth = mono_class_get_method_from_name(cl, "RemoveAt", 1)
+
+        let params = UnsafeMutablePointer<UnsafeMutableRawPointer?>.allocate(capacity: 1)
+        let ptrs = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
+        ptrs[0] = index
+        params[0] = UnsafeMutableRawPointer(ptrs.advanced(by: 0))
+
+        _ = params.withMemoryRebound(to: UnsafeMutableRawPointer?.self, capacity: 1, {
+
+            mono_runtime_invoke(meth, inst, $0, nil)
+        })
+        ptrs.deallocate()
+        params.deallocate()
+    }
+
+    static func listInsert(obj: MonoHandle, index: Int32, value: MonoHandle) {
+        let inst = obj.get()
+        
+        let cl = mono_object_get_class(inst)
+        
+        let meth = mono_class_get_method_from_name(cl, "Insert", 2)
+
+        let params = UnsafeMutablePointer<UnsafeMutableRawPointer?>.allocate(capacity: 2)
+        let ptrs = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
+        ptrs[0] = index
+        params[0] = UnsafeMutableRawPointer(ptrs.advanced(by: 0))
+        params[1] = UnsafeMutableRawPointer(value.get())
+
+        _ = params.withMemoryRebound(to: UnsafeMutableRawPointer?.self, capacity: 2, {
+
+            mono_runtime_invoke(meth, inst, $0, nil)
+        })
+        ptrs.deallocate()
+        params.deallocate()
+    }
+
     static func listItems(obj: MonoHandle) -> [MonoHandle] {
         let count = MonoHelper.listCount(obj: obj)
         
