@@ -43,6 +43,9 @@ struct HSReplay {
     static let playerTrial = "\(baseApiUrl)/playertrials/"
     static let constructedMulliganGuide = "\(baseApiUrl)/mulligan/overlay/"
     static let constructedMulliganGuideStatus = "\(baseApiUrl)/mulligan/status/"
+    // Endpoint path inferred from HDT's Mulligan G-V2 commit; verify against a live response before shipping.
+    static let constructedMulliganGuideV2 = "\(baseApiUrl)/mulligan_v2/overlay/"
+    static let constructedMulliganGuideV2Status = "\(baseApiUrl)/mulligan_v2/status/"
     static let tier7TrinketPickStats = "\(baseApiUrl)/battlegrounds/trinket_pick/"
 
     static let mixpanelIdentifyUrl = "\(baseApiUrl)/client_analytics/identify/"
