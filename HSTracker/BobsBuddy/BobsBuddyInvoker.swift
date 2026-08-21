@@ -161,13 +161,19 @@ class BobsBuddyInvoker {
         if !Settings.showBobsBuddy {
             return false
         }
-        if MonoHelper.selfTestFailed {
-            // The startup self-test (MonoHelper.testSimulation()) never proved the BobsBuddy
-            // runtime works -- either it hit an exception type it doesn't recognize, or it
-            // never got to run at all (e.g. Mono/BobsBuddy failed to load). Starting a real
-            // simulation against a runtime we know is broken would just hang the panel on
-            // "Waiting For Combat" forever instead of producing a result, so surface it as
-            // unavailable via the same sticky error state used elsewhere for load failures.
+        if MonoHelper.selfTestResult == .failed {
+            // The startup self-test (MonoHelper.testSimulation()) PROVED the BobsBuddy runtime
+            // is broken -- either it hit an exception type it doesn't recognize, or
+            // SimulatorProxy itself never came up valid. Starting a real simulation against a
+            // runtime we know is broken would just hang the panel on "Waiting For Combat"
+            // forever instead of producing a result, so surface it as unavailable via the same
+            // sticky error state used elsewhere for load failures.
+            //
+            // .pending (the self-test hasn't concluded yet, including "hasn't run yet") is
+            // deliberately NOT gated here -- that's the pre-patch upstream behavior. A slow
+            // self-test must never block a real simulation, and a genuinely broken runtime that
+            // hasn't been proven broken yet is still caught by this invoker's own error handling
+            // once it actually tries to run.
             errorState = .failedToLoad
             BobsBuddyInvoker.bobsBuddyDisplay.setErrorState(error: .failedToLoad)
             return false
