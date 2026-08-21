@@ -412,7 +412,10 @@ class MonoHelper {
     
     static func testSimulation() {
         let handle = mono_thread_attach(MonoHelper._monoInstance)
-                
+        defer {
+            mono_thread_detach(handle)
+        }
+
         let sim = SimulatorProxy()
         
         if sim.valid() {
@@ -510,7 +513,18 @@ class MonoHelper {
                     } else if let class_ = AggregateExceptionProxy._class, MonoHelper.isInstance(obj: aggregate, klass: class_) {
                         aggregate = AggregateExceptionProxy(obj: inner.get())
                     } else {
-                        fatalError("Unsupported exception")
+                        // BobsBuddy occasionally introduces new exception subclasses that
+                        // this unwrap loop doesn't recognize yet (e.g. BadCloneException,
+                        // SetException). Previously this was a fatalError, which crashed
+                        // the entire app on startup whenever BobsBuddy shipped one of
+                        // these -- turning a self-test failure into a hard outage. Treat
+                        // it the same way BobsBuddyInvoker.runSimulation() treats an
+                        // unrecognized inner exception during a real simulation: log
+                        // it and bail out of this self-test as failed/unavailable rather
+                        // than asserting a result exists.
+                        exc.deallocate()
+                        logger.error("testSimulation: unrecognized exception type, treating the self-test as failed: \(MonoHelper.toString(obj: aggregate))")
+                        return
                     }
                 }
                 let str = MonoHelper.toString(obj: aggregate)
@@ -524,13 +538,11 @@ class MonoHelper {
 
             let ostr = MonoHelper.toString(obj: top)
             logger.debug("testSimulation result is \(ostr)")
-            
+
             // For testing the damage result code which is a little trickier
             //let damage = top.getResultDamage()
             //logger.debug("testSimulation damage is \(damage)")
         }
-        
-        mono_thread_detach(handle)
     }
     
     static func loadClass(ns: String, name: String) -> OpaquePointer {
