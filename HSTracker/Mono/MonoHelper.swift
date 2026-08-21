@@ -294,7 +294,16 @@ class MonoHelper {
     static var _monoInstance: OpaquePointer? // MonoDomain
     static var _assembly: OpaquePointer? // MonoClass
     static var _image: OpaquePointer? // MonoImage
-        
+
+    // Outcome of the startup self-test (testSimulation()). Defaults to true ("not yet proven
+    // to work") so that every way testSimulation() can end without reaching its one success
+    // log line -- the new early-return on an unrecognized exception, the pre-existing silent
+    // return when sim.valid() is false, or any future early exit nobody has written yet --
+    // is treated as a failure unless explicitly cleared. Only the success path (right after
+    // logging "testSimulation result is ...") clears it. BobsBuddyInvoker.shouldRun()
+    // consults this flag so a broken BobsBuddy runtime doesn't silently no-op forever.
+    static var selfTestFailed = true
+
     static func initialize() {
         for cl in ReflectionHelper.getMonoClasses() {
             cl.initialize()
@@ -523,6 +532,7 @@ class MonoHelper {
                         // it and bail out of this self-test as failed/unavailable rather
                         // than asserting a result exists.
                         exc.deallocate()
+                        MonoHelper.selfTestFailed = true
                         logger.error("testSimulation: unrecognized exception type, treating the self-test as failed: \(MonoHelper.toString(obj: aggregate))")
                         return
                     }
@@ -538,6 +548,7 @@ class MonoHelper {
 
             let ostr = MonoHelper.toString(obj: top)
             logger.debug("testSimulation result is \(ostr)")
+            MonoHelper.selfTestFailed = false
 
             // For testing the damage result code which is a little trickier
             //let damage = top.getResultDamage()

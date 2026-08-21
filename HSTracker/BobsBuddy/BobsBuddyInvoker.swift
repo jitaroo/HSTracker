@@ -161,6 +161,17 @@ class BobsBuddyInvoker {
         if !Settings.showBobsBuddy {
             return false
         }
+        if MonoHelper.selfTestFailed {
+            // The startup self-test (MonoHelper.testSimulation()) never proved the BobsBuddy
+            // runtime works -- either it hit an exception type it doesn't recognize, or it
+            // never got to run at all (e.g. Mono/BobsBuddy failed to load). Starting a real
+            // simulation against a runtime we know is broken would just hang the panel on
+            // "Waiting For Combat" forever instead of producing a result, so surface it as
+            // unavailable via the same sticky error state used elsewhere for load failures.
+            errorState = .failedToLoad
+            BobsBuddyInvoker.bobsBuddyDisplay.setErrorState(error: .failedToLoad)
+            return false
+        }
         return true
     }
     
