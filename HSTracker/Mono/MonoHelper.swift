@@ -457,6 +457,25 @@ class MonoHelper {
         defer {
             mono_thread_detach(handle)
             MonoHelper.setSelfTestResult(outcome)
+            // Machine-readable, PID-attributed verdict line for
+            // tools/update-hstracker-on-start.sh's wait_for_selftest_verdict().
+            // Every copy of HSTracker on the machine can log an identical
+            // startup banner (same version = same banner text), so the banner
+            // alone cannot prove a success line inside the candidate's log
+            // window actually came from THIS process rather than some other
+            // already-running copy. Stamping this exit's own pid closes that
+            // gap: the updater only promotes the framework cache when it finds
+            // "verdict=passed pid=<the exact candidate pid it launched>" --
+            // deliberately asymmetric with failure, which the updater accepts
+            // unattributed (see the updater's classify_selftest_chunk()).
+            // Emitted from `defer` (not duplicated at each exit) so every exit
+            // -- including any added later -- resolves this exactly once, the
+            // same guarantee already documented above for `outcome` itself.
+            // Do not change this format without updating the updater's
+            // SELFTEST_VERDICT_SUCCESS_PREFIX / SELFTEST_VERDICT_FAILURE_PREFIX.
+            let pid = ProcessInfo.processInfo.processIdentifier
+            let verdictWord = (outcome == .passed) ? "passed" : "failed"
+            logger.info("baconbrain-selftest verdict=\(verdictWord) pid=\(pid)")
         }
 
         let sim = SimulatorProxy()
