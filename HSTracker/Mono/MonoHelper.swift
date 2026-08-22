@@ -294,7 +294,43 @@ class MonoHelper {
     static var _monoInstance: OpaquePointer? // MonoDomain
     static var _assembly: OpaquePointer? // MonoClass
     static var _image: OpaquePointer? // MonoImage
-        
+
+    // Outcome of the startup self-test (testSimulation()).
+    //
+    // - .pending: the self-test hasn't concluded yet (including: it hasn't run at all yet).
+    //   This is the pre-patch upstream behavior -- BobsBuddyInvoker.shouldRun() does not gate
+    //   on it, so a slow-to-start self-test never blocks a real simulation. A genuinely broken
+    //   Mono/BobsBuddy runtime is still caught by the invoker's own error handling elsewhere;
+    //   we only add a gate once failure is PROVEN, not merely "not yet proven to work".
+    // - .failed: the self-test PROVED the runtime is broken -- either it hit an exception type
+    //   it doesn't recognize, or SimulatorProxy itself never came up valid. shouldRun() blocks
+    //   on this and surfaces the sticky error state.
+    // - .passed: the self-test completed and logged its result line.
+    //
+    // testSimulation() is restructured so every one of its exits (including any future one
+    // nobody has written yet) resolves this exactly once via setSelfTestResult(), defaulting to
+    // .failed unless overwritten by the explicit success path -- see testSimulation().
+    //
+    // Mono callbacks run testSimulation() off the main thread, and shouldRun() can be read from
+    // multiple call sites concurrently, so reads/writes go through an UnfairLock like other
+    // shared mutable statics in this codebase (e.g. Influx.lock).
+    enum SelfTestResult {
+        case pending
+        case passed
+        case failed
+    }
+
+    private static let selfTestResultLock = UnfairLock()
+    private static var _selfTestResult: SelfTestResult = .pending
+
+    static var selfTestResult: SelfTestResult {
+        selfTestResultLock.around { _selfTestResult }
+    }
+
+    static func setSelfTestResult(_ result: SelfTestResult) {
+        selfTestResultLock.around { _selfTestResult = result }
+    }
+
     static func initialize() {
         for cl in ReflectionHelper.getMonoClasses() {
             cl.initialize()
@@ -412,9 +448,38 @@ class MonoHelper {
     
     static func testSimulation() {
         let handle = mono_thread_attach(MonoHelper._monoInstance)
-                
+        // Every exit from this function must resolve the tri-state exactly once. Default to
+        // .failed so any exit path below that doesn't explicitly overwrite `outcome` -- today
+        // or in a future edit -- can never look like "still pending" (see SelfTestResult above
+        // for why .pending must never be a stand-in for a proven failure). Only the one success
+        // path at the bottom overwrites this to .passed.
+        var outcome: SelfTestResult = .failed
+        defer {
+            mono_thread_detach(handle)
+            MonoHelper.setSelfTestResult(outcome)
+            // Machine-readable, PID-attributed verdict line for
+            // tools/update-hstracker-on-start.sh's wait_for_selftest_verdict().
+            // Every copy of HSTracker on the machine can log an identical
+            // startup banner (same version = same banner text), so the banner
+            // alone cannot prove a success line inside the candidate's log
+            // window actually came from THIS process rather than some other
+            // already-running copy. Stamping this exit's own pid closes that
+            // gap: the updater only promotes the framework cache when it finds
+            // "verdict=passed pid=<the exact candidate pid it launched>" --
+            // deliberately asymmetric with failure, which the updater accepts
+            // unattributed (see the updater's classify_selftest_chunk()).
+            // Emitted from `defer` (not duplicated at each exit) so every exit
+            // -- including any added later -- resolves this exactly once, the
+            // same guarantee already documented above for `outcome` itself.
+            // Do not change this format without updating the updater's
+            // SELFTEST_VERDICT_SUCCESS_PREFIX / SELFTEST_VERDICT_FAILURE_PREFIX.
+            let pid = ProcessInfo.processInfo.processIdentifier
+            let verdictWord = (outcome == .passed) ? "passed" : "failed"
+            logger.info("baconbrain-selftest verdict=\(verdictWord) pid=\(pid)")
+        }
+
         let sim = SimulatorProxy()
-        
+
         if sim.valid() {
             let test = InputProxy()
             
@@ -510,7 +575,19 @@ class MonoHelper {
                     } else if let class_ = AggregateExceptionProxy._class, MonoHelper.isInstance(obj: aggregate, klass: class_) {
                         aggregate = AggregateExceptionProxy(obj: inner.get())
                     } else {
-                        fatalError("Unsupported exception")
+                        // BobsBuddy occasionally introduces new exception subclasses that
+                        // this unwrap loop doesn't recognize yet (e.g. BadCloneException,
+                        // SetException). Previously this was a fatalError, which crashed
+                        // the entire app on startup whenever BobsBuddy shipped one of
+                        // these -- turning a self-test failure into a hard outage. Treat
+                        // it the same way BobsBuddyInvoker.runSimulation() treats an
+                        // unrecognized inner exception during a real simulation: log
+                        // it and bail out of this self-test as failed/unavailable rather
+                        // than asserting a result exists.
+                        exc.deallocate()
+                        outcome = .failed
+                        logger.error("testSimulation: unrecognized exception type, treating the self-test as failed: \(MonoHelper.toString(obj: aggregate))")
+                        return
                     }
                 }
                 let str = MonoHelper.toString(obj: aggregate)
@@ -524,13 +601,18 @@ class MonoHelper {
 
             let ostr = MonoHelper.toString(obj: top)
             logger.debug("testSimulation result is \(ostr)")
-            
+            outcome = .passed
+
             // For testing the damage result code which is a little trickier
             //let damage = top.getResultDamage()
             //logger.debug("testSimulation damage is \(damage)")
+        } else {
+            // sim never coming up valid means the self-test never actually ran -- e.g. Mono or
+            // BobsBuddy failed to load. That's not "still pending"; it's a proven failure of the
+            // runtime this self-test exists to check, so it must gate shouldRun() the same way an
+            // unrecognized exception does (`outcome` already defaults to .failed above).
+            logger.error("testSimulation: SimulatorProxy is not valid, treating the self-test as failed")
         }
-        
-        mono_thread_detach(handle)
     }
     
     static func loadClass(ns: String, name: String) -> OpaquePointer {
