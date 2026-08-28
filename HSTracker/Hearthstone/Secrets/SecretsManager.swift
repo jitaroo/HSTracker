@@ -80,6 +80,7 @@ class SecretsManager {
         opponentTookDamageDuringTurns.removeAll()
         entititesInHandOnMinionsPlayed.removeAll()
         secrets.removeAll()
+        _triggeredSecrets.removeAll()
     }
     
     @discardableResult
@@ -247,12 +248,10 @@ class SecretsManager {
                     secretsCreated.append(contentsOf: getFilteredSecrets(secret, availableSecrets))
                 }
             } else if let creator, creator.cardId == CardIds.NonCollectible.Mage.TheForbiddenSequence_TheOriginStoneToken {
-                let storedIds = secret.entity.info.storedCardIds
-
-                if !storedIds.isEmpty {
-                    // The Origin Stone revealed the copy it cast, so the exact secret is known.
-                    secretsCreated.append(contentsOf: getFilteredSecrets(secret, Set<String>(storedIds)))
-                } else if let sourceGenerator = tryGetOriginStoneSourceGenerator(secret: secret) {
+                // Which secret The Origin Stone cast is never public: the game hides the copy it
+                // puts into play until it triggers. The most we may narrow to is the pool the
+                // Discover it came from could offer.
+                if let sourceGenerator = tryGetOriginStoneSourceGenerator(secret: secret) {
                     let creatableSecrets = getCreatableSecretsFromGenerator(sourceGenerator, gameMode, format)
                     secretsCreated.append(contentsOf: getFilteredSecrets(secret, creatableSecrets))
                 } else {
@@ -373,26 +372,10 @@ class SecretsManager {
     }
 
     private func tryGetOriginStoneSourceGenerator(secret: Secret) -> ICardGenerator? {
-        // The Origin Stone casts copies of unchosen discover options: it reveals a copy of the
-        // option immediately before the cast entity is created. Trace that copy back to the
-        // discover source to reuse its generator pool.
-        let revealedCast = game.opponent.revealedEntities
-            .filter { e in
-                e.id < secret.entity.id &&
-                e.isSecret &&
-                e[.copied_from_entity_id] > 0 &&
-                e.isInZone(zone: .setaside)
-            }
-            .max(by: { $0.id < $1.id })
-
-        guard let revealedCast = revealedCast else {
-            return nil
-        }
-
-        let copiedFromId = revealedCast[.copied_from_entity_id]
-        let discoverOption = game.opponent.revealedEntities
-            .first(where: { $0.id == copiedFromId })
-
+        // Which unchosen option The Origin Stone turned into the face-down secret is private,
+        // but the Discover that offered them is not. Trace back to the card that offered them
+        // and reuse its generation pool - that is as narrow as we may legitimately get.
+        let discoverOption = tryGetOriginStoneDiscoverOption(secret: secret)
         let creatorId = discoverOption?[.creator]
         let discoverSource = game.opponent.revealedEntities
             .first(where: { $0.id == creatorId })
@@ -404,7 +387,39 @@ class SecretsManager {
 
         return nil
     }
-    
+
+    // Finds an option of the Discover whose leftovers The Origin Stone cast, so its creator can
+    // be read off. Any option will do - all of them share one creator.
+    private func tryGetOriginStoneDiscoverOption(secret: Secret) -> Entity? {
+        // The options are revealed when The Origin Stone casts them, secrets included, so they
+        // are the reliable route back. The secret is created in the same block as the cast, so
+        // the newest option below it belongs to the Discover that triggered it.
+        if let option = game.opponent.revealedEntities
+            .filter({ e in
+                e.id < secret.entity.id &&
+                e[.was_discover_option] == 1 &&
+                e[.creator] > 0
+            })
+            .max(by: { $0.id < $1.id }) {
+            return option
+        }
+
+        // Failing that, go through the copy The Origin Stone revealed just before casting it.
+        // Only non-secret options are revealed that way, so this alone misses a Discover that
+        // offered nothing but secrets.
+        let revealedCast = game.opponent.revealedEntities
+            .filter { e in
+                e.id < secret.entity.id &&
+                e[.copied_from_entity_id] > 0 &&
+                e.isInZone(zone: .setaside)
+            }
+            .max(by: { $0.id < $1.id })
+
+        let copiedFromId = revealedCast?[.copied_from_entity_id]
+        return game.opponent.revealedEntities
+            .first(where: { $0.id == copiedFromId })
+    }
+
     private func getCreatableSecretsFromGenerator(_ generator: ICardGenerator, _ gameMode: GameType, _ format: FormatType) -> Set<String> {
         let allSecrets = CardIds.Secrets.Mage.All + CardIds.Secrets.Hunter.All + CardIds.Secrets.Paladin.All + CardIds.Secrets.Rogue.All
         
@@ -540,8 +555,9 @@ class SecretsManager {
         guard handleAction else { return }
 
         var exclude: [MultiIdCard] = []
-        
+
         _lastPlayedMinionId = entity.id
+        _triggeredSecrets.removeAll()
 
         if !entity.has(tag: .dormant) {
             saveSecret(secret: CardIds.Secrets.Hunter.BargainBin)
@@ -648,15 +664,19 @@ class SecretsManager {
     }
     
     func handlePlayerMinionDeath(entity: Entity) {
-        if entity.id == _lastPlayedMinionId && savedSecrets.count > 0 {
-            savedSecrets.forEach { savedSecret in
-                secrets.forEach { secret in
-                    secret.include(cardId: savedSecret)
-                }
+        guard entity.id == _lastPlayedMinionId && savedSecrets.count > 0 else { return }
+        // Only one secret triggers per event, so the exclusions made when the minion was played
+        // are only invalid if one of those secrets actually triggered on it. Anything else
+        // killing the minion later in the turn (combat, board clears, end of turn effects)
+        // leaves them valid.
+        guard _triggeredSecrets.any({ x in CardIds.Secrets.minionPlayed.any({ s in s == x.cardId }) }) else { return }
+        savedSecrets.forEach { savedSecret in
+            secrets.forEach { secret in
+                secret.include(cardId: savedSecret)
             }
-            
-            onChanged?(getSecretList())
         }
+
+        onChanged?(getSecretList())
     }
 
     func handleAvengeAsync(deathRattleCount: Int) {

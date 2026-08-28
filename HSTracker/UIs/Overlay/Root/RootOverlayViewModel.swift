@@ -22,10 +22,41 @@ class RootOverlayViewModel: ObservableObject {
     let mulliganGuideV2 = ConstructedMulliganGuideV2ViewModel()
     let constructedMulliganPreLobbyWidget = ConstructedMulliganPreLobbyWidgetViewModel()
     let mulliganGuideTrialsExhausted = MulliganGuideTrialsExhaustedViewModel()
+    let battlegroundsCompsGuides = BattlegroundsCompsGuidesViewModel()
+    let battlegroundsHeroGuides = BattlegroundsHeroGuidesViewModel()
+    let battlegroundsTrinketGuides = BattlegroundsTrinketGuidesViewModel()
+    let battlegroundsAnomalyGuides = BattlegroundsAnomalyGuidesViewModel()
+    let battlegroundsQuestGuides = BattlegroundsQuestGuidesViewModel()
+    let battlegroundsMinionsGuide = BattlegroundsMinionsViewModel()
+    let battlegroundsGuidesTabs = BattlegroundsGuidesTabsViewModel()
+    let battlegroundsTurnCounter = BattlegroundsTurnCounterViewModel()
+    let battlegroundsInspiration = BattlegroundsInspirationViewModel()
+    let battlegroundsMinionPinning = BattlegroundsMinionPinningViewModel()
 
-    // On-screen frame (in RootOverlayView's own coordinate space) of whichever
-    // child currently needs real mouse interactivity, reported by
-    // InteractiveRegionPreferenceKey. RootOverlayWindow reads this to know
-    // which pixels should stop being click-through.
-    @Published var interactiveRegion: CGRect?
+    init() {
+        // HDT wires the same reference in OverlayWindow's constructor
+        // (BattlegroundsMinionPinningViewModel.CompsGuidesVM = ...): the key
+        // piece recommendations are mined out of the loaded comp guides.
+        battlegroundsMinionPinning.compsGuides = battlegroundsCompsGuides
+    }
+
+    // On-screen frames (in RootOverlayView's own coordinate space) of every
+    // child that currently needs real mouse interactivity, reported by
+    // InteractiveRegionPreferenceKey. RootOverlayWindow reads these to know
+    // which pixels should stop being click-through. One rect per child rather
+    // than their bounding box - see the preference key for why.
+    @Published var interactiveRegions: [CGRect] = []
+
+    // Frame of whichever child wants to know when the cursor is merely *over*
+    // it, without claiming clicks. This is HDT's IsOverlayHoverVisible, the
+    // counterpart to the IsOverlayHitTestVisible that interactiveRegion covers:
+    // BgsTopBarMask is `IsHitTestVisible="False"` precisely so it can reveal the
+    // minion browser's filter button on hover while every click in that corner
+    // still falls through to Hearthstone.
+    //
+    // Reported by HoverRegionPreferenceKey and matched against the cursor by
+    // RootOverlayWindow, which tracks it continuously regardless of
+    // ignoresMouseEvents - SwiftUI's own .onHover can't do this job, since it
+    // only fires once the window has already stopped being click-through.
+    @Published var hoverRegion: CGRect?
 }

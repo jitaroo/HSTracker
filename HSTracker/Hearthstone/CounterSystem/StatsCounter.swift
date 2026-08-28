@@ -39,7 +39,11 @@ class StatsCounter: BaseCounter {
     }
     
     override var sortValue: Int {
-        return attackCounter + healthCounter 
+        return attackCounter + healthCounter
+    }
+
+    override var hasValue: Bool {
+        return attackCounter > 0 || healthCounter > 0
     }
 
     required init(controlledByPlayer: Bool, game: Game) {

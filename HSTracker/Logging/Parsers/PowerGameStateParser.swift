@@ -683,6 +683,18 @@ class PowerGameStateParser: LogEventParser {
                 }
                 currentBlock?.sourceEntityId = actionStartingEntityId
 
+                // Count the Auto Assembler Deathrattle FIRINGS (not just those that summoned onto the board).
+                if blockType == "TRIGGER" && triggerKeyword == "DEATHRATTLE" && eventHandler.currentGameMode == GameMode.battlegrounds,
+                   let firingMinion = eventHandler.entities[actionStartingEntityId],
+                   firingMinion.isMinion,
+                   firingMinion[GameTag.zone] == Zone.graveyard.rawValue {
+                    let firingRace = firingMinion[GameTag.cardrace]
+                    if firingRace == Race.lookup(Race.mechanical) || firingRace == Race.lookup(Race.all) {
+                        BobsBuddyInvoker.instance(gameId: eventHandler.gameId, turn: eventHandler.turnNumber())?
+                            .observeAutoAssemblerDeathrattleFiring(actionStartingEntityId)
+                    }
+                }
+
                 var actionStartingCardId: String? = matches[3].value
                 var actionStartingEntity: Entity?
 
@@ -1314,6 +1326,9 @@ class PowerGameStateParser: LogEventParser {
                                     addKnownCardId(eventHandler: eventHandler, cardId: card)
                                 }
                             }
+                        case CardIds.Collectible.Priest.SlimeEm:
+                            eventHandler.player.slimedMinions = eventHandler.player.board.filter { $0.isMinion }
+                            eventHandler.opponent.slimedMinions = eventHandler.opponent.board.filter { $0.isMinion }
                         case CardIds.NonCollectible.Priest.Repackage_RepackagedBoxToken:
                             for card in actionStartingEntity?.info.storedCardIds ?? [String]() {
                                 addKnownCardId(eventHandler: eventHandler, cardId: card)
@@ -1497,8 +1512,10 @@ class PowerGameStateParser: LogEventParser {
                 // Handle hand related minions that trigger enchantments on opponent's board
                 let enchantmentMapping = [
                     CardIds.NonCollectible.Neutral.ChoralMrrrglr: CardIds.NonCollectible.Neutral.ChoralMrrrglr_ChorusEnchantment,
+                    CardIds.NonCollectible.Neutral.ChoralMrrrglr_ChoralMrrrglr: CardIds.NonCollectible.Neutral.ChoralMrrrglr_ChorusEnchantment,
                     CardIds.NonCollectible.Neutral.TimewarpedMrrrglr: CardIds.NonCollectible.Neutral.ChoralMrrrglr_ChorusEnchantment,
                     CardIds.NonCollectible.Neutral.CostumeEnthusiast: CardIds.NonCollectible.Neutral.CostumeEnthusiast_EnthusiasticEnchantment,
+                    CardIds.NonCollectible.Neutral.CostumeEnthusiast_CostumeEnthusiast: CardIds.NonCollectible.Neutral.CostumeEnthusiast_EnthusiasticEnchantment,
                     CardIds.NonCollectible.Neutral.Dramaloc: CardIds.NonCollectible.Neutral.Dramaloc_DramaticEnchantment,
                     CardIds.NonCollectible.Neutral.DramalocSticker: CardIds.NonCollectible.Neutral.DramalocSticker_DramaticEnchantment
                         ]
@@ -1510,6 +1527,14 @@ class PowerGameStateParser: LogEventParser {
                             e[GameTag.attached] == sourceEntity.id &&
                             e[GameTag.creator] == sourceEntity.id }) {
                             BobsBuddyInvoker.instance(gameId: eventHandler.gameId, turn: eventHandler.turnNumber())?.updateMinionEnchantment(enchantment, sourceEntity.id, false)
+                        } else {
+                            // A trinket source (Dramaloc Sticker) attaches one enchantment per friendly minion with CREATOR = the
+                            // trinket; the simulator reads the value from the trinket itself, so attach one to the captured trinket.
+                            if let trinketEnchantment = eventHandler.entities.values
+                            .first(where: { e in e.cardId == enchantmentCardId &&
+                                e[GameTag.creator] == sourceEntity.id }) {
+                                BobsBuddyInvoker.instance(gameId: eventHandler.gameId, turn: eventHandler.turnNumber())?.updateTrinketEnchantment(trinketEnchantment, sourceEntity.id, false)
+                            }
                         }
                     }
                 }

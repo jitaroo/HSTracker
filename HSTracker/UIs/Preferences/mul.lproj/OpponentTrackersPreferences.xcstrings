@@ -361,6 +361,18 @@
         }
       }
     },
+    "Cps-op-002.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Show corpses counter\"; ObjectID = \"Cps-op-002\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show corpses counter"
+          }
+        }
+      }
+    },
     "eGQ-pE-MU0.title" : {
       "comment" : "Class = \"NSButtonCell\"; title = \"Clear opponent tracker on game end\"; ObjectID = \"eGQ-pE-MU0\";",
       "extractionState" : "extracted_with_value",

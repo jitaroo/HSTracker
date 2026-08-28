@@ -19,6 +19,8 @@ class RootOverlayWindow: OverWindowController {
     private var globalMouseMonitor: Any?
     private var localMouseMonitor: Any?
     private var fallbackTimer: Timer?
+    private var hoveredCardId: String?
+    private weak var hoveredView: CardHoverNSView?
 
     override func windowDidLoad() {
         super.windowDidLoad()
@@ -65,7 +67,7 @@ class RootOverlayWindow: OverWindowController {
             self?.updateMouseThrough()
             return event
         }
-        regionSubscription = viewModel.$interactiveRegion.sink { [weak self] _ in
+        regionSubscription = viewModel.$interactiveRegions.sink { [weak self] _ in
             self?.updateMouseThrough()
         }
         // Backstop: mouse-moved monitors should keep ignoresMouseEvents in
@@ -79,20 +81,123 @@ class RootOverlayWindow: OverWindowController {
 
     private func updateMouseThrough() {
         guard let window = window, let hostingView = hostingView else { return }
-        guard let region = viewModel.interactiveRegion else {
-            setIgnoresMouseEvents(true)
-            return
-        }
         let screenLocation = NSEvent.mouseLocation
         let windowPoint = window.convertPoint(fromScreen: screenLocation)
         let viewPoint = hostingView.convert(windowPoint, from: nil)
-        let inside = region.contains(viewPoint)
+
+        updateFilterRegionHover(at: viewPoint)
+
+        guard !viewModel.interactiveRegions.isEmpty else {
+            setIgnoresMouseEvents(true)
+            return
+        }
+        let inside = viewModel.interactiveRegions.contains { $0.contains(viewPoint) }
         setIgnoresMouseEvents(!inside)
+
+        updateCardHover()
+    }
+
+    // HDT's BgsTopBarMask MouseEnter/MouseLeave handlers, which flip
+    // BattlegroundsMinionsVM.IsFilterRegionHovered to slide the minion browser's
+    // filter button in and out.
+    //
+    // Driven from the cursor position tracked here rather than from a SwiftUI
+    // .onHover, because the mask deliberately stays click-through
+    // (IsHitTestVisible="False" on HDT's side): .onHover only fires once
+    // ignoresMouseEvents is already false, so it would never see the cursor over
+    // the part of the mask outside the panel - which is exactly where the button
+    // slides out to. Called before the interactiveRegion guard below so it keeps
+    // running while the overlay is fully click-through.
+    private func updateFilterRegionHover(at viewPoint: NSPoint) {
+        let hovering = viewModel.hoverRegion?.contains(viewPoint) ?? false
+        let minions = viewModel.battlegroundsMinionsGuide
+        guard minions.isFilterRegionHovered != hovering else { return }
+        // Durations match the tab's own slide storyboard: 0.2s out, 0.4s back.
+        withAnimation(.easeOut(duration: hovering ? 0.2 : 0.4)) {
+            minions.isFilterRegionHovered = hovering
+        }
     }
 
     private func setIgnoresMouseEvents(_ ignores: Bool) {
         if window?.ignoresMouseEvents != ignores {
             window?.ignoresMouseEvents = ignores
+        }
+    }
+
+    // Matches the live cursor position (already computed above for the
+    // click-through check) against every currently-reported card hover
+    // region and drives CardTooltipPanel directly - see the comment atop
+    // CardHoverRegionPreferenceKey in CardImageTooltip.swift for why this
+    // replaces a per-view hover callback.
+    // Matches the live cursor against registered CardHoverNSView instances using
+    // CALayer coordinate conversion. layer.convert(bounds, to: rootLayer) goes
+    // through the full CALayer transform chain - including SwiftUI's scaleEffect
+    // and NSScrollView's scroll offset - giving the correct visual position.
+    // The final comparison is in screen coordinates (Y-up, Cocoa convention)
+    // using NSEvent.mouseLocation, avoiding any NSView/SwiftUI coordinate space
+    // issues entirely.
+    private func updateCardHover() {
+        guard let overlayWindow = window else { return }
+        let screenLocation = NSEvent.mouseLocation
+
+        // `last`, not `first`: the Inspiration board overlaps its tiles by 8pt
+        // (HDT's Margin="-4,0"), so two entries can contain the cursor at once.
+        // Registration follows view-tree order, and a later sibling draws on
+        // top - which is the one WPF's hit-testing would pick. Everywhere else
+        // the tiles do not overlap, so at most one entry ever matches and this
+        // is the same as before.
+        let match = CardHoverRegistry.shared.entries.last { entry in
+            guard let nsView = entry.view,
+                  nsView.window === overlayWindow else { return false }
+            // NSView.convert(to: nil) → window base coordinates (Y-up from
+            // window bottom, flips handled by AppKit automatically).
+            // convertToScreen → screen coordinates (same Y-up convention).
+            // NSEvent.mouseLocation is also Y-up screen coordinates.
+            let rectInWindow = nsView.convert(nsView.bounds, to: nil)
+            let screenRect = overlayWindow.convertToScreen(rectInWindow)
+            return screenRect.contains(screenLocation)
+        }
+
+        if let match = match {
+            // Keyed on the matched view as well as the card: an Inspiration board
+            // routinely holds two copies of the same minion, and now that the
+            // tooltip anchors to the element rather than following the cursor,
+            // moving between them has to re-anchor it. HDT gets this for free -
+            // each element raises its own MouseLeave/MouseEnter.
+            if hoveredCardId != match.cardId || hoveredView !== match.view {
+                hoveredCardId = match.cardId
+                hoveredView = match.view
+                // HDT anchors the tooltip to the hovered element and clamps it to
+                // the overlay window (its ActualWidth/ActualHeight), not to the
+                // screen - so both rects are handed over here, in the screen
+                // coordinates the panel positions itself in.
+                let anchor = match.view.map {
+                    overlayWindow.convertToScreen($0.convert($0.bounds, to: nil))
+                }
+                CardTooltipPanel.shared.show(cardId: match.cardId, showTriple: match.showTriple,
+                                             baconTriple: match.baconTriple,
+                                             placement: match.placement,
+                                             anchor: anchor, bounds: overlayWindow.frame)
+            }
+        } else {
+            if hoveredCardId != nil {
+                hoveredCardId = nil
+                hoveredView = nil
+                // Unconditional hide: we know no card is under cursor, so we must
+                // dismiss regardless of which card (base or golden) is currently shown.
+                CardTooltipPanel.shared.hide()
+            }
+            // Force-hide if the tooltip's current card is no longer registered.
+            // Fires at most every 150ms via the fallback timer and catches the
+            // race where hide(ifShowing:) returned early because currentCardId
+            // was a different card than the one whose view was removed (e.g.
+            // the guide navigated away while a new 300ms show-delay was still
+            // in flight for a different hovered card).
+            let registry = CardHoverRegistry.shared
+            if let shown = CardTooltipPanel.shared.currentCardId,
+               !registry.entries.contains(where: { $0.cardId == shown && $0.view != nil }) {
+                CardTooltipPanel.shared.hide()
+            }
         }
     }
 }

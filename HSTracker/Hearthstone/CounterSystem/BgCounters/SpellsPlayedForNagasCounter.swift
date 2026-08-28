@@ -40,7 +40,7 @@ class SpellsPlayedForNagasCounter: NumericCounter {
     }
 
     override func valueToShow() -> String {
-        return "\(1 + (counter / 4)) (\(counter % 4)/4)"
+        return "\(1 + (counter / 3)) (\(counter % 3)/3)"
     }
 
     override func handleTagChange(tag: GameTag, entity: Entity, value: Int, prevValue: Int) {

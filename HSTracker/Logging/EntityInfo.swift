@@ -36,6 +36,7 @@ class EntityInfo {
     var cardIdBeforeReveal: String?
     var originalEntityWasCreated: Bool?
     var guessedCardState: GuessedCardState = GuessedCardState.none
+    var pendingStartOfGameReveal = false
     var storedCardIds: [String] = []
     var copyOfCardId: String?
     var latestCardId: String {

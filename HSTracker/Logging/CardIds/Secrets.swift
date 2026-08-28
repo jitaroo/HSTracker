@@ -45,7 +45,24 @@ extension CardIds.Secrets {
         Paladin.NobleSacrifice,
         Mage.Vaporize
     ]
-    
+
+    // Secrets that trigger when the opponent plays a minion. Only one secret triggers per
+    // event, so if one of these goes off the others were not given a chance to.
+    static let minionPlayed: [MultiIdCard] = [
+        Hunter.BargainBin,
+        Hunter.HiddenCache,
+        Hunter.Snipe,
+        Hunter.Zombeeees,
+        Mage.ExplosiveRunes,
+        Mage.FrozenClone,
+        Mage.MirrorEntity,
+        Mage.Objection,
+        Mage.PotionOfPolymorph,
+        Paladin.Repentance,
+        Rogue.Ambush,
+        Rogue.Kidnap
+    ]
+
     static let all = Hunter.All + Mage.All + Paladin.All + Rogue.All
     
     static func getSecretMultiIdCard(_ id: String) -> MultiIdCard? {

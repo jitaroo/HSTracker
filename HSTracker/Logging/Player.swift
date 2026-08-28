@@ -121,6 +121,11 @@ final class Player {
     fileprivate(set) var entitiesDiscardedFromHand = [Entity]()
     var isPlayingWhizbang = false
     var hasDeathKnightTourist = false
+    // True when this player's deck was built half out of their enemy's cards (Azalina Soulsever).
+    // Resolved from `id` on read rather than stored: the copies are created during CREATE_GAME, and
+    // player/opponent ids only arrive once the async MatchInfo poll completes, so at write time we do
+    // not yet know which side is which.
+    var deckCopiedFromEnemy: Bool { id > 0 && game.controllersWithDeckCopiedFromEnemy.contains(id) }
     fileprivate(set) var deathrattlesPlayedCount = 0
     private let game: Game
     var lastDrawnCardId: String?
@@ -132,6 +137,7 @@ final class Player {
         return deadMinionsCards.last
     }
     var deadMinionsCards = [Entity]()
+    var slimedMinions = [Entity]()
     var secretsTriggeredCards = [Entity]()
     var beatrixCardIds: Set<Int> = []
     var beatrixCopiedCard: String?
@@ -235,6 +241,7 @@ final class Player {
         entitiesDiscardedFromHand.removeAll()
         secretsTriggeredCards.removeAll()
         deadMinionsCards.removeAll()
+        slimedMinions.removeAll()
         deathrattlesPlayedCount = 0
         heroPowerCount = 0
         offeredEntityIds.removeAll()
@@ -1059,21 +1066,11 @@ final class Player {
                 if let last = options.last {
                     creator.info.storedCardIds.append(last)
                 }
-            } else if creator.cardId == CardIds.NonCollectible.Mage.TheForbiddenSequence_TheOriginStoneToken {
-                // The Origin Stone reveals a copy of each unchosen discover option immediately
-                // before casting it, so the secret it puts into play is public information.
-                if let revealedCast = game.entities.values
-                    .filter({ e in e.id < entity.id && e.isSecret && e.hasCardId
-                    && e.isControlled(by: entity[GameTag.controller])
-                    && e[GameTag.copied_from_entity_id] > 0
-                    && e.isInZone(zone: Zone.setaside) })
-                    .sorted(by: { $0.id > $1.id })
-                    .first {
-                    if !revealedCast.cardId.isEmpty {
-                        entity.info.storedCardIds.append(revealedCast.cardId)
-                    }
-                }
             }
+            // The Origin Stone deliberately gets no handling here. It casts copies of the
+            // unchosen discover options, and the log reveals those options - but the secret
+            // copy it puts into play stays hidden until it triggers, exactly as it does in
+            // game. Naming it from the revealed options would leak private information.
         }
         
         if Settings.fullGameLog {

@@ -32,6 +32,11 @@ class CardsDrawnThisTurnCounter: NumericCounter {
         super.init(controlledByPlayer: controlledByPlayer, game: game)
     }
 
+    // Player-only by design, so Azalina copying our deck does not make it meaningful for the opponent.
+    override var mirrorsPlayerDeck: Bool {
+        return false
+    }
+
     override func shouldShow() -> Bool {
         guard game.isTraditionalHearthstoneMatch else { return false }
         return isPlayerCounter && inPlayerDeckOrKnown(cardIds: relatedCards)

@@ -8,20 +8,10 @@
 
 import Foundation
 
-class Pyrotechnician: ICardGenerator {
-    func getCardId() -> String {
-        return CardIds.Collectible.Neutral.Pyrotechnician
-    }
-
-    func isInGeneratorPool(_ card: Card, _ gameMode: GameType, _ format: FormatType) -> Bool {
-        return card.type == .spell
-            && card.spellSchool == .fire
-        && card.isCardLegal(gameType: gameMode, format: format)
-    }
-
-    func isInGeneratorPool(_ card: MultiIdCard, _ gameMode: GameType, _ format: FormatType) -> Bool {
-        return card.ids.any { c in isInGeneratorPool(Card(id: c), gameMode, format) }
-    }
-    
-    required init() {}
+// "After you cast a spell, add a random Fire spell to your hand."
+// Fire spell pool + ICardGenerator conformance inherited from FireSpellPool.
+class Pyrotechnician: FireSpellPool {
+    override func getCardId() -> String { CardIds.Collectible.Neutral.Pyrotechnician }
+    override func picks() -> Int { 1 }
+    override func isWithReplacement() -> Bool { true }
 }

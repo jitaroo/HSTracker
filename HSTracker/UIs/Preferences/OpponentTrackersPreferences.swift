@@ -33,7 +33,8 @@ class OpponentTrackersPreferences: PreferencePaneController, PreferencePane {
     @IBOutlet var showCounters: NSButton!
     @IBOutlet var showPlayerRelatedCards: NSButton!
     @IBOutlet var showPlayerMaxResources: NSButton!
-    
+    @IBOutlet var showCorpsesCounter: NSButton!
+
     override func viewWillAppear() {
         super.viewWillAppear()
         
@@ -59,6 +60,7 @@ class OpponentTrackersPreferences: PreferencePaneController, PreferencePane {
         showCounters.state = Settings.showOpponentCounters ? .on : .off
         showPlayerRelatedCards.state = Settings.showOpponentRelatedCards ? .on : .off
         showPlayerMaxResources.state = Settings.showOpponentMaxResources ? .on : .off
+        showCorpsesCounter.state = Settings.showOpponentCorpsesCounter ? .on : .off
     }
 
     @IBAction func checkboxClicked(_ sender: NSButton) {
@@ -101,6 +103,9 @@ class OpponentTrackersPreferences: PreferencePaneController, PreferencePane {
             Settings.showOpponentRelatedCards = showPlayerRelatedCards.state == .on
         } else if sender == showPlayerMaxResources {
             Settings.showOpponentMaxResources = showPlayerMaxResources.state == .on
+        } else if sender == showCorpsesCounter {
+            Settings.showOpponentCorpsesCounter = showCorpsesCounter.state == .on
+            AppDelegate.instance().coreManager.game.updateOpponentResourcesWidget()
         }
     }
 }

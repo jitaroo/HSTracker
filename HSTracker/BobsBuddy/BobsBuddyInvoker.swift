@@ -72,6 +72,7 @@ class BobsBuddyInvoker {
     private var currentOpponentMinions: [Int: MinionProxy] = [:]
     
     private var opponentHand: [Entity] = []
+    private var opponentTeammateHand: [Entity] = []
     private var opponentHandMap: [Entity: Entity] = [:]
     private var opponentSecrets: [Entity] = []
         
@@ -213,8 +214,13 @@ class BobsBuddyInvoker {
     }
 
     func startCombat() {
-        opponentHand = [Entity]()
-        opponentSecrets = [Entity]()
+        // A duos teammate pass re-enters startCombat after the primary snapshot. Clearing here would drop
+        // the opponent's own hand entities, which updateCardOpponentHand still rebuilds its hand from.
+        if input == nil || !game.isBattlegroundsDuosMatch() {
+            opponentHand = [Entity]()
+            opponentTeammateHand = [Entity]()
+            opponentSecrets = [Entity]()
+        }
 
         if !shouldRun() {
             return
@@ -893,6 +899,15 @@ class BobsBuddyInvoker {
                 let atk = attached[.tag_script_data_num_1]
                 let health = attached[.tag_script_data_num_2]
                 minion.setBloodGemStats(atk, health)
+            case CardIds.NonCollectible.Neutral.TorethsBlessing:
+                let torethsBlessing = sim.enchantmentFactory.create(cardId: CardIds.NonCollectible.Neutral.TorethsBlessing, controlledByPlayer: minion.controlledByPlayer)
+                if torethsBlessing.get() != nil {
+                    // The engine keeps the shield's remaining-hit count in the minion's
+                    // DIVINE_SHIELD tag (not always 3 at combat start — can be lower
+                    // due to card effects like persist poet);
+                    torethsBlessing.scriptDataNum1 = Int32(entity[.divine_shield])
+                    minion.attachEnchantment(enchantment: torethsBlessing)
+                }
             default:
                 if attached.card.type == .enchantment && !attached.cardId.isEmpty {
                     let enchantment = sim.enchantmentFactory.create(cardId: attached.cardId, controlledByPlayer: minion.controlledByPlayer)
@@ -907,10 +922,12 @@ class BobsBuddyInvoker {
         
         if attachedEntities.any({ e in e.has(tag: GameTag.modular)}) {
             if minion.isMech() {
-                checkForMagnetizedDeathrattles(minion, attachedEntities, allEntities)
+                checkForMagnetizedDeathrattles(minion, entity, attachedEntities, allEntities)
             }
             // Not just mech here, because Technical Element can magnetize to Elementals
             checkForSurfnSurfFromMagnetizedModules(minion, entity, allEntities)
+            checkForRepeatedMagnetizedAutoAssemblers(minion, entity, attachedEntities, allEntities)
+            checkForDarkGiftsOnMagnetizedModules(sim, minion, entity, attachedEntities, allEntities)
         }
         
         minion.gameId = Int32(entity.id)
@@ -920,7 +937,7 @@ class BobsBuddyInvoker {
     
     // Magnetized deathrattles (e.g., Auto Assembler) can be *hiding* if initially attached
     // to a magnetic minion that was then tripled and magnetized to another mech.
-    private static func checkForMagnetizedDeathrattles(_ minion: MinionProxy, _ attachedEntities: [Entity], _ allEntities: SynchronizedDictionary<Int, Entity>?) {
+    private static func checkForMagnetizedDeathrattles(_ minion: MinionProxy, _ host: Entity, _ attachedEntities: [Entity], _ allEntities: SynchronizedDictionary<Int, Entity>?) {
         // Required to resolve the chain of magnetized
         guard let allEntities else {
             return
@@ -928,7 +945,10 @@ class BobsBuddyInvoker {
 
         // Specific handling for: Auto Assembler
         // Each attached enchantment's CREATOR is the magnetic card that produced it; take each distinct id once.
-        for magneticId in attachedEntities.compactMap({ e in e[GameTag.creator] }).filter({ id in id > 0 }).unique() {
+        // Exclude the HOST: an enchantment the host created on itself is already turned into an
+        // AutoAssemblerEnchantment by the attachedEntities above (only magnetized modules are hidden).
+        // Only MAGNETIC enchantments are followed
+        for magneticId in attachedEntities.filter({ e in e.has(tag: .modular) }).compactMap({ e in e[GameTag.creator] }).filter({ id in id > 0 && id != host.id }).unique() {
             guard allEntities[magneticId] != nil else {
                 continue
             }
@@ -946,7 +966,64 @@ class BobsBuddyInvoker {
 
         // Future magnetic deathrattles can be added/handled here.
     }
-    
+
+    // Count the Auto Assembler modules fused into this host. TAG_SCRIPT_DATA_NUM_1 on the
+    // enchantment cannot give the count: repeated magnetizations accumulate into ONE enchantment
+    // and that tag holds the stats each module carried when it fused.
+    // Each module stays in the entity tree as its own REMOVEDFROMGAME minion instead,
+    // and two cases find them:
+    //   - a magnetic enchantment on the host names its module in CREATOR
+    //   - a module records its host in TAG_SCRIPT_DATA_NUM_1 when it magnetizes
+    private static func checkForRepeatedMagnetizedAutoAssemblers(_ minion: MinionProxy, _ host: Entity, _ attachedEntities: [Entity], _ allEntities: SynchronizedDictionary<Int, Entity>?) {
+        guard let allEntities else {
+            return
+        }
+
+        var modules = [Int: Bool]()  // module entity id -> is golden
+
+        for attached in attachedEntities {
+            guard attached.has(tag: .modular) else { continue }
+
+            guard let module = Cards.by(dbfId: attached[.creator_dbid], collectible: false) else { continue }
+
+            guard module.id == CardIds.NonCollectible.Neutral.AutoAssembler || module.id == CardIds.NonCollectible.Neutral.AutoAssembler_AutoAssembler1 else { continue }
+
+            let isGolden = module.id == CardIds.NonCollectible.Neutral.AutoAssembler_AutoAssembler1
+
+            let moduleId = attached[.creator]
+            if moduleId > 0 {
+                modules[moduleId] = isGolden  // one entry per magnetic enchantment's CREATOR
+            }
+        }
+
+        for entity in allEntities.values {
+            // The played module is left in the entity tree as a REMOVEDFROMGAME minion whose CREATOR
+            // is the card that initiated the magnetization.
+            // Only a module's own record of where it fused (TAG_SCRIPT_DATA_NUM_1) identifies this host.
+            guard entity[.tag_script_data_num_1] == host.id else { continue }
+
+            guard entity[.zone] == Zone.removedfromgame.rawValue else { continue }
+
+            guard entity.cardId == CardIds.NonCollectible.Neutral.AutoAssembler || entity.cardId == CardIds.NonCollectible.Neutral.AutoAssembler_AutoAssembler1 else { continue }
+
+            let isGolden = entity.cardId == CardIds.NonCollectible.Neutral.AutoAssembler_AutoAssembler1
+
+            modules[entity.id] = isGolden
+        }
+
+        guard !modules.isEmpty else { return }
+
+        // Exclude one counted module per BG32_172e the host carries, because EnchantmentFactory
+        // resolves that card id to an AutoAssemblerEnchantment which already summons one Automaton.
+        // A host can carry more than one instance (a golden formed by tripling brings each copy's).
+        let carried = attachedEntities.count { e in e.cardId == CardIds.NonCollectible.Neutral.AutoAssembler_AutoAssemblerEnchantment
+            || e.cardId == CardIds.NonCollectible.Neutral.AutoAssembler_AutoAssembler2 }
+
+        for module in modules.sorted(by: { $0.key < $1.key }).dropFirst(carried) {
+            minion.addDeathrattle(deathrattle: module.value ? AutoAssemblerProxy.goldenDeathrattle() : AutoAssemblerProxy.deathrattle())
+        }
+    }
+
     // A magnetized module keeps its own attached enchantments, including Surf n' Surf Spellcraft spells
     // cast on a Technical Element, which is then magnetized to another host minion.
     // The magnetized module records its host in TAG_SCRIPT_DATA_NUM_1 when it magnetizes.
@@ -971,6 +1048,41 @@ class BobsBuddyInvoker {
                     minion.addDeathrattle(deathrattle: GenericDeathrattles.crab())
                 case CardIds.NonCollectible.Neutral.SurfnSurf_CrabRiding:
                     minion.addDeathrattle(deathrattle: GenericDeathrattles.crabGolden())
+                default:
+                    break
+                }
+            }
+        }
+    }
+
+    // Only specific Dark Gifts (Jaws of Death, Offensive Sacrifice) offered on a magnetic minion can be obtained
+    // from Ominous Stone. The enchantment might be attached to magnetized minion.
+    private static func checkForDarkGiftsOnMagnetizedModules(_ sim: SimulatorProxy, _ minion: MinionProxy, _ host: Entity, _ attachedEntities: [Entity], _ allEntities: SynchronizedDictionary<Int, Entity>?) {
+        guard let allEntities else {
+            return
+        }
+
+        for magneticId in attachedEntities.filter({ e in e.has(tag: .modular) }).compactMap({ e in e[GameTag.creator] }).filter({ id in id > 0 && id != host.id }).unique() {
+            let gifts = allEntities.values
+                .filter({ x in x.isAttachedTo(entityId: magneticId) })
+                .sorted(by: { $0.id < $1.id })
+
+            for gift in gifts {
+                switch gift.cardId {
+                case CardIds.NonCollectible.Neutral.JawsOfDeath:
+                    // Do not attach if START_OF_COMBAT tag was cleared
+                    if host[GameTag.start_of_combat] == 0 {
+                        break
+                    }
+                    let enchantment = sim.enchantmentFactory.create(cardId: CardIds.NonCollectible.Neutral.JawsOfDeath, controlledByPlayer: minion.controlledByPlayer)
+                    if enchantment.get() != nil {
+                        minion.attachEnchantment(enchantment: enchantment)
+                    }
+                case CardIds.NonCollectible.Neutral.OffensiveSacrifice:
+                    let offensiveSacrifice = sim.enchantmentFactory.create(cardId: CardIds.NonCollectible.Neutral.OffensiveSacrifice, controlledByPlayer: minion.controlledByPlayer)
+                    if offensiveSacrifice.get() != nil {
+                        minion.attachEnchantment(enchantment: offensiveSacrifice)
+                    }
                 default:
                     break
                 }
@@ -1174,12 +1286,16 @@ class BobsBuddyInvoker {
             }
             inputPlayer.setSecrets(secrets: secretsToAdd)
             
-            self.opponentHand = BobsBuddyInvoker.getOrderedHandEntities(gamePlayer.hand)
+            let opponentHandEntities = BobsBuddyInvoker.getOrderedHandEntities(gamePlayer.hand)
+            if isDuosTeammate {
+                self.opponentTeammateHand = opponentHandEntities
+            } else {
+                self.opponentHand = opponentHandEntities
+            }
             let opponentHand = inputPlayer.hand
             MonoHelper.listClear(obj: opponentHand)
-            
-            let opponentHandEntities = getOpponentHandEntities(simulator: simulator)
-            for e in opponentHandEntities {
+
+            for e in getOpponentHandEntities(handEntities: opponentHandEntities, simulator: simulator) {
                 MonoHelper.addToList(list: opponentHand, element: e)
             }
         }
@@ -1212,7 +1328,15 @@ class BobsBuddyInvoker {
             inputPlayer.beastHealthBonus = Int32(pBeastBonus[GameTag.tag_script_data_num_2]) // attached
             logger.info("pBeastAttack=\(inputPlayer.beastAttackBonus), pBeastHealth=\(inputPlayer.beastHealthBonus), friendly=\(friendly)")
         }
-        
+
+        // Fang Anklet: a ghost board appears to accumulate the Fangs Out enchantment from the prior player.
+        if !friendly && inputPlayer.heroIsKelThuzad {
+            if let pFangAnklet = playerAttached.first(where: { x in x.cardId == CardIds.NonCollectible.Neutral.FangAnklet_FangAnkletPlayerEnchantDnt }) {
+                inputPlayer.beastAttackBonus += Int32(pFangAnklet[.tag_script_data_num_1]) // attached
+                inputPlayer.beastHealthBonus += Int32(pFangAnklet[.tag_script_data_num_2]) // attached
+            }
+        }
+
         if let pAncestralAutomaton = playerAttached.first(where: { x in x.cardId == CardIds.Invalid.AncestralAutomaton_AncestralAutomatonPlayerEnchantDnt }) {
             inputPlayer.ancestralAutomatonCounter = Int32( pAncestralAutomaton[.tag_script_data_num_1]) // attached
         }
@@ -1230,8 +1354,11 @@ class BobsBuddyInvoker {
         }
         
         inputPlayer.elementalPlayCounter = Int32(game.playerEntity?[.gametag_2878] ?? 0) // direct
-        
-        logger.info("pEternal=\(inputPlayer.eternalKnightCounter), pUndead=\(inputPlayer.undeadAttackBonus), pElemental=\(inputPlayer.elementalPlayCounter), friendly=\(friendly)")
+
+        inputPlayer.elementalsGiveExtraAttack = Int32(game.playerEntity?[.bacon_elemental_buffatkvalue] ?? 0) // direct
+        inputPlayer.elementalsGiveExtraHealth = Int32(game.playerEntity?[.bacon_elemental_buffhealthvalue] ?? 0) // direct
+
+        logger.info("pEternal=\(inputPlayer.eternalKnightCounter), pUndead=\(inputPlayer.undeadAttackBonus), pElemental=\(inputPlayer.elementalPlayCounter), pElementalExtraAtk=\(inputPlayer.elementalsGiveExtraAttack), pElementalExtraHealth=\(inputPlayer.elementalsGiveExtraHealth), friendly=\(friendly)")
         
         inputPlayer.piratesSummonCounter = Int32(game.playerEntity?[.gametag_2358] ?? 0) // direct
         
@@ -1437,22 +1564,33 @@ class BobsBuddyInvoker {
         }
         
         opponentHandMap[entity] = copy
-        
+
         // Wait for attached entities to be logged. This should happen at the exact same timestamp.
         //await _game.GameTime.WaitForDuration(1);
         let simulator = SimulatorProxy()
-        let entities = getOpponentHandEntities(simulator: simulator)
-        if let _class = MinionCardEntityProxy._class, entities.filter({ x in MonoHelper.isInstance(obj: x, klass: _class) }).count <= MonoHelper.listItems(obj: input.opponent.hand).filter({ x in MonoHelper.isInstance(obj: x, klass: _class) }).count {
+
+        // In duos both opponent-side players are set up from game.opponent, so a revealed card is
+        // attributed by the list it was captured in. Rebuilding the other one would write the
+        // opponent teammate's cards into the hand of the opponent fighting first.
+        var handEntities = opponentHand
+        var handOwner = input.opponent
+        if input.opponentTeammate.get() != nil && !opponentHand.contains(entity) && opponentTeammateHand.contains(entity) {
+            handEntities = opponentTeammateHand
+            handOwner = input.opponentTeammate
+        }
+
+        let entities = getOpponentHandEntities(handEntities: handEntities, simulator: simulator)
+        if let _class = MinionCardEntityProxy._class, entities.filter({ x in MonoHelper.isInstance(obj: x, klass: _class) }).count <= MonoHelper.listItems(obj: handOwner.hand).filter({ x in MonoHelper.isInstance(obj: x, klass: _class) }).count {
             return
         }
 
-        let cls = mono_object_get_class(input.opponent.hand.get())
+        let cls = mono_object_get_class(handOwner.hand.get())
         let newHand = MonoHandle(obj: MonoHelper.objectNew(clazz: cls))
         for ent in entities {
             MonoHelper.addToList(list: newHand, element: ent)
         }
-        input.opponent.hand = newHand
-        
+        handOwner.hand = newHand
+
         tryRerun()
     }
     
@@ -1539,7 +1677,7 @@ class BobsBuddyInvoker {
         for (heroPowers, sideFriendly) in sides where heroPowers.get() != nil {
             if let match = listFirst(heroPowers, { (hp: HeroPowerDataProxy) in
                 hp.cardId
-                == CardIds.NonCollectible.Neutral.TavishStormpike_LockAndLoad && hp.attachedMinion.game_id == creatorId }) {
+                == CardIds.NonCollectible.Neutral.TavishStormpike_LockAndLoad && hp.attachedMinion.get() != nil && hp.attachedMinion.game_id == creatorId }) {
                 tavishLockAndLoad = match
                 friendly = sideFriendly
                 break
@@ -1636,16 +1774,18 @@ class BobsBuddyInvoker {
         
         var friendly = true
         // True to a "transform", transformedSandyEntity has the same Id as the original Sandy
-        var sandyMinion = listFirst(input.player.side, { (m: MinionProxy) in m.game_id == transformedSandyEntity.id })
+        // Guard against the snapshot holding the already-transformed copy (non-Sandy minion with same id)
+        guard let sandyClass = SandyProxy._class else { return }
+        var sandyMinion = listFirst(input.player.side, { (m: MinionProxy) in MonoHelper.isInstance(obj: m, klass: sandyClass) && m.game_id == transformedSandyEntity.id })
         if sandyMinion == nil && input.playerTeammate.get() != nil {
-            sandyMinion = listFirst(input.playerTeammate.side, { (m: MinionProxy) in m.game_id == transformedSandyEntity.id })
+            sandyMinion = listFirst(input.playerTeammate.side, { (m: MinionProxy) in MonoHelper.isInstance(obj: m, klass: sandyClass) && m.game_id == transformedSandyEntity.id })
         }
         if sandyMinion == nil {
             friendly = false
-            sandyMinion = listFirst(input.opponent.side, { (m: MinionProxy) in m.game_id == transformedSandyEntity.id })
+            sandyMinion = listFirst(input.opponent.side, { (m: MinionProxy) in MonoHelper.isInstance(obj: m, klass: sandyClass) && m.game_id == transformedSandyEntity.id })
         }
         if sandyMinion == nil && input.opponentTeammate.get() != nil {
-            sandyMinion = listFirst(input.opponentTeammate.side, { (m: MinionProxy) in m.game_id == transformedSandyEntity.id })
+            sandyMinion = listFirst(input.opponentTeammate.side, { (m: MinionProxy) in MonoHelper.isInstance(obj: m, klass: sandyClass) && m.game_id == transformedSandyEntity.id })
         }
         guard let sandyMinion, sandyMinion.get() != nil else {
             return
@@ -1920,10 +2060,10 @@ class BobsBuddyInvoker {
                 break
             }
         }
-        guard let minion else {
+        guard let minion, !minion.minionUpdatedDuringCombat else {
             return
         }
-        
+
         // Attach enchant to the minion
         if enchantmentEntity.card.type == CardType.enchantment && !enchantmentEntity.cardId.isEmpty {
             let enchantment = SimulatorProxy().enchantmentFactory.create(cardId: enchantmentEntity.cardId, controlledByPlayer: minion.controlledByPlayer)
@@ -1937,7 +2077,38 @@ class BobsBuddyInvoker {
 
         tryRerun()
     }
-    
+
+    func updateTrinketEnchantment(_ enchantmentEntity: Entity, _ trinketEntityId: Int, _ isPlayerTrinket: Bool) {
+        guard let input, updateRevealedEntityValidStates else {
+            return
+        }
+
+        let opaque = mono_thread_attach(MonoHelper._monoInstance)
+
+        defer {
+            mono_thread_detach(opaque)
+        }
+
+        let targetPlayer = isPlayerTrinket ? input.player : input.opponent
+        guard let trinket: TrinketProxy = listFirst(targetPlayer.trinkets, { (t: TrinketProxy) in t.game_id == trinketEntityId }),
+            !trinket.trinketUpdatedDuringCombat else {
+            return
+        }
+
+        // Attach enchant to the trinket
+        if enchantmentEntity.card.type == CardType.enchantment && !enchantmentEntity.cardId.isEmpty {
+            let enchantment = SimulatorProxy().enchantmentFactory.create(cardId: enchantmentEntity.cardId, controlledByPlayer: trinket.controlledByPlayer)
+            if enchantment.get() != nil {
+                enchantment.scriptDataNum1 = Int32(enchantmentEntity[GameTag.tag_script_data_num_1])
+                enchantment.scriptDataNum2 = Int32(enchantmentEntity[GameTag.tag_script_data_num_2])
+                trinket.attachEnchantment(enchantment: enchantment)
+                trinket.trinketUpdatedDuringCombat = true
+            }
+        }
+
+        tryRerun()
+    }
+
     static let timewarpedMagnanimooseEnchantment = "BACON_FAKE_Magnanimoose_Enchantment"
     
     func updateDrBoomsMonsterReborn(_ sourceEntityId: Int, _ rebornMaxHealth: Int, _ isPlayerMinion: Bool) {
@@ -2096,11 +2267,25 @@ class BobsBuddyInvoker {
     // Minions whose death firings summoned Ancestral Automatons, awaiting reconciliation:
     // source entity id -> (trigger multiplier, summoned Automatons in creation order)
     private var _pendingAutoAssemblerDeathrattleSources = [Int: (triggerMultiplier: Int, summonedIsPremium: [Bool])]()
-    
+
+    // All Auto Assembler deathrattle FIRINGS observed per host minion.
+    private var _observedAutoAssemblerFirings = [Int: Int]()
+
+    func observeAutoAssemblerDeathrattleFiring(_ sourceEntityId: Int) {
+        guard _pendingAutoAssemblerDeathrattleSources[sourceEntityId] != nil else {
+            return
+        }
+        _observedAutoAssemblerFirings[sourceEntityId] = (_observedAutoAssemblerFirings[sourceEntityId] ?? 0) + 1
+    }
+
     func observeMagnetizedAutoAssemblerDeathrattles(_ sourceEntityId: Int, _ extraDeathrattles: Int, _ isGolden: Bool) {
         if _pendingAutoAssemblerDeathrattleSources[sourceEntityId] == nil {
             let observation = (1 + extraDeathrattles, [Bool]())
             _pendingAutoAssemblerDeathrattleSources[sourceEntityId] = observation
+            // The registration above happens mid-block, so at this block's BLOCK_START the source was not in
+            // the dictionary yet and the firing counter returned without counting it.
+            // Count it here; every later firing of this source is counted at its own BLOCK_START.
+            _observedAutoAssemblerFirings[sourceEntityId] = 1
         }
         var observation = _pendingAutoAssemblerDeathrattleSources[sourceEntityId]
         observation?.summonedIsPremium.append(isGolden)
@@ -2158,18 +2343,12 @@ class BobsBuddyInvoker {
         if MonoHelper.isInstance(obj: minion, klass: ICopiesDeathrattlesProxy._class!) {
             return false
         }
-        
-        // Extra deathrattles (e.g., Titus Rivendare) resolve as full repeats of the whole deathrattle list —
-        // so the first (observed / triggerMultiplier) summons are the distinct deathrattles in their real order.
-        var automatons = summonedByIsPremium.take(summonedByIsPremium.count / triggerMultiplier)
-        
-        // A minion's own innate deathrattles and deathrattles from attached enchantments resolve before these
-        // AdditionalDeathrattles, and appear as the leading elements; drop them so automatons map to AdditionalDeathrattles only.
-        let leadingCaptured = (MonoHelper.isInstance(obj: minion, klass: AutoAssemblerProxy._class!) ? 1 : 0)
-        + MonoHelper.listItems(obj: minion.enchantments).filter { MonoHelper.isInstance(obj: $0, klass: AutoAssemblerEnchantmentProxy._class!) || MonoHelper.isInstance(obj: $0, klass: AutoAssemblerEnchantmentGoldenProxy._class!) }.count
-            
-        if leadingCaptured > 0 {
-            automatons = Array(automatons.dropFirst(leadingCaptured))
+
+        // Sneed's New Shredder's innate Deathrattle summons a copy of a hand minion; when that hand
+        // minion is an Ancestral Automaton the observation is indistinguishable from a hidden
+        // magnetized Auto Assembler — do not attribute its summons to a module.
+        if MonoHelper.isInstance(obj: minion, klass: SneedsNewShredderProxy._class!) {
+            return false
         }
 
         let getAction = { (m: MonoHandle) -> UnsafeMutablePointer<MonoObject>? in
@@ -2177,7 +2356,43 @@ class BobsBuddyInvoker {
         }
         let autoAssemblerAction = getAction(AutoAssemblerProxy.deathrattle())
         let autoAssemblerGoldenAction = getAction(AutoAssemblerProxy.goldenDeathrattle())
-        
+
+        // Extra deathrattles (e.g., Titus Rivendare) resolve as full repeats of the whole deathrattle list —
+        // so the first (observed / triggerMultiplier) are the distinct deathrattles in their real order.
+        let isAutoAssembler = MonoHelper.isInstance(obj: minion, klass: AutoAssemblerProxy._class!)
+        let otherEnchantmentDeathrattles = MonoHelper.listItems(obj: minion.enchantments).filter { e in
+            MonoHelper.isInstance(obj: e, klass: IDeathrattleProxy._class!)
+                && !MonoHelper.isInstance(obj: e, klass: AutoAssemblerEnchantmentProxy._class!)
+                && !MonoHelper.isInstance(obj: e, klass: AutoAssemblerEnchantmentGoldenProxy._class!)
+        }.count
+        let otherAdditionalDeathrattles = (0 ..< MonoHelper.listCount(obj: minion.additionalDeathrattles)).filter { i in
+            let action = getAction(MonoHelper.listItem(obj: minion.additionalDeathrattles, index: i))
+            return action != autoAssemblerAction && action != autoAssemblerGoldenAction
+        }.count
+        let otherDeathrattles = (MonoHelper.isInstance(obj: minion, klass: IDeathrattleProxy._class!) && !isAutoAssembler ? 1 : 0)
+            + otherEnchantmentDeathrattles
+            + otherAdditionalDeathrattles
+
+        let observedFirings = _observedAutoAssemblerFirings[sourceEntityId] ?? 0
+        let firedDeathrattles = max(observedFirings / triggerMultiplier - otherDeathrattles, 0)
+        let summonedDeathrattles = summonedByIsPremium.count / triggerMultiplier
+        var automatons = summonedByIsPremium.take(max(summonedDeathrattles, firedDeathrattles))
+
+        // A firing the board had no space for leaves no summon to read the premium flag from; repeat the last
+        // observed one, because every module fused into one host grants the same Automaton.
+        while automatons.count < firedDeathrattles && !summonedByIsPremium.isEmpty {
+            automatons.append(summonedByIsPremium[summonedByIsPremium.count - 1])
+        }
+
+        // A minion's own innate deathrattles and deathrattles from attached enchantments resolve before these
+        // AdditionalDeathrattles, and appear as the leading elements; drop them so automatons map to AdditionalDeathrattles only.
+        let leadingCaptured = (isAutoAssembler ? 1 : 0)
+        + MonoHelper.listItems(obj: minion.enchantments).filter { MonoHelper.isInstance(obj: $0, klass: AutoAssemblerEnchantmentProxy._class!) || MonoHelper.isInstance(obj: $0, klass: AutoAssemblerEnchantmentGoldenProxy._class!) }.count
+
+        if leadingCaptured > 0 {
+            automatons = Array(automatons.dropFirst(leadingCaptured))
+        }
+
         // Get any existing AutoAssembler deathrattles already tracked on AdditionalDeathrattles
         var currentIndices = [Int]()
         for i in 0 ..< MonoHelper.listCount(obj: minion.additionalDeathrattles) {
@@ -2327,9 +2542,9 @@ class BobsBuddyInvoker {
         return true
     }
 
-    private func getOpponentHandEntities(simulator: SimulatorProxy) -> [MonoHandle] {
+    private func getOpponentHandEntities(handEntities: [Entity], simulator: SimulatorProxy) -> [MonoHandle] {
         var result = [MonoHandle]()
-        for _e in opponentHand {
+        for _e in handEntities {
             let e = opponentHandMap[_e] ?? _e
             if e.isMinion {
                 let attached = getAttachedEntities(entityId: e.id)

@@ -140,7 +140,7 @@ class BattlegroundsOverlayView: NSView {
                 let heroes = player.playerEntities.filter { x in x.isHero && (x.has(tag: .bacon_hero_can_be_drafted) || x.has(tag: .bacon_skin))}
                 heroPowers = heroes.compactMap { x in Cards.by(dbfId: x[.hero_power], collectible: false)?.id }
             }
-            windowManager.battlegroundsTierOverlay.tierOverlay.onHeroPowers(heroPowers: heroPowers)
+            game.battlegroundsMinionsOnHeroPowers(heroPowers)
             let rect = SizeHelper.battlegroundsDetailsFrame()
             windowManager.show(controller: windowManager.battlegroundsDetailsWindow, show: true,
                                frame: rect, overlay: true)
@@ -150,8 +150,6 @@ class BattlegroundsOverlayView: NSView {
     }
 
     private var bobsBuddyHidden = false
-    private var battlegroundsTierHidden = false
-    private var battlegroundsTurnHidden = false
 
     @MainActor
     func update() {
@@ -182,20 +180,12 @@ class BattlegroundsOverlayView: NSView {
             let windowManager = game.windowManager
             
             game.hideBobsBuddy = true
-            game.hideBattlegroundsTier = true
             game.hideBattlegroundsTurn = true
+            game.updateTurnCounterOverlay()
             
             if windowManager.bobsBuddyPanel.window?.isVisible ?? false {
                 bobsBuddyHidden = true
                 windowManager.show(controller: windowManager.bobsBuddyPanel, show: false)
-            }
-            if windowManager.battlegroundsTierOverlay.window?.isVisible ?? false {
-                battlegroundsTierHidden = true
-                windowManager.show(controller: windowManager.battlegroundsTierOverlay, show: false)
-            }
-            if windowManager.turnCounter.window?.isVisible ?? false {
-                battlegroundsTurnHidden = true
-                windowManager.show(controller: windowManager.turnCounter, show: false)
             }
         } else {
             displayHero(entityId: nil)
@@ -213,16 +203,8 @@ class BattlegroundsOverlayView: NSView {
                 bobsBuddyHidden = false
                 windowManager.show(controller: windowManager.bobsBuddyPanel, show: true)
             }
-            game.hideBattlegroundsTier = false
-            if battlegroundsTierHidden {
-                battlegroundsTierHidden = false
-                windowManager.show(controller: windowManager.battlegroundsTierOverlay, show: true)
-            }
             game.hideBattlegroundsTurn = false
-            if battlegroundsTurnHidden {
-                battlegroundsTurnHidden = false
-                windowManager.show(controller: windowManager.turnCounter, show: true)
-            }
+            game.updateTurnCounterOverlay()
         }
     }
 }

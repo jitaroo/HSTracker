@@ -37,7 +37,7 @@ class CounterManager {
 
     func getVisibleCounters(controlledByPlayer: Bool) -> [BaseCounter] {
         let counters = controlledByPlayer ? playerCounters : opponentCounters
-        return counters.filter { $0.shouldShow() }
+        return counters.filter { $0.shouldShow() || $0.mirrorsPlayerDeckKnowledge }
     }
 
     func getExampleCounters(controlledByPlayer: Bool) -> [BaseCounter] {
@@ -48,11 +48,17 @@ class CounterManager {
     func handleTagChange(tag: GameTag, id: Int, value: Int, prevValue: Int) {
         guard let entity = game.entities[id] else { return }
 
+        let isBattlegroundsMatch = game.isBattlegroundsMatch()
+        let isTraditionalHearthstoneMatch = game.isTraditionalHearthstoneMatch
+        guard isBattlegroundsMatch || isTraditionalHearthstoneMatch else { return }
+
         for playerCounter in playerCounters {
+            if playerCounter.isBattlegroundsCounter != isBattlegroundsMatch { continue }
             playerCounter.handleTagChange(tag: tag, entity: entity, value: value, prevValue: prevValue)
         }
 
         for opponentCounter in opponentCounters {
+            if opponentCounter.isBattlegroundsCounter != isBattlegroundsMatch { continue }
             opponentCounter.handleTagChange(tag: tag, entity: entity, value: value, prevValue: prevValue)
         }
     }

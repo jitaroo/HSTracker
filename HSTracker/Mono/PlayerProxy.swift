@@ -27,7 +27,7 @@ class PlayerProxy: MonoHandle, MonoClassInitializer {
             PlayerProxy._setHeroIsKelThuzad = MonoHelper.getMethod(PlayerProxy._class, "SetHeroIsKelThuzad", 0)
             
             // fields
-            initializeProperties(properties: [ "Side", "HeroPowers", "Quests", "Objectives", "Trinkets", "Secrets", "Hand", "MagnanimooseSummonPoolDuos", "FriendlyMinionsDeadLastCombatCounter", "EternalKnightCounter", "MagnetizeCounter", "AncestralAutomatonCounter", "UndeadAttackBonus", "UndeadHealthBonus", "WhelpAttackBonus", "WhelpHealthBonus", "ElementalPlayCounter", "BloodGemAtkBuff", "BloodGemHealthBuff", "TavernSpellCounter", "PiratesSummonCounter", "ResourcesSpentThisGame", "BeastsSummonCounter", "BeastAttackBonus", "BeastHealthBonus", "BeetlesAtkBuff", "BeetlesHealthBuff", "BattlecryCounter", "DeathrattleCounter", "TavernSpellAtkBuff", "TavernSpellHealthBuff", "BackToBackAtk", "BackToBackHealth", "BackToBackCounter", "HauntedAtkBuff", "HauntedHealthBuff", "Health", "DamageTaken", "Tier", "HeroIsKelThuzad" ])
+            initializeProperties(properties: [ "Side", "HeroPowers", "Quests", "Objectives", "Trinkets", "Secrets", "Hand", "MagnanimooseSummonPoolDuos", "FriendlyMinionsDeadLastCombatCounter", "EternalKnightCounter", "MagnetizeCounter", "AncestralAutomatonCounter", "UndeadAttackBonus", "UndeadHealthBonus", "WhelpAttackBonus", "WhelpHealthBonus", "ElementalPlayCounter", "ElementalsGiveExtraAttack", "ElementalsGiveExtraHealth", "BloodGemAtkBuff", "BloodGemHealthBuff", "TavernSpellCounter", "PiratesSummonCounter", "ResourcesSpentThisGame", "BeastsSummonCounter", "BeastAttackBonus", "BeastHealthBonus", "BeetlesAtkBuff", "BeetlesHealthBuff", "BattlecryCounter", "DeathrattleCounter", "TavernSpellAtkBuff", "TavernSpellHealthBuff", "BackToBackAtk", "BackToBackHealth", "BackToBackCounter", "HauntedAtkBuff", "HauntedHealthBuff", "Health", "DamageTaken", "Tier", "HeroIsKelThuzad" ])
         }
     }
     
@@ -131,7 +131,13 @@ class PlayerProxy: MonoHandle, MonoClassInitializer {
     
     @MonoPrimitiveProperty(property: "ElementalPlayCounter", owner: PlayerProxy.self)
     var elementalPlayCounter: Int32
-    
+
+    @MonoPrimitiveProperty(property: "ElementalsGiveExtraAttack", owner: PlayerProxy.self)
+    var elementalsGiveExtraAttack: Int32
+
+    @MonoPrimitiveProperty(property: "ElementalsGiveExtraHealth", owner: PlayerProxy.self)
+    var elementalsGiveExtraHealth: Int32
+
     @MonoPrimitiveProperty(property: "BloodGemAtkBuff", owner: PlayerProxy.self)
     var bloodGemAtkBuff: Int32
     

@@ -265,6 +265,18 @@
         }
       }
     },
+    "Cor-ps-002.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Show corpses counter\"; ObjectID = \"Cor-ps-002\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show corpses counter"
+          }
+        }
+      }
+    },
     "e7g-zd-YkC.title" : {
       "comment" : "Class = \"NSButtonCell\"; title = \"Show deck name\"; ObjectID = \"e7g-zd-YkC\";",
       "extractionState" : "extracted_with_value",

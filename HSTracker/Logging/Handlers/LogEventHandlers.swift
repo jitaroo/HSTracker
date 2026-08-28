@@ -282,6 +282,7 @@ protocol PowerEventHandler: AnyObject {
     func handlePlayerHandToDeck(entity: Entity, cardId: String?)
     
     var isBattlegroundsCombatPhase: Bool { get set }
+    var controllersWithDeckCopiedFromEnemy: Set<Int> { get set }
 
     func handlePlayerMaxHealthChange(_ value: Int)
     func handleOpponentMaxHealthChange(_ value: Int)
@@ -289,7 +290,8 @@ protocol PowerEventHandler: AnyObject {
     func handleOpponentMaxManaChange(_ value: Int)
     func handlePlayerMaxHandSizeChange(_ value: Int)
     func handleOpponentMaxHandSizeChange(_ value: Int)
+    func handlePlayerCorpsesLeftChange(_ value: Int)
     func handleOpponentCorpsesLeftChange(_ value: Int)
-    
+
     func resetOpponentHandCostReduction()
 }

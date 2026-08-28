@@ -32,9 +32,13 @@ class NumericCounter: BaseCounter {
     override func valueToShow() -> String {
         return String(counter)
     }
-    
+
     override var sortValue: Int {
         return counter
+    }
+
+    override var hasValue: Bool {
+        return counter > 0
     }
     
     var lastEntityToCount: Entity?

@@ -6,29 +6,15 @@
 //  Copyright © 2026 Benjamin Michotte. All rights reserved.
 //
 
-class PlumeOfVulcanos: ICardGenerator {
-    required init() {}
-
-    func getCardId() -> String {
-        return CardIds.NonCollectible.Mage.Vulcanos_PlumeOfVulcanosToken1
-    }
-
-    func isInGeneratorPool(_ card: Card, _ gameMode: GameType, _ format: FormatType) -> Bool {
-        return card.type == .spell &&
-               card.spellSchool == SpellSchool.fire &&
-        card.isCardLegal(gameType: gameMode, format: format)
-    }
-
-    func isInGeneratorPool(_ card: MultiIdCard, _ gameMode: GameType, _ format: FormatType) -> Bool {
-        return card.ids.contains { c in
-            isInGeneratorPool(Card(id: c), gameMode, format)
-        }
-    }
+// "Whenever this takes damage, get a random Fire spell. It costs (3) less."
+// Non-collectible token created by Vulcanos. Fire spell pool + ICardGenerator
+// conformance inherited from FireSpellPool.
+class PlumeOfVulcanos: FireSpellPool {
+    override func getCardId() -> String { CardIds.NonCollectible.Mage.Vulcanos_PlumeOfVulcanosToken1 }
+    override func picks() -> Int { 1 }
+    override func isWithReplacement() -> Bool { true }
 }
 
 class PlumeOfVulcanos2: PlumeOfVulcanos {
-
-    override func getCardId() -> String {
-        return CardIds.NonCollectible.Mage.Vulcanos_PlumeOfVulcanosToken2
-    }
+    override func getCardId() -> String { CardIds.NonCollectible.Mage.Vulcanos_PlumeOfVulcanosToken2 }
 }

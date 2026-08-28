@@ -36,6 +36,7 @@ class PlayerTrackersPreferences: PreferencePaneController, PreferencePane {
     @IBOutlet var showPlayerRelatedCards: NSButton!
     @IBOutlet var showPlayerHighlightSynergies: NSButton!
     @IBOutlet var showPlayerMaxResources: NSButton!
+    @IBOutlet var showCorpsesCounter: NSButton!
 
     override func viewWillAppear() {
         super.viewWillAppear()
@@ -65,6 +66,7 @@ class PlayerTrackersPreferences: PreferencePaneController, PreferencePane {
         showPlayerRelatedCards.state = Settings.showPlayerRelatedCards ? .on : .off
         showPlayerHighlightSynergies.state = Settings.showPlayerHighlightSynergies ? .on : .off
         showPlayerMaxResources.state = Settings.showPlayerMaxResources ? .on : .off
+        showCorpsesCounter.state = Settings.showPlayerCorpsesCounter ? .on : .off
     }
     
     @IBAction func colorChange(_ sender: NSColorWell) {
@@ -117,6 +119,9 @@ class PlayerTrackersPreferences: PreferencePaneController, PreferencePane {
             Settings.showPlayerHighlightSynergies = showPlayerHighlightSynergies.state == .on
         } else if sender == showPlayerMaxResources {
             Settings.showPlayerMaxResources = showPlayerMaxResources.state == .on
+        } else if sender == showCorpsesCounter {
+            Settings.showPlayerCorpsesCounter = showCorpsesCounter.state == .on
+            AppDelegate.instance().coreManager.game.updatePlayerResourcesWidget()
         }
     }
 }

@@ -373,13 +373,6 @@ struct SizeHelper {
         return hearthstoneWindow.relativeFrame(frame)
     }
     
-    static func turnCounterFrame() -> NSRect {
-        let frame = battlegroundsTierOverlayFrame()
-        let left = frame.minX - 100
-        let top = frame.minY
-        return NSRect(x: left, y: top, width: 100, height: frame.height)
-    }
-    
     static func battlegroundsSessionFrame() -> NSRect {
         let bottom = hearthstoneWindow.frame.minY + 0.05 * hearthstoneWindow.height
         let top = hearthstoneWindow.frame.maxY - 0.15 * hearthstoneWindow.height
@@ -401,17 +394,6 @@ struct SizeHelper {
         
         let frame = NSRect(x: left, y: bottom, width: right - left, height: top - bottom)
         return (frame)
-    }
-    
-    static func battlegroundsTierOverlayFrame() -> NSRect {
-        let trackerFrame = playerTrackerFrame()
-        let tierOverlay = AppDelegate.instance().coreManager?.game.windowManager.battlegroundsTierOverlay.tierOverlay
-        let tiers = (tierOverlay?.showTavernTier7 ?? false) ? 7 : 6
-        let height = CGFloat(56)
-        let width = CGFloat(tiers * 48 + 8)
-        let x = hearthstoneWindow.frame.minX + hearthstoneWindow.frame.width - width
-        
-        return NSRect(x: x, y: trackerFrame.minY + trackerFrame.height - height, width: width, height: height)
     }
     
     static func bobsPanelOverlayFrame() -> NSRect {

@@ -2,25 +2,37 @@
   "sourceLanguage" : "en",
   "strings" : {
     "4LE-h7-rfX.title" : {
-      "comment" : "Class = \"NSButtonCell\"; title = \"Show tiers\"; ObjectID = \"4LE-h7-rfX\";",
+      "comment" : "Class = \"NSButtonCell\"; title = \"Show minions and guides browser\"; ObjectID = \"4LE-h7-rfX\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diener und Ratgeber anzeigen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Show tiers"
+            "value" : "Show minions and guides browser"
           }
         },
-        "fr" : {
+        "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Afficher les niveaux"
+            "value" : "하수인과 가이드 탐색기 표시"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar Navegador de Lacaios e Guias"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "显示酒馆等级"
+            "value" : "显示随从和指南浏览器"
           }
         }
       }
@@ -75,6 +87,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Afficher les stats de choix des babioles"
+          }
+        }
+      }
+    },
+    "bgg-ui-002.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Show hero and comp guides\"; ObjectID = \"bgg-ui-002\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show hero and comp guides"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher les guides de héros et de composition"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영웅과 조합 가이드 보기"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar Guias de Herói e Composição"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示英雄和流派指南"
+          }
+        }
+      }
+    },
+    "bgl-ui-002.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Show minions and guides browser in pre-lobby\"; ObjectID = \"bgl-ui-002\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show minions and guides browser in pre-lobby"
           }
         }
       }
@@ -903,6 +963,84 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "100 %"
+          }
+        }
+      }
+    },
+    "tvp-ui-002.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Show tavern pinning\"; ObjectID = \"tvp-ui-002\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show tavern pinning"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exibir Fixador da Taverna"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示酒馆标记"
+          }
+        }
+      }
+    },
+    "tvp-ui-012.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Auto-enable comps key pieces on game start\"; ObjectID = \"tvp-ui-012\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Auto-enable comps key pieces on game start"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoativar Peças-Chaves da Comp no Início da Partida"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在对局开始时自动启用关键随从标记"
+          }
+        }
+      }
+    },
+    "tvp-ui-022.title" : {
+      "comment" : "Class = \"NSButtonCell\"; title = \"Show quick guides\"; ObjectID = \"tvp-ui-022\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show quick guides"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "퀵 가이드 표시"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exibir Guias Rápidos"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示快速指南"
           }
         }
       }

@@ -6,20 +6,11 @@
 //  Copyright © 2025 Benjamin Michotte. All rights reserved.
 //
 
-class Blasteroid: ICardGenerator {
-    func getCardId() -> String {
-        return CardIds.Collectible.Mage.Blasteroid
-    }
-
-    func isInGeneratorPool(_ card: Card, _ gameMode: GameType, _ format: FormatType) -> Bool {
-        return card.type == .spell &&
-        card.spellSchool == .fire &&
-        card.isCardLegal(gameType: gameMode, format: format)
-    }
-
-    func isInGeneratorPool(_ card: MultiIdCard, _ gameMode: GameType, _ format: FormatType) -> Bool {
-        return card.ids.any { c in isInGeneratorPool(Card(id: c), gameMode, format) }
-    }
-    
-    required init() {}
+// "Battlecry: Shuffle 5 random Fire spells into your deck. They cost (2) less."
+// Fire spell pool + ICardGenerator conformance inherited from FireSpellPool.
+class Blasteroid: FireSpellPool {
+    override func getCardId() -> String { CardIds.Collectible.Mage.Blasteroid }
+    override func picks() -> Int { 1 }
+    override func isWithReplacement() -> Bool { true }
+    override func eventCount() -> Int { 5 }
 }

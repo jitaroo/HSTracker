@@ -8,7 +8,6 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="CountersOverlay" customModule="HSTracker" customModuleProvider="target">
             <connections>
-                <outlet property="countersView" destination="zww-YH-zlf" id="Y3J-hK-8X8"/>
                 <outlet property="window" destination="vBW-9j-7u4" id="mUd-k5-m7E"/>
             </connections>
         </customObject>
@@ -21,24 +20,6 @@
             <view key="contentView" id="7ar-03-dDi">
                 <rect key="frame" x="0.0" y="0.0" width="276" height="378"/>
                 <autoresizingMask key="autoresizingMask"/>
-                <subviews>
-                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="zww-YH-zlf" customClass="CountersView" customModule="HSTracker" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="276" height="378"/>
-                        <connections>
-                            <binding destination="-2" name="hidden" keyPath="self.visibility" id="F8j-fA-J7i">
-                                <dictionary key="options">
-                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                </dictionary>
-                            </binding>
-                        </connections>
-                    </customView>
-                </subviews>
-                <constraints>
-                    <constraint firstAttribute="trailing" secondItem="zww-YH-zlf" secondAttribute="trailing" id="PHo-1t-BQw"/>
-                    <constraint firstItem="zww-YH-zlf" firstAttribute="leading" secondItem="7ar-03-dDi" secondAttribute="leading" id="Ubr-rF-IVA"/>
-                    <constraint firstItem="zww-YH-zlf" firstAttribute="top" secondItem="7ar-03-dDi" secondAttribute="top" id="u8i-Do-xyq"/>
-                    <constraint firstAttribute="bottom" secondItem="zww-YH-zlf" secondAttribute="bottom" id="wr1-kl-H0d"/>
-                </constraints>
             </view>
             <point key="canvasLocation" x="27" y="116"/>
         </window>

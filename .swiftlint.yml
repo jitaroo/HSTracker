@@ -5,6 +5,7 @@ excluded:
   - HSTracker/Logging/CardIds/
   - HSTrackerUITests
   - HSTrackerTests
+  - .claude/worktrees
 disabled_rules:
   - cyclomatic_complexity
   - function_body_length

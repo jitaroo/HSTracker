@@ -54,7 +54,7 @@ struct ConstructedMulliganPreLobbyWidgetView: View {
             // contributions from views that actually call .preference().
             .background(
                 GeometryReader { proxy in
-                    Color.clear.preference(key: InteractiveRegionPreferenceKey.self, value: proxy.frame(in: .rootOverlayCanvas))
+                    Color.clear.preference(key: InteractiveRegionPreferenceKey.self, value: [proxy.frame(in: .rootOverlayCanvas)])
                 }
             )
         }
@@ -206,7 +206,7 @@ struct ConstructedMulliganPreLobbyWidgetView: View {
                     .foregroundColor(.white)
                     .frame(width: 16, height: 16)
                     .overlay(Circle().stroke(Color.white, lineWidth: 1))
-                    .mulliganTooltip(String.localizedString("ConstructedPreLobbyWidget_TrialsRemaining_Tooltip", comment: ""))
+                    .guideTooltip(String.localizedString("ConstructedPreLobbyWidget_TrialsRemaining_Tooltip", comment: ""))
             }
             if viewModel.resetTimeVisibility {
                 Text(String(format: String.localizedString("BattlegroundsPreLobby_Authenticated_TrialsResetsIn", comment: ""), viewModel.trialTimeRemaining ?? ""))

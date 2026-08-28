@@ -8,9 +8,22 @@
 
 import Foundation
 
-class FiddlefireImp: ICardGenerator {
-    func getCardId() -> String {
-        return CardIds.Collectible.Warlock.FiddlefireImp
+// "Battlecry: Add a random Fire Mage and Fire Warlock spell to your hand."
+//
+// Mirrors HDT's `class FiddlefireImp : DiscoverPoolCard, ICardGenerator` - the pool half
+// supplies the Outfinder hover summary, the generator half is a separate registration.
+class FiddlefireImp: DiscoverPoolCard, ICardGenerator {
+    override func getCardId() -> String { CardIds.Collectible.Warlock.FiddlefireImp }
+    override func picks() -> Int { 1 }
+    override func eventCount() -> Int { 2 }
+    override func isWithReplacement() -> Bool { true }
+
+    override func getCardPool(playerClass: CardClass?, gt: GameType, format: FormatType) -> [Card] {
+        return Cards.collectible().filter {
+            $0.type == .spell &&
+            ($0.isClass(cardClass: .mage) || $0.isClass(cardClass: .warlock)) &&
+            $0.spellSchool == .fire
+        }
     }
 
     func isInGeneratorPool(_ card: Card, _ gameMode: GameType, _ format: FormatType) -> Bool {
@@ -23,6 +36,4 @@ class FiddlefireImp: ICardGenerator {
     func isInGeneratorPool(_ card: MultiIdCard, _ gameMode: GameType, _ format: FormatType) -> Bool {
         return card.ids.any { c in isInGeneratorPool(Card(id: c), gameMode, format) }
     }
-    
-    required init() {}
 }

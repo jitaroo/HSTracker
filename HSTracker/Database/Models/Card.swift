@@ -28,6 +28,13 @@ final class Card {
     var health = 0
     var attack = 0
     var overload = 0
+    // Death Knight triple-rune costs (GameTag.COST_BLOOD/FROST/UNHOLY) - a card
+    // needing 3 of one rune can't be generated into a deck that isn't already
+    // running that rune spec, which RelatedCardsSystem/Cards/Pools' generation
+    // filter checks for.
+    var costBlood = 0
+    var costFrost = 0
+    var costUnholy = 0
     var name = "unknown"
     var enName = ""
     var playerClass: CardClass = .neutral
@@ -43,7 +50,8 @@ final class Card {
     var multiClassGroup: MultiClassGroup = .invalid
     var multipleClasses = 0
     var techLevel = 0
-    var isBaconPoolMinion = false
+    // raw IS_BACON_POOL_MINION tag value, not a bool: Rot Hide Gnoll has 2 but is not in the pool
+    var isBaconPoolMinion = 0
     var jsonRepresentation: [String: Any] = [:]
     var hideStats = false
     var mercenariesAbilityCooldown = 0
@@ -59,7 +67,21 @@ final class Card {
     var tourist = 0
     var baconTriple = false
     var baconTripleUpgradeMinionId = 0
+    // BACON_BUDDY / BACON_TRIPLED_BASE_MINION_ID - BattlegroundsDb pairs them to
+    // collect the base (non-golden) buddies for the Buddies card-type filter.
+    var isBaconBuddy = false
+    var baconTripledBaseMinionId = 0
     var baconCard = false
+    // GameTag.HIDE_COST, as parsed from the card XML.
+    var hideCostTag = false
+
+    // Mirrors HDT's Card.HideCost: the tag, or a 0-cost card whose English text
+    // says "Passive" - which is how passive Battlegrounds hero powers are
+    // marked. HDT's third branch (a fake card with a nil cost) has no
+    // equivalent here. Drives whether a hero power renders a cost gem.
+    var hideCost: Bool {
+        hideCostTag || (cost == 0 && enText.contains("Passive"))
+    }
     var faction: GameTag?
     var spellSchool: SpellSchool = .none
     var highlightColor = HighlightColor.none
@@ -391,6 +413,9 @@ extension Card: NSCopying {
         copy.health = self.health
         copy.attack = self.attack
         copy.overload = self.overload
+        copy.costBlood = self.costBlood
+        copy.costFrost = self.costFrost
+        copy.costUnholy = self.costUnholy
         copy.name = self.name
         copy.enName = self.enName
         copy.playerClass = self.playerClass
@@ -425,6 +450,7 @@ extension Card: NSCopying {
         copy.zilliaxCustomizableFunctionalModule = self.zilliaxCustomizableFunctionalModule
         copy.zilliaxCustomizableCosmeticModule = self.zilliaxCustomizableCosmeticModule
         copy.multipleClasses = self.multipleClasses
+        copy.hideCostTag = self.hideCostTag
         copy.baconTripleUpgradeMinionId = self.baconTripleUpgradeMinionId
         copy.faction = self.faction
         copy.spellSchool = self.spellSchool

@@ -7,75 +7,33 @@
 //
 
 import Foundation
+import SwiftUI
 
-class CountersView: NSView {
-    override func layout() {
-        let views = subviews
-        if views.count == 0 {
-            return
-        }
-        
-        let maxWidth = bounds.width
-        var rowLayout: [[NSView]] = []
-        var width = 0.0
-        var content = [NSView]()
-        for view in views {
-            if width + view.intrinsicContentSize.width > maxWidth {
-                rowLayout.append(content)
-                content = [NSView]()
-                content.append(view)
-                width = view.intrinsicContentSize.width
-            } else {
-                content.append(view)
-                width += view.intrinsicContentSize.width
-            }
-        }
-        rowLayout.append(content)
-        var y = 49.0
-        for row in rowLayout {
-            var x = 0.0
-            for view in row {
-                let ics = view.intrinsicContentSize
-                view.frame = NSRect(x: x, y: y, width: ics.width, height: ics.height)
-                x += ics.width
-            }
-            y -= 49.0
-        }
-    }
-
-    func update(_ overlay: CountersOverlay) {
-        if !Thread.isMainThread {
-            DispatchQueue.main.async {
-                self.update(overlay)
-            }
-            return
-        }
-
-        for view in self.subviews {
-            view.removeFromSuperview()
-        }
-        for view in overlay.visibleCounters.array() {
-            self.addSubview(CounterView(view))
-        }
-        self.needsLayout = true
-    }
-}
-
+// Not itself gated to macOS 10.15 (WindowManager/Game.swift/AppDelegate hold
+// and call this unconditionally, same as before this was ported to SwiftUI) -
+// only the private content-rebuilding path touches SwiftUI/NSHostingView,
+// gated internally with `if #available`. See CountersOverlayContentView.swift
+// and CounterChipView.swift for the actual SwiftUI content, which replaces
+// the old CountersView/CounterView.xib AppKit views.
 class CountersOverlay: OverWindowController {
-    @IBOutlet var countersView: CountersView!
-    
     private(set) var _counters: CounterManager!
     var isPlayer = false
-    
-    @objc dynamic var visibility = false
-    
+
+    @objc dynamic var visibility = false {
+        didSet {
+            if #available(macOS 10.15, *) {
+                refreshContent()
+            }
+        }
+    }
+
     var countersListChanged: (() -> Void)?
-    
+
     func setCounters(_ counters: CounterManager) {
         _counters = counters
         _counters.addCountersChangedListener(countersChanged)
     }
-    
+
     private func countersChanged() {
         if !Thread.isMainThread {
             DispatchQueue.main.async {
@@ -85,47 +43,62 @@ class CountersOverlay: OverWindowController {
         }
         updateVisibleCounters()
     }
-    
+
     var visibleCounters = SynchronizedArray<BaseCounter>()
-    
-    override func showWindow(_ sender: Any?) {
-        super.showWindow(sender)
-        
-        DispatchQueue.main.async {
-            self.countersView?.update(self)
+
+    // Tracks how many chips the SwiftUI content last rendered, so needsUpdate()
+    // stays cheap and available on every OS version - the actual view model
+    // objects (CounterChipViewModel) are 10.15-only and rebuilt fresh inside
+    // refreshContent() rather than kept as a stored property here.
+    private var renderedCounterCount = 0
+
+    override func windowDidLoad() {
+        super.windowDidLoad()
+        if #available(macOS 10.15, *) {
+            window?.contentView = NSHostingView(rootView: CountersOverlayContentView(visibility: visibility, chips: []))
         }
     }
-    
+
+    @available(macOS 10.15, *)
+    private func refreshContent() {
+        guard let hostingView = window?.contentView as? NSHostingView<CountersOverlayContentView> else { return }
+        let chips = visibleCounters.array().map { CounterChipViewModel(counter: $0) }
+        renderedCounterCount = chips.count
+        hostingView.rootView = CountersOverlayContentView(visibility: visibility, chips: chips)
+    }
+
     @MainActor
     func updateVisibleCounters() {
         let visibleCounters = _counters.getVisibleCounters(controlledByPlayer: isPlayer)
-        
+
         var changed = false
         for counter in self.visibleCounters.array() where !visibleCounters.contains(counter) {
             self.visibleCounters.remove(counter)
             changed = true
         }
-        
+
         for counter in visibleCounters where !self.visibleCounters.contains(counter) {
             self.visibleCounters.append(counter)
             changed = true
         }
-        
-        if changed || countersView?.subviews.count != visibleCounters.count {
-            countersView?.update(self)
+
+        if changed || renderedCounterCount != visibleCounters.count {
+            if #available(macOS 10.15, *) {
+                refreshContent()
+            }
         }
-        
+
         sortVisibleCounters()
     }
-    
+
     private func sortVisibleCounters() {
         if !AppDelegate.instance().coreManager.game.isBattlegroundsMatch() {
             return
         }
-     
+
         visibleCounters.sort(by: { $0.sortValue < $1.sortValue })
     }
-    
+
     func forceShowExampleCounters() {
         if !Thread.isMainThread {
             DispatchQueue.main.async {
@@ -134,15 +107,17 @@ class CountersOverlay: OverWindowController {
             return
         }
         visibleCounters.removeAll()
-        
+
         let exampleCounters = _counters.getExampleCounters(controlledByPlayer: isPlayer)
-        
+
         for counter in exampleCounters {
             visibleCounters.append(counter)
         }
-        countersView?.update(self)
+        if #available(macOS 10.15, *) {
+            refreshContent()
+        }
     }
-    
+
     func forceHideExampleCounters() {
         if !Thread.isMainThread {
             DispatchQueue.main.async {
@@ -153,13 +128,14 @@ class CountersOverlay: OverWindowController {
         visibleCounters.removeAll()
         updateVisibleCounters()
     }
-    
+
     func needsUpdate() -> Bool {
-        return countersView?.subviews.count != visibleCounters.count
-    }
-    
-    func update() {
-        countersView?.update(self)
+        return renderedCounterCount != visibleCounters.count
     }
 
+    func update() {
+        if #available(macOS 10.15, *) {
+            refreshContent()
+        }
+    }
 }

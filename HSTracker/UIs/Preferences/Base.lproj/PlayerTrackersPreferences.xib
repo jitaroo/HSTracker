@@ -13,6 +13,7 @@
                 <outlet property="showActiveEffects" destination="ch7-2L-q2U" id="ig5-uL-38l"/>
                 <outlet property="showBoardDamage" destination="MtK-l1-SKk" id="QIY-Sd-Emn"/>
                 <outlet property="showBottomCards" destination="mw3-8S-Qfd" id="sPH-Qw-nIg"/>
+                <outlet property="showCorpsesCounter" destination="Cor-ps-001" id="Cor-ps-004"/>
                 <outlet property="showCounters" destination="sgy-13-dsa" id="dTX-wb-2S8"/>
                 <outlet property="showDeathrattleCounter" destination="E5o-tN-vdV" id="dkS-7r-Nop"/>
                 <outlet property="showDeckName" destination="xPH-sG-hVe" id="Abt-o1-xT9"/>
@@ -183,6 +184,16 @@
                         <action selector="checkboxClicked:" target="-2" id="kFF-Rj-Ejn"/>
                     </connections>
                 </button>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Cor-ps-001">
+                    <rect key="frame" x="20" y="181" width="421" height="16"/>
+                    <buttonCell key="cell" type="check" title="Show corpses counter" bezelStyle="regularSquare" imagePosition="left" state="off" inset="2" id="Cor-ps-002">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="checkboxClicked:" target="-2" id="Cor-ps-003"/>
+                    </connections>
+                </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Yk4-rS-X8P">
                     <rect key="frame" x="20" y="168" width="421" height="16"/>
                     <buttonCell key="cell" type="check" title="Highlight synergies in the deck" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="B89-dN-j4b">
@@ -300,6 +311,8 @@
                 <constraint firstItem="AVh-I0-Pfw" firstAttribute="leading" secondItem="XxF-gV-LnW" secondAttribute="leading" constant="20" symbolic="YES" id="Pla-Af-gab"/>
                 <constraint firstAttribute="trailing" secondItem="UDp-f2-KNr" secondAttribute="trailing" constant="20" symbolic="YES" id="R8r-lL-zwI"/>
                 <constraint firstItem="y1s-H7-YS6" firstAttribute="leading" secondItem="XxF-gV-LnW" secondAttribute="leading" constant="20" symbolic="YES" id="Y9F-DW-iWb"/>
+                <constraint firstItem="Cor-ps-001" firstAttribute="leading" secondItem="XxF-gV-LnW" secondAttribute="leading" constant="20" symbolic="YES" id="Cor-ps-005"/>
+                <constraint firstAttribute="trailing" secondItem="Cor-ps-001" secondAttribute="trailing" constant="20" symbolic="YES" id="Cor-ps-006"/>
                 <constraint firstAttribute="trailing" secondItem="mw3-8S-Qfd" secondAttribute="trailing" constant="20" symbolic="YES" id="Zib-o9-UTB"/>
                 <constraint firstAttribute="trailing" secondItem="FGp-0L-JIH" secondAttribute="trailing" constant="20" symbolic="YES" id="aeR-c8-buE"/>
                 <constraint firstAttribute="trailing" secondItem="xcN-Th-tgi" secondAttribute="trailing" constant="20" symbolic="YES" id="atJ-We-1ek"/>

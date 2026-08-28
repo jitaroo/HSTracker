@@ -15,6 +15,7 @@
                 <outlet property="showActiveEffects" destination="HHb-MF-VW4" id="cMM-ud-GGF"/>
                 <outlet property="showBoardDamage" destination="mB7-0k-NWy" id="HSd-Lc-kS5"/>
                 <outlet property="showCardHuds" destination="Jvp-6c-HZ0" id="dCi-2R-3hn"/>
+                <outlet property="showCorpsesCounter" destination="Cps-op-001" id="Cps-op-004"/>
                 <outlet property="showCounters" destination="0w1-8P-7Ul" id="Okz-Fc-TfP"/>
                 <outlet property="showDeathrattleCounter" destination="U2A-tO-ePh" id="deO-Wh-znY"/>
                 <outlet property="showGraveyard" destination="Uzg-vA-1f9" id="UEn-1g-mXh"/>
@@ -162,6 +163,16 @@
                         <action selector="checkboxClicked:" target="-2" id="fmq-0p-CIG"/>
                     </connections>
                 </button>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Cps-op-001">
+                    <rect key="frame" x="20" y="77" width="392" height="16"/>
+                    <buttonCell key="cell" type="check" title="Show corpses counter" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Cps-op-002">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="checkboxClicked:" target="-2" id="Cps-op-003"/>
+                    </connections>
+                </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mB7-0k-NWy">
                     <rect key="frame" x="20" y="64" width="392" height="16"/>
                     <buttonCell key="cell" type="check" title="Show board damage" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fah-Dr-Amh">
@@ -237,6 +248,8 @@
                 <constraint firstAttribute="trailing" secondItem="U2A-tO-ePh" secondAttribute="trailing" constant="20" symbolic="YES" id="KQa-Lg-Run"/>
                 <constraint firstAttribute="trailing" secondItem="AOs-wd-f13" secondAttribute="trailing" constant="20" symbolic="YES" id="M85-5w-bkS"/>
                 <constraint firstAttribute="trailing" secondItem="dFP-v4-7Gs" secondAttribute="trailing" constant="20" symbolic="YES" id="PyP-Me-Fzw"/>
+                <constraint firstItem="Cps-op-001" firstAttribute="leading" secondItem="DPe-et-cJR" secondAttribute="leading" constant="20" symbolic="YES" id="Cps-op-005"/>
+                <constraint firstAttribute="trailing" secondItem="Cps-op-001" secondAttribute="trailing" constant="20" symbolic="YES" id="Cps-op-006"/>
                 <constraint firstAttribute="trailing" secondItem="vlC-Xd-bPQ" secondAttribute="trailing" constant="20" symbolic="YES" id="Ry7-AF-wjX"/>
                 <constraint firstAttribute="trailing" secondItem="GPS-bk-Bdd" secondAttribute="trailing" constant="20" symbolic="YES" id="UBR-5k-pcI"/>
                 <constraint firstItem="vlC-Xd-bPQ" firstAttribute="leading" secondItem="DPe-et-cJR" secondAttribute="leading" constant="20" symbolic="YES" id="VeP-9d-i8B"/>

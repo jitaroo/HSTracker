@@ -8,20 +8,12 @@
 
 import Foundation
 
-class FyrakkTheBlazing: ICardGenerator {
-    func getCardId() -> String {
-        return CardIds.Collectible.Neutral.FyrakkTheBlazing
-    }
-
-    func isInGeneratorPool(_ card: Card, _ gameMode: GameType, _ format: FormatType) -> Bool {
-        return card.type == .spell &&
-               card.spellSchool == .fire &&
-        card.isCardLegal(gameType: gameMode, format: format)
-    }
-
-    func isInGeneratorPool(_ card: MultiIdCard, _ gameMode: GameType, _ format: FormatType) -> Bool {
-        return card.ids.any { c in isInGeneratorPool(Card(id: c), gameMode, format) }
-    }
-    
-    required init() {}
+// "Immune to Fire spells. Battlecry: Cast 15 Mana worth of Fire spells at random enemies."
+// The number of casts is unpredictable (depends on rolled spell costs), so it is modeled
+// as a single representative draw. Fire spell pool + ICardGenerator conformance
+// inherited from FireSpellPool.
+class FyrakkTheBlazing: FireSpellPool {
+    override func getCardId() -> String { CardIds.Collectible.Neutral.FyrakkTheBlazing }
+    override func picks() -> Int { 1 }
+    override func isWithReplacement() -> Bool { true }
 }

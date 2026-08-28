@@ -56,8 +56,12 @@ struct TagChangeActions {
                 self.stateChange(eventHandler: eventHandler, value: value)
             case .transformed_from_card:
                 self.transformedFromCardChange(eventHandler: eventHandler, id: id, value: value)
-            case .creator, .displayed_creator:
+            case .creator:
                 self.creatorChanged(eventHandler: eventHandler, id: id, value: value)
+            case .displayed_creator:
+                self.azalinaCopyCreated(eventHandler: eventHandler, id: id, value: value)
+                self.creatorChanged(eventHandler: eventHandler, id: id, value: value)
+                self.ectoplasmCreated(eventHandler: eventHandler, id: id, value: value)
             case .whizbang_deck_id:
                 self.whizbangDeckIdChange(eventHandler: eventHandler, id: id, value: value)
             case .mulligan_state:
@@ -139,6 +143,7 @@ struct TagChangeActions {
     private func onBattlegroundsSetupChange(eventHandler: PowerEventHandler, value: Int, prevValue: Int) {
         if prevValue == 1 && value == 0 {
             eventHandler.isBattlegroundsCombatPhase = true
+            hideMinionPinningShop(eventHandler)
             if eventHandler.isBattlegroundsSoloMatch() {
                 BobsBuddyInvoker.instance(gameId: eventHandler.gameId, turn: eventHandler.turnNumber())?.startCombat()
             }
@@ -152,12 +157,22 @@ struct TagChangeActions {
 
         if prevValue == 1 && value == 0 {
             eventHandler.isBattlegroundsCombatPhase = false
+            hideMinionPinningShop(eventHandler)
             if !eventHandler.isBattlegroundsDuosMatch() || eventHandler.duosWasOpponentHeroModified {
                 eventHandler.snapshotBattlegroundsBoardState()
             }
             if eventHandler.isBattlegroundsDuosMatch() {
                 BobsBuddyInvoker.instance(gameId: eventHandler.gameId, turn: eventHandler.turnNumber())?.startCombat()
             }
+        }
+    }
+
+    // Both of HDT's combat-setup handlers collapse BgsMinionPinningShop as
+    // combat opens - the shop is gone, so its markers must be too.
+    private func hideMinionPinningShop(_ eventHandler: PowerEventHandler) {
+        guard #available(macOS 10.15, *), let game = eventHandler as? Game else { return }
+        DispatchQueue.main.async {
+            game.windowManager.rootOverlay?.viewModel.battlegroundsMinionPinning.setShopVisible(false)
         }
     }
 
@@ -411,6 +426,10 @@ struct TagChangeActions {
                 }
             }
         }
+
+        if Mulligan.done.rawValue == value, let game = eventHandler as? Game, game.isMulliganDone() {
+            revealPendingStartOfGameEntities(eventHandler: eventHandler)
+        }
     }
     
     private func whizbangDeckIdChange(eventHandler: PowerEventHandler, id: Int, value: Int) {
@@ -433,6 +452,42 @@ struct TagChangeActions {
         }
     }
     
+    private func azalinaCopyCreated(eventHandler: PowerEventHandler, id: Int, value: Int) {
+        guard let creator = eventHandler.entities[value], creator.cardId == CardIds.Collectible.Priest.AzalinaSoulsever else {
+            return
+        }
+        guard let copy = eventHandler.entities[id] else {
+            return
+        }
+
+        // Record the raw controller, not the side. This runs during CREATE_GAME, where player.id and
+        // opponent.id are still unset because the async MatchInfo poll has not resolved them yet.
+        let controller = copy[.controller]
+        if controller > 0 {
+            eventHandler.controllersWithDeckCopiedFromEnemy.insert(controller)
+        }
+    }
+
+    // The copy going to the enemy is created hidden and in SETASIDE, so the usual KnownCardIds
+    // guess (which skips SETASIDE) never claims it. Its DISPLAYED_CREATOR points back at
+    // Slime 'em! though, which is enough to name it while it is still on its way to hand.
+    // Only DISPLAYED_CREATOR is used, not CREATOR: the same block also creates hidden SETASIDE
+    // copies of the enemy's slimed minions, and those never carry a DISPLAYED_CREATOR.
+    private func ectoplasmCreated(eventHandler: PowerEventHandler, id: Int, value: Int) {
+        if value == 0 {
+            return
+        }
+        guard let entity = eventHandler.entities[id], entity.cardId.isEmpty else {
+            return
+        }
+        guard let creator = eventHandler.entities[value], creator.cardId == CardIds.Collectible.Priest.SlimeEm else {
+            return
+        }
+
+        entity.cardId = CardIds.NonCollectible.Priest.Slimeem_EctoplasmToken
+        entity.info.guessedCardState = .guessed
+    }
+
     private func creatorChanged(eventHandler: PowerEventHandler, id: Int, value: Int) {
         if value == 0 {
             return
@@ -651,12 +706,14 @@ struct TagChangeActions {
             return
         }
         
-        if entity.isControlled(by: eventHandler.opponent.id) {
-            let corpsesSpent = entity[.corpses_spent_this_game]
+        let corpsesSpent = entity[.corpses_spent_this_game]
+        if entity.isControlled(by: eventHandler.player.id) {
+            eventHandler.handlePlayerCorpsesLeftChange(value - corpsesSpent)
+        } else if entity.isControlled(by: eventHandler.opponent.id) {
             eventHandler.handleOpponentCorpsesLeftChange(value - corpsesSpent)
         }
     }
-    
+
     private func corpsesSpentThisGameChange(eventHandler: PowerEventHandler, id: Int, value: Int, previous prevValue: Int) {
         if value <= 0 {
             return
@@ -670,8 +727,10 @@ struct TagChangeActions {
             return
         }
 
-        if entity.isControlled(by: eventHandler.opponent.id) {
-            let corpses = entity[.corpses]
+        let corpses = entity[.corpses]
+        if entity.isControlled(by: eventHandler.player.id) {
+            eventHandler.handlePlayerCorpsesLeftChange(corpses - value)
+        } else if entity.isControlled(by: eventHandler.opponent.id) {
             eventHandler.handleOpponentCorpsesLeftChange(corpses - value)
         }
     }
@@ -719,16 +778,37 @@ struct TagChangeActions {
         let isCultivatingSpriteBulb = powerGameStateParser?.currentBlock?.cardId == CardIds.Collectible.Neutral.CultivatingSprite && entity.cardId == CardIds.NonCollectible.Neutral.CultivatingSprite_BloomingBulbToken
 
         entity.info.hidden = !isCultivatingSpriteBulb && (hideEntity || (isStartOfTheGameEffect && entity.isControlled(by: eventHandler.opponent.id)))
-                
+
         if isStartOfTheGameEffect {
-            entity.info.guessedCardState = .revealed
-            
-            predictFabled(entity)
-            
+            // Revealing a start-of-game effect (e.g. Azalina Soulsever) on the opponent's side before
+            // the mulligan is over would leak deck information through the tracker while the player can
+            // still see it; defer the reveal until the mulligan is done and catch up in mulliganStateChange.
+            if entity.isControlled(by: eventHandler.opponent.id), let game = eventHandler as? Game, !game.isMulliganDone() {
+                entity.info.pendingStartOfGameReveal = true
+            } else {
+                revealStartOfGameEntity(entity)
+            }
+
             AppDelegate.instance().coreManager.game.updateTrackers()
         }
     }
-    
+
+    private func revealStartOfGameEntity(_ entity: Entity) {
+        entity.info.pendingStartOfGameReveal = false
+        entity.info.guessedCardState = .revealed
+
+        predictFabled(entity)
+    }
+
+    private func revealPendingStartOfGameEntities(eventHandler: PowerEventHandler) {
+        let pending = eventHandler.entities.values.filter { $0.info.pendingStartOfGameReveal }
+        guard !pending.isEmpty else { return }
+        for entity in pending {
+            revealStartOfGameEntity(entity)
+        }
+        AppDelegate.instance().coreManager.game.updateTrackers()
+    }
+
     private func predictFabled(_ entity: Entity) {
         guard !entity.info.created, entity.hasCardId, let cardIds = CardIds.fabledDict[entity.cardId] else {
             return

@@ -8,20 +8,10 @@
 
 import Foundation
 
-class UmbralGeist: ICardGenerator {
-    func getCardId() -> String {
-        return CardIds.Collectible.Neutral.UmbralGeist
-    }
-
-    func isInGeneratorPool(_ card: Card, _ gameMode: GameType, _ format: FormatType) -> Bool {
-        return card.type == .spell
-            && card.spellSchool == .shadow
-        && card.isCardLegal(gameType: gameMode, format: format)
-    }
-
-    func isInGeneratorPool(_ card: MultiIdCard, _ gameMode: GameType, _ format: FormatType) -> Bool {
-        return card.ids.any { c in isInGeneratorPool(Card(id: c), gameMode, format) }
-    }
-    
-    required init() {}
+// "Deathrattle: Add a random Shadow spell to your hand."
+// Shadow spell pool + ICardGenerator conformance inherited from ShadowSpellPool.
+class UmbralGeist: ShadowSpellPool {
+    override func getCardId() -> String { CardIds.Collectible.Neutral.UmbralGeist }
+    override func picks() -> Int { 1 }
+    override func isWithReplacement() -> Bool { true }
 }

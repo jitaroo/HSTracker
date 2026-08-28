@@ -53,6 +53,29 @@ class BaseCounter: NSObject {
         fatalError("Must override shouldShow()")
     }
 
+    var hasValue: Bool {
+        return false
+    }
+
+    /// Opponent counters normally have to guess from the opponent's class and the format, because we
+    /// cannot see their deck. Azalina Soulsever copies half of our deck into theirs, so a payoff
+    /// sitting in our deck becomes a payoff they may hold too - judge those counters with the
+    /// player's deck knowledge on top of their own heuristic.
+    var mirrorsPlayerDeckKnowledge: Bool {
+        return !isPlayerCounter
+            && mirrorsPlayerDeck
+            && game.isTraditionalHearthstoneMatch
+            && game.opponent.deckCopiedFromEnemy
+            && hasValue
+            && inPlayerDeckOrKnown(cardIds: relatedCards)
+    }
+
+    /// Whether this counter takes part in the mirroring above. Opt out for counters that are
+    /// deliberately player-only.
+    var mirrorsPlayerDeck: Bool {
+        return true
+    }
+
     func valueToShow() -> String {
         fatalError("Must override valueToShow()")
     }
@@ -132,7 +155,14 @@ class BaseCounter: NSObject {
     
     var cardsToDisplay: [Card] {
         let availableCardIds = getAvailableCardIds()
-        return getCardsToDisplay().compactMap({ cardId in
+
+        // The opponent branch of getCardsToDisplay() filters by their class, which would drop the
+        // cards Azalina copied out of our deck and leave the tooltip empty under the pill.
+        let cardIdsToDisplay = mirrorsPlayerDeckKnowledge
+            ? Array(Set(getCardsToDisplay() + getCardsInDeckOrKnown(cardIds: relatedCards)))
+            : getCardsToDisplay()
+
+        return cardIdsToDisplay.compactMap({ cardId in
             if let card = Cards.by(cardId: cardId) {
                 if isBattlegroundsCounter, let availableCardIds, !availableCardIds.contains(card.dbfId) && !_alwaysAvailableCards.contains(where: {$0 == cardId }) {
                     return nil

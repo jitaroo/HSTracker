@@ -1004,6 +1004,253 @@ class HSReplayAPI {
         }
     }
     
+    // Mirrors BattlegroundsInspirationViewModel.MakeRequest. Two variants, as
+    // with the comp stats above: OAuth for accounts that own Tier7, an
+    // X-Trial-Token header for accounts riding a trial.
+    @available(macOS 10.15.0, *)
+    static func getBattlegroundsInspiration(parameters: BattlegroundsInspirationParams) async -> BattlegroundsInspiration? {
+        return await withCheckedContinuation { continuation in
+            var body: Data?
+            do {
+                body = try JSONEncoder().encode(parameters)
+                if let body {
+                    logger.debug("Sending inspiration request: \(String(data: body, encoding: .utf8) ?? "ERROR")")
+                }
+            } catch {
+                logger.error(error)
+            }
+            startAuthorizedRequest("\(HSReplay.battlegroundsInspirationUrl)", method: .POST, headers: ["Content-Type": "application/json"], body: body, completionHandler: { result in
+                switch result {
+                case .success(let response):
+                    let inspiration: BattlegroundsInspiration? = parseResponse(data: response.data, defaultValue: nil)
+                    continuation.resume(returning: inspiration)
+                case .failure(let error):
+                    logger.error(error)
+                    continuation.resume(returning: nil)
+                }
+            })
+        }
+    }
+
+    @available(macOS 10.15.0, *)
+    static func getBattlegroundsInspiration(token: String?, parameters: BattlegroundsInspirationParams) async -> BattlegroundsInspiration? {
+        guard let token else {
+            return nil
+        }
+        return await withCheckedContinuation { continuation in
+            var body: Data?
+            do {
+                body = try JSONEncoder().encode(parameters)
+                if let body {
+                    logger.debug("Sending inspiration request: \(String(data: body, encoding: .utf8) ?? "ERROR")")
+                }
+            } catch {
+                logger.error(error)
+            }
+            guard let body else {
+                continuation.resume(returning: nil)
+                return
+            }
+            let http = Http(url: "\(HSReplay.battlegroundsInspirationUrl)")
+            _ = http.uploadPromise(method: .post, headers: ["Content-Type": "application/json", "X-Trial-Token": token], data: body).done { response in
+                guard let data = response as? Data else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                let inspiration: BattlegroundsInspiration? = parseResponse(data: data, defaultValue: nil)
+                continuation.resume(returning: inspiration)
+            }.catch { error in
+                logger.error(error)
+                continuation.resume(returning: nil)
+            }
+        }
+    }
+
+    // Builds the query string by hand (rather than passing a parameters dict
+    // to startAuthorizedRequest/Http) so `minion_types` can be repeated once
+    // per value - matching the HSReplayNET client exactly (it appends
+    // "&minion_types={type}" in a loop) - instead of relying on either
+    // library's own array-parameter serialization, which isn't guaranteed to
+    // produce the same wire format.
+    private static func compGuidesQuery(gameLanguage: String, minionTypes: [Int]) -> String {
+        var query = "?game_language=\(gameLanguage)"
+        for type in minionTypes {
+            query += "&minion_types=\(type)"
+        }
+        return query
+    }
+
+    @available(macOS 10.15.0, *)
+    static func getCompGuides(gameLanguage: String) async -> BattlegroundsCompGuidesData? {
+        return await withCheckedContinuation { continuation in
+            let http = Http(url: "\(HSReplay.compGuidesUrl)?game_language=\(gameLanguage)")
+            _ = http.getPromise(method: .get).done { data in
+                guard let data = data else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                let guides: BattlegroundsCompGuidesData? = parseResponse(data: data, defaultValue: nil)
+                continuation.resume(returning: guides)
+            }.catch { error in
+                logger.error(error)
+                continuation.resume(returning: nil)
+            }
+        }
+    }
+
+    @available(macOS 10.15.0, *)
+    static func getTier7CompGuides(gameLanguage: String, minionTypes: [Int]) async -> BattlegroundsTier7CompGuidesData? {
+        return await withCheckedContinuation { continuation in
+            let url = "\(HSReplay.tier7CompGuidesUrl)\(compGuidesQuery(gameLanguage: gameLanguage, minionTypes: minionTypes))"
+            startAuthorizedRequest(url, method: .GET, parameters: [:], completionHandler: { result in
+                switch result {
+                case .success(let response):
+                    let guides: BattlegroundsTier7CompGuidesData? = parseResponse(data: response.data, defaultValue: nil)
+                    continuation.resume(returning: guides)
+                    return
+                case .failure(let error):
+                    logger.error(error)
+                    continuation.resume(returning: nil)
+                    return
+                }
+            })
+        }
+    }
+
+    @available(macOS 10.15.0, *)
+    static func getTier7CompGuides(token: String?, gameLanguage: String, minionTypes: [Int]) async -> BattlegroundsTier7CompGuidesData? {
+        guard let token = token else {
+            return nil
+        }
+        return await withCheckedContinuation { continuation in
+            let url = "\(HSReplay.tier7CompGuidesUrl)\(compGuidesQuery(gameLanguage: gameLanguage, minionTypes: minionTypes))"
+            let http = Http(url: url)
+            _ = http.getPromise(method: .get, headers: ["X-Trial-Token": token]).done { data in
+                guard let data = data else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                let guides: BattlegroundsTier7CompGuidesData? = parseResponse(data: data, defaultValue: nil)
+                continuation.resume(returning: guides)
+            }.catch { error in
+                logger.error(error)
+                continuation.resume(returning: nil)
+            }
+        }
+    }
+
+    // Ports HSReplay-API-Client's two GetDiscoverPoolKeywords overloads: the premium path goes
+    // through OAuth (OAuthClient.DataQueries), the trial path sends an X-Trial-Token header
+    // (HsReplayClient). Both return the same keyword -> card-ids map.
+    @available(macOS 10.15.0, *)
+    static func getDiscoverPoolKeywords() async -> [String: [String]]? {
+        return await withCheckedContinuation { continuation in
+            startAuthorizedRequest(HSReplay.discoverPoolKeywordsUrl, method: .GET, parameters: [:], completionHandler: { result in
+                switch result {
+                case .success(let response):
+                    let keywords: [String: [String]]? = parseResponse(data: response.data, defaultValue: nil)
+                    continuation.resume(returning: keywords)
+                case .failure(let error):
+                    logger.error(error)
+                    continuation.resume(returning: nil)
+                }
+            })
+        }
+    }
+
+    @available(macOS 10.15.0, *)
+    static func getDiscoverPoolKeywords(token: String?) async -> [String: [String]]? {
+        guard let token = token else {
+            return nil
+        }
+        return await withCheckedContinuation { continuation in
+            let http = Http(url: HSReplay.discoverPoolKeywordsUrl)
+            _ = http.getPromise(method: .get, headers: ["X-Trial-Token": token]).done { data in
+                guard let data = data else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                let keywords: [String: [String]]? = parseResponse(data: data, defaultValue: nil)
+                continuation.resume(returning: keywords)
+            }.catch { error in
+                logger.error(error)
+                continuation.resume(returning: nil)
+            }
+        }
+    }
+
+    @available(macOS 10.15.0, *)
+    static func getHeroGuides(gameLanguage: String) async -> BattlegroundsHeroGuidesData? {
+        return await withCheckedContinuation { continuation in
+            let http = Http(url: "\(HSReplay.heroGuidesUrl)?game_language=\(gameLanguage)")
+            _ = http.getPromise(method: .get).done { data in
+                guard let data = data else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                let guides: BattlegroundsHeroGuidesData? = parseResponse(data: data, defaultValue: nil)
+                continuation.resume(returning: guides)
+            }.catch { error in
+                logger.error(error)
+                continuation.resume(returning: nil)
+            }
+        }
+    }
+
+    @available(macOS 10.15.0, *)
+    static func getTrinketGuides(gameLanguage: String) async -> BattlegroundsTrinketGuidesData? {
+        return await withCheckedContinuation { continuation in
+            let http = Http(url: "\(HSReplay.trinketGuidesUrl)?game_language=\(gameLanguage)")
+            _ = http.getPromise(method: .get).done { data in
+                guard let data = data else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                let guides: BattlegroundsTrinketGuidesData? = parseResponse(data: data, defaultValue: nil)
+                continuation.resume(returning: guides)
+            }.catch { error in
+                logger.error(error)
+                continuation.resume(returning: nil)
+            }
+        }
+    }
+
+    @available(macOS 10.15.0, *)
+    static func getAnomalyGuides(gameLanguage: String) async -> BattlegroundsAnomalyGuidesData? {
+        return await withCheckedContinuation { continuation in
+            let http = Http(url: "\(HSReplay.anomalyGuidesUrl)?game_language=\(gameLanguage)")
+            _ = http.getPromise(method: .get).done { data in
+                guard let data = data else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                let guides: BattlegroundsAnomalyGuidesData? = parseResponse(data: data, defaultValue: nil)
+                continuation.resume(returning: guides)
+            }.catch { error in
+                logger.error(error)
+                continuation.resume(returning: nil)
+            }
+        }
+    }
+
+    @available(macOS 10.15.0, *)
+    static func getQuestGuides(gameLanguage: String) async -> BattlegroundsQuestGuidesData? {
+        return await withCheckedContinuation { continuation in
+            let http = Http(url: "\(HSReplay.questGuidesUrl)?game_language=\(gameLanguage)")
+            _ = http.getPromise(method: .get).done { data in
+                guard let data = data else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                let guides: BattlegroundsQuestGuidesData? = parseResponse(data: data, defaultValue: nil)
+                continuation.resume(returning: guides)
+            }.catch { error in
+                logger.error(error)
+                continuation.resume(returning: nil)
+            }
+        }
+    }
+
     @available(macOS 10.15.0, *)
     static func getTier7TrinketPickStats(parameters: BattlegroundsTrinketPickParams) async -> BattlegroundsTrinketPickStats? {
         return await withCheckedContinuation { continuation in

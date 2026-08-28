@@ -34,6 +34,10 @@ class PlayedSpellSchoolsCounter: NumericCounter {
 
     private var playedSpellSchools = Set<SpellSchool>()
 
+    func getPlayedSpellSchools() -> Set<SpellSchool> {
+        return playedSpellSchools
+    }
+
     required init(controlledByPlayer: Bool, game: Game) {
         super.init(controlledByPlayer: controlledByPlayer, game: game)
     }
