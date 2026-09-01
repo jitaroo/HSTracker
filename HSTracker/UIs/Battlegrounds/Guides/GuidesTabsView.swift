@@ -42,7 +42,7 @@ struct GuidesTabsView: View {
         // lobby in BattlegroundsMinionsViewModel.availableRaces, or the Minions
         // tab comes up with no races and an empty Card Types grid.
         // if true {
-        if viewModel.showBrowser && (AppDelegate.instance().coreManager.game.isBattlegroundsMatch() || viewModel.isPreLobby) {
+        if viewModel.showBrowser && (viewModel.isInMatch || viewModel.isPreLobby) {
             VStack(spacing: 0) {
                 // Stand-alone mode drops the tab strip and shows the minions
                 // browser on its own, matching HDT's third top-bar state

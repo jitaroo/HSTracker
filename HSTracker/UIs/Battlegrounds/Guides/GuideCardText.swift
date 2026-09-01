@@ -129,8 +129,18 @@ private struct GuideFlowToken: Identifiable {
 @available(macOS 10.15, *)
 private struct GuideFlowWidthKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
+    // Combines with max, not last-wins. The reader below shares a ZStack with
+    // the wrapped content, and that content writes nothing - so it contributes
+    // `defaultValue` to the reduction. A last-wins reduce would let that 0
+    // clobber the measured width, which drives a self-sustaining oscillation:
+    // width 0 hides the content, one child is left so the real width comes
+    // through, the content comes back and zeroes it again, every frame
+    // ("Bound preference GuideFlowWidthKey tried to update multiple times per
+    // frame"). Taking the max ignores non-writing siblings; a genuine resize
+    // still reports through, since reduce only ever combines siblings within a
+    // single layout pass and never across passes.
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
+        value = max(value, nextValue())
     }
 }
 

@@ -5,12 +5,18 @@
 //  Created by Francisco Moraes on 8/21/26.
 //  Copyright © 2026 Benjamin Michotte. All rights reserved.
 //
-//  Build-time tool: transcodes HearthSim's CardDefs.xml into the binary blob
+//  Build-time tool: transcodes HearthSim's CardDefs XML into the binary blob
 //  Database.loadDatabase reads. Run from the "Compile CardDefs" build phase,
 //  never from the app. It deliberately knows nothing about what the tags mean -
 //  see CardDefsBinary.swift.
 //
-//  usage: CardDefsCompiler <CardDefs.xml> <CardDefs.bin>
+//  hsdata used to ship every card in a single CardDefs.xml, but as of its
+//  "split CardDefs.xml by card set" commit the Battlegrounds and Mercenaries
+//  entities live in CardDefs.Bacon.xml and CardDefs.Lettuce.xml. All of them go
+//  into one blob, so the tool takes any number of sources and concatenates them
+//  in the order given; the card sets are disjoint, so nothing collides.
+//
+//  usage: CardDefsCompiler <CardDefs.xml>... <CardDefs.bin>
 //
 
 import Foundation
@@ -88,26 +94,29 @@ final class Transcoder: NSObject, XMLParserDelegate {
 }
 
 let arguments = CommandLine.arguments
-guard arguments.count == 3 else {
-    FileHandle.standardError.write(Data("usage: CardDefsCompiler <CardDefs.xml> <CardDefs.bin>\n".utf8))
+guard arguments.count >= 3 else {
+    FileHandle.standardError.write(Data("usage: CardDefsCompiler <CardDefs.xml>... <CardDefs.bin>\n".utf8))
     exit(2)
 }
-let source = URL(fileURLWithPath: arguments[1])
-let destination = URL(fileURLWithPath: arguments[2])
-
-guard let data = try? Data(contentsOf: source, options: .mappedIfSafe) else {
-    FileHandle.standardError.write(Data("error: cannot read \(source.path)\n".utf8))
-    exit(1)
-}
+let sources = arguments[1..<(arguments.count - 1)].map { URL(fileURLWithPath: $0) }
+let destination = URL(fileURLWithPath: arguments[arguments.count - 1])
 
 let started = Date()
 let transcoder = Transcoder()
-let parser = XMLParser(data: data)
-parser.delegate = transcoder
-guard parser.parse() else {
-    let reason = parser.parserError?.localizedDescription ?? "unknown error"
-    FileHandle.standardError.write(Data("error: \(source.lastPathComponent): \(reason)\n".utf8))
-    exit(1)
+var inputBytes = 0
+for source in sources {
+    guard let data = try? Data(contentsOf: source, options: .mappedIfSafe) else {
+        FileHandle.standardError.write(Data("error: cannot read \(source.path)\n".utf8))
+        exit(1)
+    }
+    inputBytes += data.count
+    let parser = XMLParser(data: data)
+    parser.delegate = transcoder
+    guard parser.parse() else {
+        let reason = parser.parserError?.localizedDescription ?? "unknown error"
+        FileHandle.standardError.write(Data("error: \(source.lastPathComponent): \(reason)\n".utf8))
+        exit(1)
+    }
 }
 
 let blob = transcoder.writer.finish()
@@ -120,7 +129,7 @@ do {
     exit(1)
 }
 
-print(String(format: "CardDefsCompiler: %d entities, %d tags, %d localized tags, %.1f MB -> %.1f MB in %.1fs",
-             transcoder.entities, transcoder.tags, transcoder.localized,
-             Double(data.count) / 1_048_576, Double(blob.count) / 1_048_576,
+print(String(format: "CardDefsCompiler: %d files, %d entities, %d tags, %d localized tags, %.1f MB -> %.1f MB in %.1fs",
+             sources.count, transcoder.entities, transcoder.tags, transcoder.localized,
+             Double(inputBytes) / 1_048_576, Double(blob.count) / 1_048_576,
              -started.timeIntervalSinceNow))

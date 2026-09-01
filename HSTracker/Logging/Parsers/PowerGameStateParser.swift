@@ -321,8 +321,9 @@ class PowerGameStateParser: LogEventParser {
                     currentBlock.type == "TRIGGER" && currentBlock.triggerKeyword == "DEATHRATTLE",
                     let deadMinion = eventHandler.entities[currentBlock.sourceEntityId],
                     deadMinion.isMinion {
-                    let race = deadMinion[GameTag.cardrace]
-                    if race == Race.lookup(Race.mechanical) || race == Race.lookup(Race.all) {
+                    // The CARDRACE tag only carries the primary race, so a dual-race Mech is missed;
+                    // read the race off the card definition instead.
+                    if deadMinion.card.isMech() || deadMinion.card.isAllRace() {
                         let isGolden = cardId == CardIds.NonCollectible.Neutral.AncestralAutomaton_AncestralAutomaton
                         let sourceZone = deadMinion[GameTag.zone]
                         if sourceZone == Zone.graveyard.rawValue {  // Deathrattles triggered the normal way
@@ -688,8 +689,7 @@ class PowerGameStateParser: LogEventParser {
                    let firingMinion = eventHandler.entities[actionStartingEntityId],
                    firingMinion.isMinion,
                    firingMinion[GameTag.zone] == Zone.graveyard.rawValue {
-                    let firingRace = firingMinion[GameTag.cardrace]
-                    if firingRace == Race.lookup(Race.mechanical) || firingRace == Race.lookup(Race.all) {
+                    if firingMinion.card.isMech() || firingMinion.card.isAllRace() {
                         BobsBuddyInvoker.instance(gameId: eventHandler.gameId, turn: eventHandler.turnNumber())?
                             .observeAutoAssemblerDeathrattleFiring(actionStartingEntityId)
                     }

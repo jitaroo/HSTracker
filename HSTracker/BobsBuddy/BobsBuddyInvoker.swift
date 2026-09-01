@@ -1016,8 +1016,13 @@ class BobsBuddyInvoker {
         // Exclude one counted module per BG32_172e the host carries, because EnchantmentFactory
         // resolves that card id to an AutoAssemblerEnchantment which already summons one Automaton.
         // A host can carry more than one instance (a golden formed by tripling brings each copy's).
-        let carried = attachedEntities.count { e in e.cardId == CardIds.NonCollectible.Neutral.AutoAssembler_AutoAssemblerEnchantment
+        var carried = attachedEntities.count { e in e.cardId == CardIds.NonCollectible.Neutral.AutoAssembler_AutoAssemblerEnchantment
             || e.cardId == CardIds.NonCollectible.Neutral.AutoAssembler_AutoAssembler2 }
+
+        // An Auto Assembler minion directly on the board also has an innate deathrattle.
+        if host.cardId == CardIds.NonCollectible.Neutral.AutoAssembler || host.cardId == CardIds.NonCollectible.Neutral.AutoAssembler_AutoAssembler1 {
+            carried += 1
+        }
 
         for module in modules.sorted(by: { $0.key < $1.key }).dropFirst(carried) {
             minion.addDeathrattle(deathrattle: module.value ? AutoAssemblerProxy.goldenDeathrattle() : AutoAssemblerProxy.deathrattle())
@@ -1093,12 +1098,16 @@ class BobsBuddyInvoker {
     static func getObjectiveFromEntity(factory: ObjectiveFactoryProxy, player: Bool, entity: Entity) -> ObjectiveProxy {
         let objective = factory.create(cardId: entity.cardId, controlledByPlayer: player)
         let scriptDataNum1 = entity[.tag_script_data_num_1]
-        let scriptDataNum2 = objective.scriptDataNum2
+        let scriptDataNum2 = entity[.tag_script_data_num_2]
+        let scriptDataNum3 = entity[.tag_script_data_num_3]
         if scriptDataNum1 > 0 {
             objective.scriptDataNum1 = Int32(scriptDataNum1)
         }
-        if scriptDataNum1 > 0 {
+        if scriptDataNum2 > 0 {
             objective.scriptDataNum2 = Int32(scriptDataNum2)
+        }
+        if scriptDataNum3 > 0 {
+            objective.scriptDataNum3 = Int32(scriptDataNum3)
         }
         return objective
     }
@@ -1316,6 +1325,19 @@ class BobsBuddyInvoker {
         let pEternalLegion = playerAttached.first { x in x.cardId == CardIds.NonCollectible.Neutral.EternalKnight_EternalKnightPlayerEnchant }
         if let pEternalLegion {
             inputPlayer.eternalKnightCounter = Int32(pEternalLegion[.tag_script_data_num_1]) // attached
+            inputPlayer.eternalLegionCounter = Int32(pEternalLegion[.tag_script_data_num_3]) // attached
+        }
+
+        // Eternal Portrait trinket's accumulated grant is also on a per-Knight enchantment.
+        // If it's missing from the attached player, read it here from an Eternal Knight.
+        if inputPlayer.eternalLegionCounter == 0 {
+            for boardEntity in gamePlayer.board {
+                let legion = getAttachedEntities(entityId: boardEntity.id).first { x in x.cardId == CardIds.NonCollectible.Neutral.EternalPortrait_GreaterEternalLegionEnchantment }
+                if let legion, legion[.tag_script_data_num_1] > 0 {
+                    inputPlayer.eternalLegionCounter = Int32(legion[.tag_script_data_num_1] / 4)
+                    break
+                }
+            }
         }
         let pUndeadBonus = playerAttached.first { x in x.cardId == CardIds.NonCollectible.Neutral.NerubianDeathswarmer_UndeadBonusAttackPlayerEnchantDnt }
         if let pUndeadBonus {
@@ -1358,7 +1380,7 @@ class BobsBuddyInvoker {
         inputPlayer.elementalsGiveExtraAttack = Int32(game.playerEntity?[.bacon_elemental_buffatkvalue] ?? 0) // direct
         inputPlayer.elementalsGiveExtraHealth = Int32(game.playerEntity?[.bacon_elemental_buffhealthvalue] ?? 0) // direct
 
-        logger.info("pEternal=\(inputPlayer.eternalKnightCounter), pUndead=\(inputPlayer.undeadAttackBonus), pElemental=\(inputPlayer.elementalPlayCounter), pElementalExtraAtk=\(inputPlayer.elementalsGiveExtraAttack), pElementalExtraHealth=\(inputPlayer.elementalsGiveExtraHealth), friendly=\(friendly)")
+        logger.info("pEternal=\(inputPlayer.eternalKnightCounter), pEternalLegion=\(inputPlayer.eternalLegionCounter), pUndead=\(inputPlayer.undeadAttackBonus), pElemental=\(inputPlayer.elementalPlayCounter), pElementalExtraAtk=\(inputPlayer.elementalsGiveExtraAttack), pElementalExtraHealth=\(inputPlayer.elementalsGiveExtraHealth), friendly=\(friendly)")
         
         inputPlayer.piratesSummonCounter = Int32(game.playerEntity?[.gametag_2358] ?? 0) // direct
         
@@ -2272,23 +2294,17 @@ class BobsBuddyInvoker {
     private var _observedAutoAssemblerFirings = [Int: Int]()
 
     func observeAutoAssemblerDeathrattleFiring(_ sourceEntityId: Int) {
-        guard _pendingAutoAssemblerDeathrattleSources[sourceEntityId] != nil else {
-            return
-        }
+        // Counted unconditionally: DEATHRATTLE blocks that resolve before the first observed Automaton
+        // summon (the minion's innate deathrattle) must be in the count that
+        // reconcileAutoAssemblerDeathrattles subtracts otherDeathrattles from.
         _observedAutoAssemblerFirings[sourceEntityId] = (_observedAutoAssemblerFirings[sourceEntityId] ?? 0) + 1
     }
 
     func observeMagnetizedAutoAssemblerDeathrattles(_ sourceEntityId: Int, _ extraDeathrattles: Int, _ isGolden: Bool) {
         if _pendingAutoAssemblerDeathrattleSources[sourceEntityId] == nil {
-            let observation = (1 + extraDeathrattles, [Bool]())
-            _pendingAutoAssemblerDeathrattleSources[sourceEntityId] = observation
-            // The registration above happens mid-block, so at this block's BLOCK_START the source was not in
-            // the dictionary yet and the firing counter returned without counting it.
-            // Count it here; every later firing of this source is counted at its own BLOCK_START.
-            _observedAutoAssemblerFirings[sourceEntityId] = 1
+            _pendingAutoAssemblerDeathrattleSources[sourceEntityId] = (1 + extraDeathrattles, [Bool]())
         }
-        var observation = _pendingAutoAssemblerDeathrattleSources[sourceEntityId]
-        observation?.summonedIsPremium.append(isGolden)
+        _pendingAutoAssemblerDeathrattleSources[sourceEntityId]?.summonedIsPremium.append(isGolden)
         BobsBuddyInvoker.currentCombatHasPendingAutoAssemblerObservations = true
     }
 

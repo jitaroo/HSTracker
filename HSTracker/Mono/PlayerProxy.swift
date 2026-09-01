@@ -27,7 +27,7 @@ class PlayerProxy: MonoHandle, MonoClassInitializer {
             PlayerProxy._setHeroIsKelThuzad = MonoHelper.getMethod(PlayerProxy._class, "SetHeroIsKelThuzad", 0)
             
             // fields
-            initializeProperties(properties: [ "Side", "HeroPowers", "Quests", "Objectives", "Trinkets", "Secrets", "Hand", "MagnanimooseSummonPoolDuos", "FriendlyMinionsDeadLastCombatCounter", "EternalKnightCounter", "MagnetizeCounter", "AncestralAutomatonCounter", "UndeadAttackBonus", "UndeadHealthBonus", "WhelpAttackBonus", "WhelpHealthBonus", "ElementalPlayCounter", "ElementalsGiveExtraAttack", "ElementalsGiveExtraHealth", "BloodGemAtkBuff", "BloodGemHealthBuff", "TavernSpellCounter", "PiratesSummonCounter", "ResourcesSpentThisGame", "BeastsSummonCounter", "BeastAttackBonus", "BeastHealthBonus", "BeetlesAtkBuff", "BeetlesHealthBuff", "BattlecryCounter", "DeathrattleCounter", "TavernSpellAtkBuff", "TavernSpellHealthBuff", "BackToBackAtk", "BackToBackHealth", "BackToBackCounter", "HauntedAtkBuff", "HauntedHealthBuff", "Health", "DamageTaken", "Tier", "HeroIsKelThuzad" ])
+            initializeProperties(properties: [ "Side", "HeroPowers", "Quests", "Objectives", "Trinkets", "Secrets", "Hand", "MagnanimooseSummonPoolDuos", "FriendlyMinionsDeadLastCombatCounter", "EternalKnightCounter", "EternalLegionCounter", "MagnetizeCounter", "AncestralAutomatonCounter", "UndeadAttackBonus", "UndeadHealthBonus", "WhelpAttackBonus", "WhelpHealthBonus", "ElementalPlayCounter", "ElementalsGiveExtraAttack", "ElementalsGiveExtraHealth", "BloodGemAtkBuff", "BloodGemHealthBuff", "TavernSpellCounter", "PiratesSummonCounter", "ResourcesSpentThisGame", "BeastsSummonCounter", "BeastAttackBonus", "BeastHealthBonus", "BeetlesAtkBuff", "BeetlesHealthBuff", "BattlecryCounter", "DeathrattleCounter", "TavernSpellAtkBuff", "TavernSpellHealthBuff", "BackToBackAtk", "BackToBackHealth", "BackToBackCounter", "HauntedAtkBuff", "HauntedHealthBuff", "Health", "DamageTaken", "Tier", "HeroIsKelThuzad" ])
         }
     }
     
@@ -110,6 +110,9 @@ class PlayerProxy: MonoHandle, MonoClassInitializer {
     
     @MonoPrimitiveProperty(property: "EternalKnightCounter", owner: PlayerProxy.self)
     var eternalKnightCounter: Int32
+    
+    @MonoPrimitiveProperty(property: "EternalLegionCounter", owner: PlayerProxy.self)
+    var eternalLegionCounter: Int32
     
     @MonoHandleProperty(property: "MagnetizeCounter", owner: PlayerProxy.self)
     var magnetizeCounter: MonoHandle

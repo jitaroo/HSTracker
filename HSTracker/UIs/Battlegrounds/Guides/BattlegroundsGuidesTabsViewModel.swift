@@ -42,6 +42,30 @@ final class BattlegroundsGuidesTabsViewModel: ObservableObject {
     // isn't torn down again until the match itself takes over.
     @Published var isPreLobby = false
 
+    // The other half of GuidesTabsView's visibility gate - HDT's
+    // ShowBgsTopBar/HideBgsTopBar. Published state rather than a live
+    // Game.isBattlegroundsMatch() call in the view body: a plain function call
+    // gives SwiftUI nothing to invalidate on, so once a match ended the panel
+    // kept rendering its last state - through the game-over screen and all the
+    // way back to the main menu - until some unrelated @Published on this object
+    // happened to fire. Pushed by Game.updateBattlegroundsOverlay(), and again
+    // from onMatchEnd() so the teardown does not depend on a later GUI tick.
+    @Published private(set) var isInMatch = false
+
+    // Guarded: updateBattlegroundsOverlay() runs on every tracker refresh, and an
+    // unconditional assignment would republish (and so re-lay out the whole
+    // panel) on each one.
+    func setInMatch(_ value: Bool) {
+        guard isInMatch != value else { return }
+        isInMatch = value
+    }
+
+    // Alongside the other top-bar view models' onMatchEnd (see Game.swift's
+    // match-end block).
+    func onMatchEnd() {
+        setInMatch(false)
+    }
+
     // There are no heroes to guide before a match has started - HDT's HeroesTabEnabled.
     var heroesTabEnabled: Bool { !isPreLobby }
 

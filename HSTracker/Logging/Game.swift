@@ -772,6 +772,14 @@ class Game: NSObject, PowerEventHandler {
         DispatchQueue.main.async {
             let isBG = self.isBattlegroundsMatch() && !self.gameEnded
 
+            // GuidesTabsView gates on this rather than calling isBattlegroundsMatch()
+            // from its body, which gave SwiftUI nothing to invalidate on - see
+            // BattlegroundsGuidesTabsViewModel.isInMatch. Pushed outside the isBG
+            // branch below precisely so the false edge lands too.
+            if #available(macOS 10.15, *) {
+                self.windowManager.rootOverlay?.viewModel.battlegroundsGuidesTabs.setInMatch(isBG)
+            }
+
             // HDT refreshes the minion browser's lobby state from ShowBgsTopBar,
             // which this is the analogue of. The available races are not readable
             // from the mirror yet at gameStart, so they have to be picked up here.
@@ -2360,6 +2368,10 @@ class Game: NSObject, PowerEventHandler {
                 // (unlike the legacy KVO-based ViewModel.reset() calls
                 // above), which Combine requires happen on the main thread.
                 DispatchQueue.main.async {
+                    // Drops the top bar itself, not just its contents: without this
+                    // the guides panel survived the game-over screen and followed
+                    // the player back to the main menu.
+                    self.windowManager.rootOverlay?.viewModel.battlegroundsGuidesTabs.onMatchEnd()
                     self.windowManager.rootOverlay?.viewModel.battlegroundsCompsGuides.onMatchEnd()
                     self.windowManager.rootOverlay?.viewModel.battlegroundsHeroGuides.onMatchEnd()
                     self.windowManager.rootOverlay?.viewModel.battlegroundsQuestGuides.onMatchEnd()
@@ -5010,14 +5022,18 @@ class Game: NSObject, PowerEventHandler {
         // Background (e.g. #40FF0000) on the RelatedCardsTrigger Grid in Overlay.xaml.
         guard #available(macOS 10.15, *) else { return }
 
-        let vm = windowManager.tooltipGridCards
+        // This runs on the DiscoverStateWatcher queue. windowManager.tooltipGridCards
+        // resolves to RelatedCardsTooltipPanel.shared, whose lazy init instantiates an
+        // NSPanel, so every access to the panel - reads included - has to be on the main
+        // thread.
         if state.cardId == "" {
-            if vm.cards.count > 0 {
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                let vm = self.windowManager.tooltipGridCards
+                if vm.cards.count > 0 {
                     vm.hide()
                 }
+                RelatedCardsRightClickMonitor.shared.clearHoveredLargePool()
             }
-            RelatedCardsRightClickMonitor.shared.clearHoveredLargePool()
             return
         }
 
@@ -5028,8 +5044,6 @@ class Game: NSObject, PowerEventHandler {
             guard relatedCards.count > 0 else {
                 return
             }
-            
-            vm.setTitle(String.localizedString("Related_Cards", comment: ""))
             
             let frame = SizeHelper.hearthstoneWindow.frame
             
@@ -5061,30 +5075,33 @@ class Game: NSObject, PowerEventHandler {
                 break
             }
             
-            let tooltipWidth = CGFloat(vm.gridWidth)
-            let tooltipHeight = CGFloat(vm.gridHeight)
-            
-            // Correct placement if tooltip would go outside of window, and it fit on the other side
-            switch tooltipPlacement {
-            case PlacementMode.top:
-                if top - tooltipHeight < 0.0 && top + height + tooltipHeight <= frame.height {
-                    tooltipPlacement = PlacementMode.bottom
-                }
-            case PlacementMode.bottom:
-                if top + height + tooltipHeight > frame.height && top - tooltipHeight >= 0.0 {
-                    tooltipPlacement = PlacementMode.top
-                }
-            case PlacementMode.left:
-                if left - tooltipWidth < 0.0 && left + width + tooltipWidth <= frame.width {
-                    tooltipPlacement = PlacementMode.right
-                }
-            case PlacementMode.right:
-                if left + width + tooltipWidth > frame.width && left - tooltipWidth >= 0.0 {
-                    tooltipPlacement = PlacementMode.left
-                }
-            }
-
             DispatchQueue.main.async {
+                let vm = self.windowManager.tooltipGridCards
+                vm.setTitle(String.localizedString("Related_Cards", comment: ""))
+
+                let tooltipWidth = CGFloat(vm.gridWidth)
+                let tooltipHeight = CGFloat(vm.gridHeight)
+
+                // Correct placement if tooltip would go outside of window, and it fit on the other side
+                switch tooltipPlacement {
+                case PlacementMode.top:
+                    if top - tooltipHeight < 0.0 && top + height + tooltipHeight <= frame.height {
+                        tooltipPlacement = PlacementMode.bottom
+                    }
+                case PlacementMode.bottom:
+                    if top + height + tooltipHeight > frame.height && top - tooltipHeight >= 0.0 {
+                        tooltipPlacement = PlacementMode.top
+                    }
+                case PlacementMode.left:
+                    if left - tooltipWidth < 0.0 && left + width + tooltipWidth <= frame.width {
+                        tooltipPlacement = PlacementMode.right
+                    }
+                case PlacementMode.right:
+                    if left + width + tooltipWidth > frame.width && left - tooltipWidth >= 0.0 {
+                        tooltipPlacement = PlacementMode.left
+                    }
+                }
+
                 vm.setCardIdsFromCards(relatedCards.compactMap({ $0 }))
                 let (statistics, summary, hasLargePool) = self.relatedCardsManager.getPoolStatistics(cardId: state.cardId, relatedCards: relatedCards, player: self.player)
                 vm.setPoolStatistics(statistics, relatedCardsSummary: summary, hasLargePool: hasLargePool)

@@ -1,4 +1,14 @@
+# 3.6.8
+## Bob's Buddy
+- Fixed magnetized Auto Assembler Deathrattle observations never being applied to the simulation.
+- Fixed Auto Assembler Deathrattles not being detected on dual-race Mechs.
+- Fixed Objectives not capturing their second and third script data values.
+- Fixed an Auto Assembler on the board having its own innate Deathrattle counted twice.
+- Fixed the Eternal Legion counter not being read, including Eternal Portrait's accumulated bonus.
+
 # 3.6.7
+## Fixes
+- Fixed incorrect card database causing missing overlays and other issues
 ## Hearthstone
 - Added The OutFinder, our Discover assistant for Constructed and Arena!\
   *Hover any card that Discovers or generates cards to see its full pool, along with the cost, attack and health distributions. Keyword breakdowns and pool filters are available to HSReplay.net Premium subscribers, and through your Mulligan Guide and Arenasmith trials.*

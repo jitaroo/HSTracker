@@ -357,9 +357,21 @@ class MonoHelper {
         let archDir = "x64"
 #endif
         
-        if let archFiles = Bundle.main.urls(forResourcesWithExtension: "dll", subdirectory: "Resources/Managed/\(archDir)") {
+        // The BCL assemblies are staged here by the "Embed Mono" build phase.
+        // They deliberately live outside Resources/Managed, which is part of the
+        // HSTracker/Resources folder reference: Copy Bundle Resources replaces
+        // that directory wholesale and would wipe them.
+        if let archFiles = Bundle.main.urls(forResourcesWithExtension: "dll", subdirectory: "Managed/\(archDir)") {
             let archLibs = archFiles.compactMap { x in x.path }
-            
+
+            // An incomplete staging leaves mono asserting on corlib deep inside
+            // mono_jit_init, which is impossible to read in a crash log. Fail here
+            // instead, with the reason.
+            guard archLibs.contains(where: { $0.hasSuffix("/System.Private.CoreLib.dll") }) else {
+                logger.error("System.Private.CoreLib.dll missing from Managed/\(archDir) (\(archLibs.count) assemblies found) - the Embed Mono build phase did not stage the runtime")
+                return false
+            }
+
             let props = UnsafeMutablePointer<UnsafePointer<CChar>?>.allocate(capacity: 1)
             "TRUSTED_PLATFORM_ASSEMBLIES".withCString {
                 props.pointee = $0
